@@ -1,11 +1,18 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, ArrowDown } from "lucide-react";
+import { Phone, Mail, ArrowDown, Linkedin, Instagram, Twitter, Facebook, Youtube } from "lucide-react";
 
 const Footer: React.FC = () => {
   const [accountOpen, setAccountOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+
+  const socialLinks = [
+    { icon: Linkedin, href: "https://linkedin.com/company/yorbot", label: "LinkedIn" },
+    { icon: Instagram, href: "https://instagram.com/yorbot", label: "Instagram" },
+    { icon: Twitter, href: "https://twitter.com/yorbot", label: "Twitter" },
+    { icon: Facebook, href: "https://facebook.com/yorbot", label: "Facebook" },
+    { icon: Youtube, href: "https://youtube.com/yorbot", label: "YouTube" }
+  ];
 
   return (
     <footer className="bg-yorbot-darkGray text-white pt-12 pb-6">
@@ -23,11 +30,26 @@ const Footer: React.FC = () => {
               <Phone size={16} className="mr-2" />
               <span className="text-sm">+91 1234567890</span>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center mb-4">
               <Mail size={16} className="mr-2" />
               <a href="mailto:yorbot21@gmail.com" className="text-sm">
                 yorbot21@gmail.com
               </a>
+            </div>
+            {/* Social Media Icons */}
+            <div className="flex space-x-4">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-yorbot-orange transition-colors"
+                  aria-label={social.label}
+                >
+                  <social.icon size={20} />
+                </a>
+              ))}
             </div>
           </div>
 

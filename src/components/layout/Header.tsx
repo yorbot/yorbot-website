@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search, ShoppingCart, Heart, User, Menu } from "lucide-react";
+import SearchBar from "../SearchBar";
 
 const Header: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -11,7 +11,6 @@ const Header: React.FC = () => {
   const [cartCount, setCartCount] = useState(2); // Mock data
   const [wishlistCount, setWishlistCount] = useState(3); // Mock data
 
-  // Set active nav based on current path
   useEffect(() => {
     const path = window.location.pathname;
     if (path === "/") setActiveNav("home");
@@ -23,7 +22,6 @@ const Header: React.FC = () => {
     else setActiveNav("");
   }, []);
 
-  // Handle scroll for sticky header
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 60) {
@@ -37,7 +35,6 @@ const Header: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Toggle mobile menu
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
     if (!isMobileMenuOpen) {
@@ -45,7 +42,6 @@ const Header: React.FC = () => {
     }
   };
 
-  // Toggle search dropdown
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
     if (!isSearchOpen) {
@@ -55,31 +51,20 @@ const Header: React.FC = () => {
 
   return (
     <header className={`w-full bg-white z-50 ${scrolled ? "shadow-md" : ""}`}>
-      {/* Top header with logo, search, and icons */}
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
           <Link to="/" className="flex items-center">
             <img 
               src="/images/yorbot-logo.png" 
               alt="Yorbot" 
-              className="h-14 md:h-16"
+              className="h-14 md:h-16 bg-white"
             />
           </Link>
 
-          {/* Desktop: Search bar */}
-          <div className="hidden md:flex relative w-1/3">
-            <input
-              type="text"
-              placeholder="Search for products..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none"
-            />
-            <button className="bg-yorbot-orange text-white px-4 py-2 rounded-r-md hover:bg-orange-600 transition-colors">
-              <Search size={20} />
-            </button>
+          <div className="hidden md:block md:w-1/2">
+            <SearchBar />
           </div>
 
-          {/* Desktop: User icons */}
           <div className="hidden md:flex items-center space-x-6">
             <Link to="/wishlist" className="relative">
               <Heart className="w-6 h-6" />
@@ -102,7 +87,6 @@ const Header: React.FC = () => {
             </Link>
           </div>
 
-          {/* Mobile: Toggle and search buttons */}
           <div className="flex md:hidden items-center space-x-4">
             <button
               onClick={toggleSearch}
@@ -119,24 +103,13 @@ const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile: Search dropdown */}
         {isSearchOpen && (
           <div className="md:hidden mt-4 animate-fade-in">
-            <div className="flex bg-yorbot-lightGray bg-opacity-90 p-2 rounded-md">
-              <input
-                type="text"
-                placeholder="Search for products..."
-                className="w-full px-3 py-2 bg-white border-none rounded-l-md focus:outline-none"
-              />
-              <button className="bg-yorbot-orange text-white px-3 py-2 rounded-r-md">
-                <Search size={18} />
-              </button>
-            </div>
+            <SearchBar />
           </div>
         )}
       </div>
 
-      {/* Desktop: Navigation bar */}
       <nav className="hidden md:block bg-[#333333]">
         <div className="container mx-auto px-4">
           <ul className="flex justify-center space-x-8 py-3">
@@ -158,7 +131,6 @@ const Header: React.FC = () => {
         </div>
       </nav>
 
-      {/* Mobile: Menu dropdown */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-yorbot-lightGray bg-opacity-95 animate-slide-in fixed top-0 right-0 w-4/5 h-full z-50 shadow-lg overflow-y-auto">
           <div className="p-4 flex justify-between items-center">
