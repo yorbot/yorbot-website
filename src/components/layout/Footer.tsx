@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
           {/* Company Information */}
           <div>
             <div className="mb-4">
-              <img src="/images/yorbot-logo.png" alt="Yorbot" className="h-12 mb-2" />
+              <img src="/images/logo.png" alt="Yorbot" className="h-12 mb-2" />
               <p className="text-sm text-gray-300">
                 Empowering your robotic and electronic projects
               </p>
