@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -46,10 +45,10 @@ const ContactUs: React.FC = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* Contact Information */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <div className="space-y-6">
-              <div>
-                <div className="bg-yorbot-orange w-12 h-12 rounded-full flex items-center justify-center mb-4">
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+            <div className="space-y-6 flex flex-col items-center">
+              <div className="text-center">
+                <div className="bg-yorbot-orange w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto">
                   <MapPin className="text-white" size={24} />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Our Location</h3>
@@ -60,8 +59,8 @@ const ContactUs: React.FC = () => {
                 </p>
               </div>
               
-              <div>
-                <div className="bg-yorbot-orange w-12 h-12 rounded-full flex items-center justify-center mb-4">
+              <div className="text-center">
+                <div className="bg-yorbot-orange w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto">
                   <Mail className="text-white" size={24} />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Email Us</h3>
@@ -73,8 +72,8 @@ const ContactUs: React.FC = () => {
                 </a>
               </div>
               
-              <div>
-                <div className="bg-yorbot-orange w-12 h-12 rounded-full flex items-center justify-center mb-4">
+              <div className="text-center">
+                <div className="bg-yorbot-orange w-12 h-12 rounded-full flex items-center justify-center mb-4 mx-auto">
                   <Phone className="text-white" size={24} />
                 </div>
                 <h3 className="text-lg font-semibold mb-2">Call Us</h3>
@@ -89,7 +88,7 @@ const ContactUs: React.FC = () => {
           </div>
           
           {/* Contact Form */}
-          <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
             <div className="mb-6">
               <h2 className="text-2xl font-bold mb-2">HELLO!</h2>
               <p className="text-gray-600">
@@ -162,7 +161,7 @@ const ContactUs: React.FC = () => {
         </div>
         
         {/* Map */}
-        <div className="rounded-lg overflow-hidden shadow-sm h-96 mb-8">
+        <div className="rounded-lg overflow-hidden shadow-sm h-96 mb-8 border border-gray-200">
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.5831053826846!2d77.58407811482115!3d12.939544990877863!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTLCsDA1JzQyLjQiTiA3N8KwMTInMzYuMCJF!5e0!3m2!1sen!2sin!4v1617005142284!5m2!1sen!2sin"
             width="100%"

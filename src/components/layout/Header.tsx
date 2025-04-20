@@ -137,7 +137,7 @@ const Header: React.FC = () => {
       </div>
 
       {/* Desktop: Navigation bar */}
-      <nav className="hidden md:block bg-yorbot-lightGray">
+      <nav className="hidden md:block bg-[#333333]">
         <div className="container mx-auto px-4">
           <ul className="flex space-x-8 py-3">
             {["home", "shop", "blogs", "educational", "about-us", "contact-us"].map((item) => (
@@ -146,8 +146,8 @@ const Header: React.FC = () => {
                   to={item === "home" ? "/" : `/${item}`}
                   className={`text-base font-medium transition-colors hover:text-yorbot-orange ${
                     activeNav === item
-                      ? "text-white bg-yorbot-gray px-4 py-2 rounded"
-                      : "text-yorbot-darkGray"
+                      ? "text-white"
+                      : "text-[#999999]"
                   }`}
                 >
                   {item.charAt(0).toUpperCase() + item.slice(1).replace("-", " ")}

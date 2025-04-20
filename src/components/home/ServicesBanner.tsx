@@ -43,7 +43,7 @@ const ServicesBanner: React.FC = () => {
   }, []);
 
   return (
-    <div className="bg-white py-8 md:py-12">
+    <div className="bg-white py-6 md:py-8">
       <div className="container mx-auto px-4">
         {/* Mobile view - slider */}
         <div className="md:hidden">
@@ -56,9 +56,9 @@ const ServicesBanner: React.FC = () => {
                     index === currentService ? "opacity-100" : "hidden"
                   }`}
                 >
-                  <service.icon className="w-10 h-10 mb-2 text-yorbot-orange" />
-                  <h3 className="font-semibold text-lg">{service.title}</h3>
-                  <p className="text-yorbot-gray text-sm text-center">{service.description}</p>
+                  <service.icon className="w-8 h-8 mb-2 text-yorbot-orange" />
+                  <h3 className="font-semibold text-base mb-1">{service.title}</h3>
+                  <p className="text-yorbot-gray text-xs text-center">{service.description}</p>
                 </div>
               ))}
             </div>
@@ -78,15 +78,15 @@ const ServicesBanner: React.FC = () => {
         </div>
 
         {/* Desktop view - grid */}
-        <div className="hidden md:grid grid-cols-4 gap-8">
+        <div className="hidden md:grid grid-cols-4 gap-6">
           {services.map((service) => (
             <div
               key={service.id}
               className="flex flex-col items-center text-center"
             >
-              <service.icon className="w-12 h-12 mb-3 text-yorbot-orange" />
-              <h3 className="font-semibold text-lg mb-1">{service.title}</h3>
-              <p className="text-yorbot-gray text-sm">{service.description}</p>
+              <service.icon className="w-9 h-9 mb-2 text-yorbot-orange" />
+              <h3 className="font-semibold text-base mb-1">{service.title}</h3>
+              <p className="text-yorbot-gray text-xs">{service.description}</p>
             </div>
           ))}
         </div>

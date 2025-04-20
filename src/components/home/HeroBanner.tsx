@@ -30,11 +30,11 @@ const banners = [
 const HeroBanner: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Auto-slide every 4 seconds
+  // Updated to 6 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
-    }, 4000);
+    }, 6000);
     return () => clearInterval(interval);
   }, []);
 

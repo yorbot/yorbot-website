@@ -1,21 +1,20 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, ArrowDown } from "lucide-react";
 
 const Footer: React.FC = () => {
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
+
   return (
     <footer className="bg-yorbot-darkGray text-white pt-12 pb-6">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Company Information */}
           <div>
             <div className="mb-4">
-              <img 
-                src="/images/yorbot-logo.png" 
-                alt="Yorbot" 
-                className="h-12 mb-2" 
-              />
+              <img src="/images/yorbot-logo.png" alt="Yorbot" className="h-12 mb-2" />
               <p className="text-sm text-gray-300">
                 Empowering your robotic and electronic projects
               </p>
@@ -32,42 +31,16 @@ const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Shop */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Shop</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/shop/development-boards" className="text-sm text-gray-300 hover:text-yorbot-orange">
-                  Development Boards
-                </Link>
-              </li>
-              <li>
-                <Link to="/shop/sensors" className="text-sm text-gray-300 hover:text-yorbot-orange">
-                  Sensors
-                </Link>
-              </li>
-              <li>
-                <Link to="/shop/project-kits" className="text-sm text-gray-300 hover:text-yorbot-orange">
-                  Project Kits
-                </Link>
-              </li>
-              <li>
-                <Link to="/shop/3d-printer" className="text-sm text-gray-300 hover:text-yorbot-orange">
-                  3D Printer & Accessories
-                </Link>
-              </li>
-              <li>
-                <Link to="/shop" className="text-sm text-gray-300 hover:text-yorbot-orange">
-                  All Categories
-                </Link>
-              </li>
-            </ul>
-          </div>
-
           {/* My Account */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">My Account</h3>
-            <ul className="space-y-2">
+          <div className="border-t md:border-0 pt-4 md:pt-0">
+            <div
+              className="flex items-center justify-between md:justify-start mb-4 cursor-pointer md:cursor-default"
+              onClick={() => setAccountOpen(!accountOpen)}
+            >
+              <h3 className="text-lg font-semibold">My Account</h3>
+              <ArrowDown className={`md:hidden h-4 w-4 transition-transform ${accountOpen ? 'rotate-180' : ''}`} />
+            </div>
+            <ul className={`space-y-2 ${accountOpen ? 'block' : 'hidden md:block'}`}>
               <li>
                 <Link to="/profile" className="text-sm text-gray-300 hover:text-yorbot-orange">
                   My Profile
@@ -92,9 +65,15 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Information */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Information</h3>
-            <ul className="space-y-2">
+          <div className="border-t md:border-0 pt-4 md:pt-0">
+            <div
+              className="flex items-center justify-between md:justify-start mb-4 cursor-pointer md:cursor-default"
+              onClick={() => setInfoOpen(!infoOpen)}
+            >
+              <h3 className="text-lg font-semibold">Information</h3>
+              <ArrowDown className={`md:hidden h-4 w-4 transition-transform ${infoOpen ? 'rotate-180' : ''}`} />
+            </div>
+            <ul className={`space-y-2 ${infoOpen ? 'block' : 'hidden md:block'}`}>
               <li>
                 <Link to="/about-us" className="text-sm text-gray-300 hover:text-yorbot-orange">
                   About Us
