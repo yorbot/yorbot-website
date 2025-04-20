@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -9,12 +8,28 @@ const categories = [
     name: "Development Boards",
     image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
     slug: "development-boards",
+    subcategories: [
+      "Arduino",
+      "Raspberry Pi",
+      "ESP32/ESP8266",
+      "Boards Compatible with Arduino",
+      "Boards Compatible with Raspberry Pi",
+      "GPS Boards"
+    ]
   },
   {
     id: 2,
     name: "Sensors",
     image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",
     slug: "sensors",
+    subcategories: [
+      "LiDAR Sensors",
+      "Ultrasonic Sensors",
+      "Temperature Sensors",
+      "Humidity Sensors",
+      "Motion Sensors",
+      "Gas Sensors"
+    ]
   },
   {
     id: 3,

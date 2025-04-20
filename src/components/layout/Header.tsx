@@ -139,7 +139,7 @@ const Header: React.FC = () => {
       {/* Desktop: Navigation bar */}
       <nav className="hidden md:block bg-[#333333]">
         <div className="container mx-auto px-4">
-          <ul className="flex space-x-8 py-3">
+          <ul className="flex justify-center space-x-8 py-3">
             {["home", "shop", "blogs", "educational", "about-us", "contact-us"].map((item) => (
               <li key={item}>
                 <Link
