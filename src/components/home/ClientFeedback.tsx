@@ -1,0 +1,141 @@
+
+import React, { useState, useEffect } from "react";
+import { Star } from "lucide-react";
+
+const testimonials = [
+  {
+    id: 1,
+    name: "Rahul Sharma",
+    rating: 5,
+    comment: "Great quality components and fast delivery. The Arduino board I ordered works perfectly for my robotics project.",
+    image: "https://randomuser.me/api/portraits/men/1.jpg",
+  },
+  {
+    id: 2,
+    name: "Priya Patel",
+    rating: 5,
+    comment: "Excellent customer service! They helped me choose the right sensors for my college project. Highly recommend.",
+    image: "https://randomuser.me/api/portraits/women/2.jpg",
+  },
+  {
+    id: 3,
+    name: "Arjun Singh",
+    rating: 4,
+    comment: "The DIY kit was perfect for my son's school project. Instructions were clear and all parts were included.",
+    image: "https://randomuser.me/api/portraits/men/3.jpg",
+  },
+  {
+    id: 4,
+    name: "Neha Gupta",
+    rating: 5,
+    comment: "The 3D printing service exceeded my expectations. The quality was amazing and turnaround time was quick.",
+    image: "https://randomuser.me/api/portraits/women/4.jpg",
+  },
+];
+
+const ClientFeedback: React.FC = () => {
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  // Auto-rotate testimonials every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Manual navigation
+  const goToTestimonial = (index: number) => {
+    setCurrentTestimonial(index);
+  };
+
+  return (
+    <div className="py-12 bg-white">
+      <div className="container mx-auto px-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Client Feedback</h2>
+
+        <div className="relative max-w-4xl mx-auto">
+          {/* Desktop: Display multiple testimonials */}
+          <div className="hidden md:grid grid-cols-2 gap-6">
+            {testimonials.map((testimonial) => (
+              <div
+                key={testimonial.id}
+                className="bg-gray-50 rounded-lg p-6 shadow-sm"
+              >
+                <div className="flex items-center mb-4">
+                  <img
+                    src={testimonial.image}
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full mr-4"
+                  />
+                  <div>
+                    <h3 className="font-semibold">{testimonial.name}</h3>
+                    <div className="flex">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={16}
+                          className={i < testimonial.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-gray-600 italic">{testimonial.comment}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile: Slider for testimonials */}
+          <div className="md:hidden">
+            {testimonials.map((testimonial, index) => (
+              <div
+                key={testimonial.id}
+                className={`transition-opacity duration-500 ${
+                  index === currentTestimonial ? "opacity-100" : "hidden"
+                }`}
+              >
+                <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
+                  <div className="flex flex-col items-center mb-4 text-center">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-16 h-16 rounded-full mb-2"
+                    />
+                    <h3 className="font-semibold">{testimonial.name}</h3>
+                    <div className="flex mt-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={16}
+                          className={i < testimonial.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-gray-600 italic text-center">{testimonial.comment}</p>
+                </div>
+              </div>
+            ))}
+
+            {/* Navigation dots */}
+            <div className="flex justify-center mt-4 space-x-2">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToTestimonial(index)}
+                  className={`w-2 h-2 rounded-full ${
+                    index === currentTestimonial ? "bg-yorbot-orange" : "bg-gray-300"
+                  }`}
+                  aria-label={`Go to testimonial ${index + 1}`}
+                ></button>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ClientFeedback;
