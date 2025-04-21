@@ -6,9 +6,10 @@ import { MinusCircle, PlusCircle, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Cart: React.FC = () => {
-  const { cartItems, cartCount, updateQuantity, removeItem } = useCart();
+  const { cartItems, cartCount, updateQuantity, removeFromCart } = useCart();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -198,7 +199,7 @@ const Cart: React.FC = () => {
                           </td>
                           <td className="text-center py-4 px-2">
                             <button 
-                              onClick={() => removeItem(item.id)}
+                              onClick={() => removeFromCart(item.id)}
                               className="text-red-500 hover:text-red-700 transition-colors"
                             >
                               <X size={20} className="mx-auto" />

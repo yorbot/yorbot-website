@@ -48,26 +48,30 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const loadCartItems = async () => {
       if (user) {
-        // Load from backend cart_items table
-        const { data, error } = await supabase
-          .from('cart_items')
-          .select('*')
-          .eq('user_id', user.id);
+        try {
+          // Using a raw query for now since types aren't updated
+          const { data, error } = await supabase
+            .from('cart_items')
+            .select('*')
+            .eq('user_id', user.id);
 
-        if (error) {
-          console.error("Error loading cart items:", error);
-          return;
-        }
-        
-        if (data) {
-          const formattedItems = data.map((item: CartItemRow) => ({
-            id: item.product_id,
-            name: item.product_name,
-            image: item.product_image,
-            price: item.price,
-            quantity: item.quantity,
-          }));
-          setCartItems(formattedItems);
+          if (error) {
+            console.error("Error loading cart items:", error);
+            return;
+          }
+          
+          if (data) {
+            const formattedItems = data.map((item: any) => ({
+              id: item.product_id,
+              name: item.product_name,
+              image: item.product_image,
+              price: item.price,
+              quantity: item.quantity,
+            }));
+            setCartItems(formattedItems);
+          }
+        } catch (err) {
+          console.error("Error in loadCartItems:", err);
         }
       } else {
         const savedCart = localStorage.getItem("cart");
@@ -85,9 +89,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
   useEffect(() => {
-    if (user) {
-      // Syncing to db happens in add/remove/update methods
-    } else {
+    if (!user) {
       localStorage.setItem("cart", JSON.stringify(cartItems));
     }
   }, [cartItems, user]);
@@ -107,25 +109,33 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       updatedCartItems[existingItemIndex].quantity += 1;
       setCartItems(updatedCartItems);
 
-      // Update DB quantity
-      await supabase
-        .from('cart_items')
-        .update({ quantity: updatedCartItems[existingItemIndex].quantity })
-        .eq('user_id', user.id)
-        .eq('product_id', item.id);
+      try {
+        // Update DB quantity
+        await supabase.rpc('update_cart_item_quantity', {
+          p_user_id: user.id,
+          p_product_id: item.id,
+          p_quantity: updatedCartItems[existingItemIndex].quantity
+        });
+      } catch (err) {
+        console.error("Error updating cart quantity:", err);
+      }
     } else {
       const newItem = { ...item, quantity: 1 };
       setCartItems([...cartItems, newItem]);
 
-      // Insert to DB
-      await supabase.from('cart_items').insert({
-        user_id: user.id,
-        product_id: item.id,
-        product_name: item.name,
-        product_image: item.image,
-        price: item.price,
-        quantity: 1,
-      });
+      try {
+        // Insert to DB
+        await supabase.rpc('add_to_cart', {
+          p_user_id: user.id,
+          p_product_id: item.id,
+          p_product_name: item.name,
+          p_product_image: item.image,
+          p_price: item.price,
+          p_quantity: 1
+        });
+      } catch (err) {
+        console.error("Error adding item to cart:", err);
+      }
     }
 
     toast("Item added to cart", {
@@ -143,11 +153,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
     setCartItems(cartItems.filter((item) => item.id !== id));
 
-    await supabase
-      .from('cart_items')
-      .delete()
-      .eq('user_id', user.id)
-      .eq('product_id', id);
+    try {
+      await supabase.rpc('remove_from_cart', {
+        p_user_id: user.id,
+        p_product_id: id
+      });
+    } catch (err) {
+      console.error("Error removing from cart:", err);
+    }
 
     toast("Item removed", {
       description: "Item has been removed from your cart.",
@@ -161,6 +174,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       });
       return;
     }
+    
     if (quantity < 1) return;
 
     const updatedCartItems = cartItems.map((item) =>
@@ -168,17 +182,28 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     );
     setCartItems(updatedCartItems);
 
-    await supabase
-      .from('cart_items')
-      .update({ quantity })
-      .eq('user_id', user.id)
-      .eq('product_id', id);
+    try {
+      await supabase.rpc('update_cart_item_quantity', {
+        p_user_id: user.id,
+        p_product_id: id,
+        p_quantity: quantity
+      });
+    } catch (err) {
+      console.error("Error updating cart quantity:", err);
+    }
   };
 
   const clearCart = async () => {
     if (!user) return;
     setCartItems([]);
-    await supabase.from('cart_items').delete().eq('user_id', user.id);
+    
+    try {
+      await supabase.rpc('clear_cart', {
+        p_user_id: user.id
+      });
+    } catch (err) {
+      console.error("Error clearing cart:", err);
+    }
   };
 
   return (
