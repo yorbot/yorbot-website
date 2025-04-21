@@ -1,25 +1,35 @@
 
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { useToast } from "@/components/ui/use-toast";
+import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Checkout: React.FC = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { cartItems, cartCount, clearCart } = useCart();
+  const { user } = useAuth();
+  
   const [addressType, setAddressType] = useState("default");
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [showUpiForm, setShowUpiForm] = useState(false);
   const [showUpiScanner, setShowUpiScanner] = useState(false);
   const [showCardForm, setShowCardForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
   
   const [addressForm, setAddressForm] = useState({
-    fullName: "John Doe",
+    fullName: "",
     companyName: "",
-    phoneNumber: "9876543210",
-    streetAddress: "123 Main Street",
-    pinCode: "560001",
-    city: "Bengaluru",
-    state: "Karnataka",
+    phoneNumber: "",
+    streetAddress: "",
+    pinCode: "",
+    city: "",
+    state: "",
   });
   
   const [upiId, setUpiId] = useState("");
@@ -29,6 +39,69 @@ const Checkout: React.FC = () => {
     expiryDate: "",
     cvv: "",
   });
+
+  // Calculate cart totals
+  const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const discount = 0; // Replace with actual discount calculation
+  const shippingFee = subtotal > 1000 ? 0 : 100;
+  const gst = Math.round(subtotal * 0.18);
+  const total = subtotal - discount + shippingFee + gst;
+
+  // Fetch user profile on component mount
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) {
+        setLoadingProfile(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching user profile:', error);
+          return;
+        }
+
+        setUserProfile(data);
+        
+        // Prefill the address form with user profile data
+        if (data) {
+          setAddressForm({
+            fullName: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
+            companyName: "",
+            phoneNumber: data.phone || "",
+            streetAddress: data.address_line1 || "",
+            pinCode: data.postal_code || "",
+            city: data.city || "",
+            state: data.state || "",
+          });
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user]);
+
+  // Redirect if cart is empty
+  useEffect(() => {
+    if (cartCount === 0) {
+      navigate('/cart');
+      toast({
+        title: "Your cart is empty",
+        description: "Add some items to your cart before checking out.",
+        variant: "destructive",
+      });
+    }
+  }, [cartCount, navigate, toast]);
 
   // Handle address form change
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -72,24 +145,71 @@ const Checkout: React.FC = () => {
   };
   
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // In a real implementation, this would process the checkout
-    console.log("Checkout with:", {
-      addressType,
-      addressForm,
-      paymentMethod,
-      upiId: showUpiForm ? upiId : null,
-      cardDetails: showCardForm ? cardForm : null,
-    });
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to complete your purchase.",
+        variant: "destructive",
+      });
+      navigate('/sign-in', { state: { from: { pathname: '/checkout' } } });
+      return;
+    }
     
-    toast({
-      title: "Order placed successfully!",
-      description: "Thank you for your purchase.",
-      variant: "default",
-    });
+    setIsLoading(true);
+    
+    try {
+      // In a real implementation, this would process the checkout
+      // and create an order in the database
+      console.log("Checkout with:", {
+        addressType,
+        addressForm,
+        paymentMethod,
+        upiId: showUpiForm ? upiId : null,
+        cardDetails: showCardForm ? cardForm : null,
+        cartItems,
+        total,
+      });
+      
+      // Simulate order processing
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Clear the cart after successful order
+      clearCart();
+      
+      toast({
+        title: "Order placed successfully!",
+        description: "Thank you for your purchase.",
+        variant: "default",
+      });
+      
+      // Redirect to a success page or order confirmation page
+      navigate('/profile');
+    } catch (error) {
+      console.error('Error processing order:', error);
+      toast({
+        title: "Checkout failed",
+        description: "An error occurred while processing your order. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if (loadingProfile) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-center items-center min-h-[70vh]">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-yorbot-orange"></div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -428,48 +548,52 @@ const Checkout: React.FC = () => {
               <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
               
               <div className="space-y-4 mb-6">
-                <div className="flex justify-between pb-4 border-b">
-                  <span className="text-gray-600">1x Arduino Uno R3</span>
-                  <span>₹550.00</span>
-                </div>
-                <div className="flex justify-between pb-4 border-b">
-                  <span className="text-gray-600">1x Raspberry Pi 4</span>
-                  <span>₹4,200.00</span>
-                </div>
-                <div className="flex justify-between pb-4 border-b">
-                  <span className="text-gray-600">3x Ultrasonic Sensor</span>
-                  <span>₹240.00</span>
-                </div>
+                {cartItems.map((item) => (
+                  <div key={item.id} className="flex justify-between pb-4 border-b">
+                    <span className="text-gray-600">{item.quantity}x {item.name}</span>
+                    <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+                  </div>
+                ))}
               </div>
               
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between pb-3 border-b">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="font-medium">₹4,990.00</span>
+                  <span className="font-medium">₹{subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between pb-3 border-b text-green-600">
-                  <span>Discount</span>
-                  <span>-₹499.00</span>
-                </div>
+                {discount > 0 && (
+                  <div className="flex justify-between pb-3 border-b text-green-600">
+                    <span>Discount</span>
+                    <span>-₹{discount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between pb-3 border-b">
                   <span className="text-gray-600">Shipping</span>
-                  <span className="font-medium">Free</span>
+                  <span className="font-medium">{shippingFee === 0 ? "Free" : `₹${shippingFee.toFixed(2)}`}</span>
                 </div>
                 <div className="flex justify-between pb-3 border-b">
                   <span className="text-gray-600">GST (18%)</span>
-                  <span className="font-medium">₹810.00</span>
+                  <span className="font-medium">₹{gst.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span>₹5,301.00</span>
+                  <span>₹{total.toFixed(2)}</span>
                 </div>
               </div>
               
               <button
                 type="submit"
-                className="w-full bg-yorbot-orange text-white text-center py-3 rounded-md font-medium hover:bg-orange-600 transition-colors"
+                disabled={isLoading}
+                className="w-full bg-yorbot-orange text-white text-center py-3 rounded-md font-medium hover:bg-orange-600 transition-colors disabled:opacity-75"
               >
-                Place Order
+                {isLoading ? (
+                  <>
+                    <span className="animate-spin mr-2">⟳</span>
+                    Processing...
+                  </>
+                ) : (
+                  "Place Order"
+                )}
               </button>
             </div>
           </div>

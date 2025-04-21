@@ -1,15 +1,22 @@
+
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Search, ShoppingCart, Heart, User, Menu } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, ShoppingCart, Heart, User, Menu, LogIn } from "lucide-react";
 import SearchBar from "../SearchBar";
+import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeNav, setActiveNav] = useState("home");
-  const [cartCount, setCartCount] = useState(2); // Mock data
-  const [wishlistCount, setWishlistCount] = useState(3); // Mock data
+  
+  const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -49,6 +56,14 @@ const Header: React.FC = () => {
     }
   };
 
+  const handleProfileClick = () => {
+    if (user) {
+      navigate("/profile");
+    } else {
+      navigate("/sign-in");
+    }
+  };
+
   return (
     <header className={`w-full bg-white z-50 ${scrolled ? "shadow-md" : ""}`}>
       <div className="container mx-auto px-4 py-4">
@@ -57,7 +72,7 @@ const Header: React.FC = () => {
             <img 
               src="/images/logo.png" 
               alt="Yorbot" 
-              className="h-14 md:h-16 bg-white"
+              className="h-14 md:h-16"
             />
           </Link>
 
@@ -82,9 +97,13 @@ const Header: React.FC = () => {
                 </span>
               )}
             </Link>
-            <Link to="/profile">
-              <User className="w-6 h-6" />
-            </Link>
+            <button onClick={handleProfileClick}>
+              {user ? (
+                <User className="w-6 h-6" />
+              ) : (
+                <LogIn className="w-6 h-6" />
+              )}
+            </button>
           </div>
 
           <div className="flex md:hidden items-center space-x-4">
@@ -156,9 +175,16 @@ const Header: React.FC = () => {
                 </span>
               )}
             </Link>
-            <Link to="/profile" onClick={toggleMobileMenu}>
-              <User className="w-6 h-6" />
-            </Link>
+            <button onClick={() => {
+              handleProfileClick();
+              toggleMobileMenu();
+            }}>
+              {user ? (
+                <User className="w-6 h-6" />
+              ) : (
+                <LogIn className="w-6 h-6" />
+              )}
+            </button>
           </div>
           <nav className="p-4">
             <ul className="space-y-4">
@@ -177,6 +203,38 @@ const Header: React.FC = () => {
                   </Link>
                 </li>
               ))}
+              {user ? (
+                <li>
+                  <Link
+                    to="/profile"
+                    className="block py-2 px-4 rounded text-yorbot-darkGray"
+                    onClick={toggleMobileMenu}
+                  >
+                    My Profile
+                  </Link>
+                </li>
+              ) : (
+                <>
+                  <li>
+                    <Link
+                      to="/sign-in"
+                      className="block py-2 px-4 rounded text-yorbot-darkGray"
+                      onClick={toggleMobileMenu}
+                    >
+                      Sign In
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/sign-up"
+                      className="block py-2 px-4 rounded text-yorbot-darkGray"
+                      onClick={toggleMobileMenu}
+                    >
+                      Sign Up
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </nav>
         </div>

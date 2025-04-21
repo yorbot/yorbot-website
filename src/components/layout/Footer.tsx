@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Phone, Mail, ArrowDown, Linkedin, Instagram, Twitter, Facebook, Youtube } from "lucide-react";
@@ -37,7 +38,7 @@ const Footer: React.FC = () => {
               </a>
             </div>
             {/* Social Media Icons */}
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 mb-6">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
@@ -114,6 +115,11 @@ const Footer: React.FC = () => {
               <li>
                 <Link to="/terms-and-conditions" className="text-sm text-gray-300 hover:text-yorbot-orange">
                   Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link to="/shipping-and-refund" className="text-sm text-gray-300 hover:text-yorbot-orange">
+                  Shipping & Refund
                 </Link>
               </li>
             </ul>

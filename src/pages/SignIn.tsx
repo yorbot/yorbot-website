@@ -1,31 +1,57 @@
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignIn: React.FC = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { signIn } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [formError, setFormError] = useState("");
+
+  // Get the return URL from location state or default to home
+  const from = (location.state as any)?.from?.pathname || "/";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormError(""); // Clear error when user types
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real implementation, this would authenticate the user
-    console.log("Sign in with:", formData);
-    
-    toast({
-      title: "Signed in successfully!",
-      description: "Welcome back to Yorbot.",
-      variant: "default",
-    });
+    setIsLoading(true);
+    setFormError("");
+
+    try {
+      const { error } = await signIn(formData.email, formData.password);
+      
+      if (error) {
+        setFormError(error.message || "Failed to sign in");
+      } else {
+        toast({
+          title: "Signed in successfully!",
+          description: "Welcome back to Yorbot.",
+          variant: "default",
+        });
+        
+        // Navigate to the page they tried to access or home
+        navigate(from, { replace: true });
+      }
+    } catch (error) {
+      setFormError("An unexpected error occurred");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -33,6 +59,11 @@ const SignIn: React.FC = () => {
       <div className="min-h-[80vh] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+          {formError && (
+            <div className="mt-3 p-3 bg-red-100 border border-red-200 text-red-700 rounded-md text-center">
+              {formError}
+            </div>
+          )}
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -99,9 +130,17 @@ const SignIn: React.FC = () => {
               <div>
                 <button
                   type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yorbot-orange hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yorbot-orange"
+                  disabled={isLoading}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yorbot-orange hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yorbot-orange disabled:opacity-75"
                 >
-                  Sign in
+                  {isLoading ? (
+                    <>
+                      <span className="animate-spin mr-2">⟳</span>
+                      Signing in...
+                    </>
+                  ) : (
+                    "Sign in"
+                  )}
                 </button>
               </div>
             </form>

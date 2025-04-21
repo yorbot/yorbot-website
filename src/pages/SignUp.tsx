@@ -1,22 +1,28 @@
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignUp: React.FC = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { signUp } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [formError, setFormError] = useState("");
   const [passwordError, setPasswordError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormError("");
 
     // Check password match when either password field changes
     if (name === "password" || name === "confirmPassword") {
@@ -31,7 +37,7 @@ const SignUp: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
@@ -39,14 +45,32 @@ const SignUp: React.FC = () => {
       return;
     }
     
-    // In a real implementation, this would register the user
-    console.log("Sign up with:", formData);
-    
-    toast({
-      title: "Account created successfully!",
-      description: "You can now sign in with your credentials.",
-      variant: "default",
-    });
+    setIsLoading(true);
+    setFormError("");
+
+    try {
+      const { error } = await signUp(
+        formData.email, 
+        formData.password,
+        { first_name: formData.name.split(' ')[0], last_name: formData.name.split(' ').slice(1).join(' ') }
+      );
+      
+      if (error) {
+        setFormError(error.message || "Failed to sign up");
+      } else {
+        toast({
+          title: "Account created successfully!",
+          description: "You can now sign in with your credentials.",
+          variant: "default",
+        });
+        navigate("/sign-in");
+      }
+    } catch (error) {
+      setFormError("An unexpected error occurred");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -54,6 +78,11 @@ const SignUp: React.FC = () => {
       <div className="min-h-[80vh] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <h2 className="text-center text-3xl font-extrabold text-gray-900">Create a new account</h2>
+          {formError && (
+            <div className="mt-3 p-3 bg-red-100 border border-red-200 text-red-700 rounded-md text-center">
+              {formError}
+            </div>
+          )}
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
@@ -143,9 +172,17 @@ const SignUp: React.FC = () => {
               <div>
                 <button
                   type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yorbot-orange hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yorbot-orange"
+                  disabled={isLoading}
+                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yorbot-orange hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yorbot-orange disabled:opacity-75"
                 >
-                  Sign up
+                  {isLoading ? (
+                    <>
+                      <span className="animate-spin mr-2">⟳</span>
+                      Creating account...
+                    </>
+                  ) : (
+                    "Sign up"
+                  )}
                 </button>
               </div>
             </form>

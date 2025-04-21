@@ -1,65 +1,36 @@
 
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { ShoppingCart, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-
-// Mock data for wishlist items
-const initialWishlistItems = [
-  {
-    id: 1,
-    name: "Arduino Uno R3",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=300&q=80",
-    price: 550,
-    inStock: true,
-  },
-  {
-    id: 2,
-    name: "Raspberry Pi 4 Model B",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=300&q=80",
-    price: 4200,
-    inStock: true,
-  },
-  {
-    id: 3,
-    name: "Ultrasonic Sensor HC-SR04",
-    image: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?auto=format&fit=crop&w=300&q=80",
-    price: 80,
-    inStock: false,
-  },
-  {
-    id: 4,
-    name: "Robot Chassis Kit",
-    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=300&q=80",
-    price: 650,
-    inStock: true,
-  },
-];
+import { useWishlist, WishlistItem } from "@/contexts/WishlistContext";
+import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Wishlist: React.FC = () => {
   const { toast } = useToast();
-  const [wishlistItems, setWishlistItems] = useState(initialWishlistItems);
-
-  // Remove item from wishlist
-  const removeItem = (id: number) => {
-    setWishlistItems(wishlistItems.filter((item) => item.id !== id));
-    toast({
-      title: "Item removed",
-      description: "Item has been removed from your wishlist.",
-      variant: "default",
-    });
-  };
+  const navigate = useNavigate();
+  const { wishlistItems, wishlistCount, removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
+  const { user } = useAuth();
 
   // Add item to cart
-  const addToCart = (item: typeof initialWishlistItems[0]) => {
-    // In a real implementation, this would add the item to the cart
-    console.log("Added to cart:", item);
+  const handleAddToCart = (item: WishlistItem) => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to add items to your cart",
+      });
+      navigate("/sign-in", { state: { from: { pathname: "/wishlist" } } });
+      return;
+    }
     
-    toast({
-      title: "Added to cart",
-      description: `${item.name} has been added to your cart.`,
-      variant: "default",
+    addToCart({
+      id: item.id,
+      name: item.name,
+      image: item.image,
+      price: item.price
     });
   };
 
@@ -74,7 +45,7 @@ const Wishlist: React.FC = () => {
         
         <h1 className="text-2xl md:text-3xl font-bold mb-8">My Wishlist</h1>
         
-        {wishlistItems.length === 0 ? (
+        {wishlistCount === 0 ? (
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold mb-4">Your wishlist is empty</h2>
             <p className="text-gray-600 mb-6">You haven't added any items to your wishlist yet.</p>
@@ -130,7 +101,7 @@ const Wishlist: React.FC = () => {
                       </td>
                       <td className="text-center py-4 px-4">
                         <button 
-                          onClick={() => addToCart(item)}
+                          onClick={() => handleAddToCart(item)}
                           disabled={!item.inStock}
                           className={`flex items-center mx-auto px-4 py-2 rounded-md transition-colors ${
                             item.inStock 
@@ -144,7 +115,7 @@ const Wishlist: React.FC = () => {
                       </td>
                       <td className="text-center py-4 px-4">
                         <button 
-                          onClick={() => removeItem(item.id)}
+                          onClick={() => removeFromWishlist(item.id)}
                           className="text-red-500 hover:text-red-700 transition-colors"
                         >
                           <X size={20} className="mx-auto" />

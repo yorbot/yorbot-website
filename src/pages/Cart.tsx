@@ -1,38 +1,20 @@
 
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { MinusCircle, PlusCircle, X } from "lucide-react";
-
-// Mock data for cart items
-const initialCartItems = [
-  {
-    id: 1,
-    name: "Arduino Uno R3",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=300&q=80",
-    price: 550,
-    quantity: 2,
-  },
-  {
-    id: 2,
-    name: "Raspberry Pi 4 Model B",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=300&q=80",
-    price: 4200,
-    quantity: 1,
-  },
-  {
-    id: 3,
-    name: "Ultrasonic Sensor HC-SR04",
-    image: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?auto=format&fit=crop&w=300&q=80",
-    price: 80,
-    quantity: 3,
-  },
-];
+import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
 const Cart: React.FC = () => {
-  const [cartItems, setCartItems] = useState(initialCartItems);
-  const [couponCode, setCouponCode] = useState("");
-  const [discountApplied, setDiscountApplied] = useState(0);
+  const { cartItems, cartCount, updateQuantity, removeItem } = useCart();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const [couponCode, setCouponCode] = React.useState("");
+  const [discountApplied, setDiscountApplied] = React.useState(0);
 
   // Calculate totals
   const subtotal = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
@@ -40,30 +22,100 @@ const Cart: React.FC = () => {
   const gst = Math.round(subtotal * 0.18);
   const total = subtotal + shippingFee + gst - discountApplied;
 
-  // Handle quantity change
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
-
-  // Remove item from cart
-  const removeItem = (id: number) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-  };
-
   // Apply coupon code
-  const applyCoupon = () => {
-    if (couponCode.toLowerCase() === "welcome10") {
-      const discount = Math.round(subtotal * 0.1);
+  const applyCoupon = async () => {
+    if (!couponCode) {
+      toast({
+        title: "Error",
+        description: "Please enter a coupon code",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Check if coupon exists in database
+      const { data: coupons, error } = await supabase
+        .from('coupons')
+        .select('*')
+        .eq('code', couponCode.toUpperCase())
+        .single();
+
+      if (error || !coupons) {
+        toast({
+          title: "Invalid coupon",
+          description: "This coupon code is not valid.",
+          variant: "destructive",
+        });
+        setDiscountApplied(0);
+        return;
+      }
+
+      // Check if coupon is expired
+      if (coupons.expires_at && new Date(coupons.expires_at) < new Date()) {
+        toast({
+          title: "Expired coupon",
+          description: "This coupon has expired.",
+          variant: "destructive",
+        });
+        setDiscountApplied(0);
+        return;
+      }
+
+      // Check if coupon is usable (max_uses)
+      if (coupons.max_uses && coupons.used_count >= coupons.max_uses) {
+        toast({
+          title: "Coupon limit reached",
+          description: "This coupon has reached its usage limit.",
+          variant: "destructive",
+        });
+        setDiscountApplied(0);
+        return;
+      }
+
+      // Check minimum order value
+      if (coupons.minimum_order_value && subtotal < coupons.minimum_order_value) {
+        toast({
+          title: "Minimum order value not met",
+          description: `This coupon requires a minimum order of ₹${coupons.minimum_order_value.toFixed(2)}.`,
+          variant: "destructive",
+        });
+        setDiscountApplied(0);
+        return;
+      }
+
+      // Calculate discount
+      let discount = 0;
+      if (coupons.discount_type === 'percentage') {
+        discount = Math.round(subtotal * (coupons.discount_value / 100));
+      } else { // fixed discount
+        discount = coupons.discount_value;
+      }
+
       setDiscountApplied(discount);
-      alert("Coupon applied successfully!");
+      toast({
+        title: "Coupon applied successfully!",
+        description: `You saved ₹${discount.toFixed(2)} with this coupon.`,
+      });
+    } catch (error) {
+      console.error("Error applying coupon:", error);
+      toast({
+        title: "Error",
+        description: "An error occurred while applying the coupon.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCheckout = () => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to proceed to checkout.",
+      });
+      navigate("/sign-in", { state: { from: { pathname: "/checkout" } } });
     } else {
-      alert("Invalid coupon code.");
-      setDiscountApplied(0);
+      navigate("/checkout");
     }
   };
 
@@ -78,7 +130,7 @@ const Cart: React.FC = () => {
         
         <h1 className="text-2xl md:text-3xl font-bold mb-8">My Shopping Cart</h1>
         
-        {cartItems.length === 0 ? (
+        {cartCount === 0 ? (
           <div className="text-center py-12">
             <h2 className="text-xl font-semibold mb-4">Your cart is empty</h2>
             <p className="text-gray-600 mb-6">Looks like you haven't added anything to your cart yet.</p>
@@ -213,12 +265,12 @@ const Cart: React.FC = () => {
                     <span>₹{total.toFixed(2)}</span>
                   </div>
                 </div>
-                <Link
-                  to="/checkout"
+                <button
+                  onClick={handleCheckout}
                   className="w-full bg-yorbot-orange text-white text-center py-3 rounded-md font-medium hover:bg-orange-600 transition-colors block"
                 >
                   Proceed to Checkout
-                </Link>
+                </button>
               </div>
             </div>
           </div>
