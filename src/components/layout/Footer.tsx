@@ -1,18 +1,18 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Phone, Mail, ArrowDown, Linkedin, Instagram, Twitter, Facebook, Youtube } from "lucide-react";
-import { useFooterContent } from "@/hooks/useFooterContent";
 
 const Footer: React.FC = () => {
-  const { data: footerContent } = useFooterContent();
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
 
   const socialLinks = [
-    { icon: Linkedin, href: footerContent?.linkedin || "#", label: "LinkedIn" },
-    { icon: Instagram, href: footerContent?.instagram || "#", label: "Instagram" },
-    { icon: Twitter, href: footerContent?.twitter || "#", label: "Twitter" },
-    { icon: Facebook, href: footerContent?.facebook || "#", label: "Facebook" },
-    { icon: Youtube, href: footerContent?.youtube || "#", label: "YouTube" }
+    { icon: Linkedin, href: "https://linkedin.com/company/yorbot", label: "LinkedIn" },
+    { icon: Instagram, href: "https://instagram.com/yorbot", label: "Instagram" },
+    { icon: Twitter, href: "https://twitter.com/yorbot", label: "Twitter" },
+    { icon: Facebook, href: "https://facebook.com/yorbot", label: "Facebook" },
+    { icon: Youtube, href: "https://youtube.com/yorbot", label: "YouTube" }
   ];
 
   return (
@@ -27,21 +27,16 @@ const Footer: React.FC = () => {
                 Empowering your robotic and electronic projects
               </p>
             </div>
-            {footerContent?.phone && (
-              <div className="flex items-center mb-2">
-                <Phone size={16} className="mr-2" />
-                <span className="text-sm">{footerContent.phone}</span>
-              </div>
-            )}
-            {footerContent?.email && (
-              <div className="flex items-center mb-2">
-                <Mail size={16} className="mr-2" />
-                <a href={`mailto:${footerContent.email}`} className="text-sm">{footerContent.email}</a>
-              </div>
-            )}
-            {footerContent?.address && (
-              <div className="mb-4 text-sm text-gray-300">{footerContent.address}</div>
-            )}
+            <div className="flex items-center mb-2">
+              <Phone size={16} className="mr-2" />
+              <span className="text-sm">+91 1234567890</span>
+            </div>
+            <div className="flex items-center mb-4">
+              <Mail size={16} className="mr-2" />
+              <a href="mailto:yorbot21@gmail.com" className="text-sm">
+                yorbot21@gmail.com
+              </a>
+            </div>
             {/* Social Media Icons */}
             <div className="flex space-x-4 mb-6">
               {socialLinks.map((social) => (
@@ -61,10 +56,14 @@ const Footer: React.FC = () => {
 
           {/* My Account */}
           <div className="border-t md:border-0 pt-4 md:pt-0">
-            <div className="flex items-center justify-between md:justify-start mb-4 cursor-pointer md:cursor-default">
+            <div
+              className="flex items-center justify-between md:justify-start mb-4 cursor-pointer md:cursor-default"
+              onClick={() => setAccountOpen(!accountOpen)}
+            >
               <h3 className="text-lg font-semibold">My Account</h3>
+              <ArrowDown className={`md:hidden h-4 w-4 transition-transform ${accountOpen ? 'rotate-180' : ''}`} />
             </div>
-            <ul className="space-y-2">
+            <ul className={`space-y-2 ${accountOpen ? 'block' : 'hidden md:block'}`}>
               <li>
                 <Link to="/profile" className="text-sm text-gray-300 hover:text-yorbot-orange">
                   My Profile
@@ -90,10 +89,14 @@ const Footer: React.FC = () => {
 
           {/* Information */}
           <div className="border-t md:border-0 pt-4 md:pt-0">
-            <div className="flex items-center justify-between md:justify-start mb-4 cursor-pointer md:cursor-default">
+            <div
+              className="flex items-center justify-between md:justify-start mb-4 cursor-pointer md:cursor-default"
+              onClick={() => setInfoOpen(!infoOpen)}
+            >
               <h3 className="text-lg font-semibold">Information</h3>
+              <ArrowDown className={`md:hidden h-4 w-4 transition-transform ${infoOpen ? 'rotate-180' : ''}`} />
             </div>
-            <ul className="space-y-2">
+            <ul className={`space-y-2 ${infoOpen ? 'block' : 'hidden md:block'}`}>
               <li>
                 <Link to="/about-us" className="text-sm text-gray-300 hover:text-yorbot-orange">
                   About Us
@@ -134,4 +137,3 @@ const Footer: React.FC = () => {
 };
 
 export default Footer;
-
