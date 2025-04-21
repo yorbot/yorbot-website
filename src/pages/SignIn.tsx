@@ -9,7 +9,7 @@ const SignIn: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -33,7 +33,7 @@ const SignIn: React.FC = () => {
 
     try {
       const { error } = await signIn(formData.email, formData.password);
-      
+
       if (error) {
         setFormError(error.message || "Failed to sign in");
       } else {
@@ -42,7 +42,7 @@ const SignIn: React.FC = () => {
           description: "Welcome back to Yorbot.",
           variant: "default",
         });
-        
+
         // Navigate to the page they tried to access or home
         navigate(from, { replace: true });
       }
@@ -54,11 +54,27 @@ const SignIn: React.FC = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      // This will redirect automatically
+    } catch (error) {
+      console.error("Google sign in error", error);
+      toast({
+        title: "Google Sign-In Failed",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Layout>
       <div className="min-h-[80vh] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">
+            Sign in to your account
+          </h2>
           {formError && (
             <div className="mt-3 p-3 bg-red-100 border border-red-200 text-red-700 rounded-md text-center">
               {formError}
@@ -158,9 +174,17 @@ const SignIn: React.FC = () => {
               <div className="mt-6">
                 <button
                   type="button"
+                  onClick={handleGoogleSignIn}
                   className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" width="24" height="24">
+                  <svg
+                    className="h-5 w-5 mr-2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
                     <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                       <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z" />
                       <path fill="#34A853" d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z" />
@@ -175,7 +199,7 @@ const SignIn: React.FC = () => {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
+                Don't have an account?{" "}
                 <Link to="/sign-up" className="font-medium text-yorbot-orange hover:text-orange-600">
                   Register
                 </Link>

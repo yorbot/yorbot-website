@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -8,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const SignUp: React.FC = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -24,7 +23,6 @@ const SignUp: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     setFormError("");
 
-    // Check password match when either password field changes
     if (name === "password" || name === "confirmPassword") {
       if (
         (name === "confirmPassword" && value !== formData.password) ||
@@ -39,22 +37,22 @@ const SignUp: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       setPasswordError("Passwords do not match");
       return;
     }
-    
+
     setIsLoading(true);
     setFormError("");
 
     try {
       const { error } = await signUp(
-        formData.email, 
+        formData.email,
         formData.password,
-        { first_name: formData.name.split(' ')[0], last_name: formData.name.split(' ').slice(1).join(' ') }
+        { first_name: formData.name.split(" ")[0], last_name: formData.name.split(" ").slice(1).join(" ") }
       );
-      
+
       if (error) {
         setFormError(error.message || "Failed to sign up");
       } else {
@@ -70,6 +68,19 @@ const SignUp: React.FC = () => {
       console.error(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch (error) {
+      console.error("Google sign in error", error);
+      toast({
+        title: "Google Sign-Up Failed",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -200,9 +211,17 @@ const SignUp: React.FC = () => {
               <div className="mt-6">
                 <button
                   type="button"
+                  onClick={handleGoogleSignIn}
                   className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" width="24" height="24">
+                  <svg
+                    className="h-5 w-5 mr-2"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
                     <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                       <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z" />
                       <path fill="#34A853" d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z" />
@@ -217,7 +236,7 @@ const SignUp: React.FC = () => {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                Already have an account?{' '}
+                Already have an account?{" "}
                 <Link to="/sign-in" className="font-medium text-yorbot-orange hover:text-orange-600">
                   Login
                 </Link>

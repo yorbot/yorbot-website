@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -21,16 +20,17 @@ const Wishlist: React.FC = () => {
       toast({
         title: "Sign in required",
         description: "Please sign in to add items to your cart",
+        variant: "destructive",
       });
       navigate("/sign-in", { state: { from: { pathname: "/wishlist" } } });
       return;
     }
-    
+
     addToCart({
       id: item.id,
       name: item.name,
       image: item.image,
-      price: item.price
+      price: item.price,
     });
   };
 

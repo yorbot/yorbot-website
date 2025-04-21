@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, Heart, User, Menu, LogIn } from "lucide-react";
@@ -98,11 +97,7 @@ const Header: React.FC = () => {
               )}
             </Link>
             <button onClick={handleProfileClick}>
-              {user ? (
-                <User className="w-6 h-6" />
-              ) : (
-                <LogIn className="w-6 h-6" />
-              )}
+              <User className="w-6 h-6" />
             </button>
           </div>
 
@@ -179,11 +174,7 @@ const Header: React.FC = () => {
               handleProfileClick();
               toggleMobileMenu();
             }}>
-              {user ? (
-                <User className="w-6 h-6" />
-              ) : (
-                <LogIn className="w-6 h-6" />
-              )}
+              <User className="w-6 h-6" />
             </button>
           </div>
           <nav className="p-4">

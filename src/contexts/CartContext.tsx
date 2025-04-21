@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,47 +23,57 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+// Define type for the cart_items table row
+type CartItemRow = {
+  id: number;
+  user_id: string;
+  product_id: number;
+  product_name: string;
+  product_image: string;
+  price: number;
+  quantity: number;
+  created_at: string;
+  updated_at: string;
+};
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { toast } = useToast();
   const { user } = useAuth();
-  
+
   // Calculate cart count
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
-  // Load cart items from local storage or database when component mounts
   useEffect(() => {
     const loadCartItems = async () => {
       if (user) {
-        // If user is logged in, load cart from database
+        // Load from backend cart_items table
         const { data, error } = await supabase
-          .from('cart_items')
-          .select('*')
-          .eq('user_id', user.id);
+          .from<CartItemRow>("cart_items")
+          .select("*")
+          .eq("user_id", user.id);
 
         if (error) {
-          console.error('Error loading cart items:', error);
+          console.error("Error loading cart items:", error);
           return;
         }
-        
         if (data) {
-          const formattedItems: CartItem[] = data.map(item => ({
+          const formattedItems = data.map((item) => ({
             id: item.product_id,
             name: item.product_name,
             image: item.product_image,
             price: item.price,
-            quantity: item.quantity
+            quantity: item.quantity,
           }));
           setCartItems(formattedItems);
         }
       } else {
-        // If no user, try to load from localStorage
-        const savedCart = localStorage.getItem('cart');
+        const savedCart = localStorage.getItem("cart");
         if (savedCart) {
           try {
             setCartItems(JSON.parse(savedCart));
           } catch (error) {
-            console.error('Error parsing cart from localStorage', error);
+            console.error("Error parsing cart from localStorage", error);
           }
         }
       }
@@ -71,57 +82,50 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     loadCartItems();
   }, [user]);
 
-  // Save cart items to local storage or database whenever they change
   useEffect(() => {
-    const saveCartItems = async () => {
-      if (user) {
-        // If a user is logged in, we'll handle this via database operations
-        // Each operation (add, remove, update) will handle its own database updates
-      } else {
-        // Otherwise save to localStorage
-        localStorage.setItem('cart', JSON.stringify(cartItems));
-      }
-    };
-
-    saveCartItems();
+    if (user) {
+      // Syncing to db happens in add/remove/update methods
+    } else {
+      localStorage.setItem("cart", JSON.stringify(cartItems));
+    }
   }, [cartItems, user]);
 
   const addToCart = async (item: Omit<CartItem, "quantity">) => {
-    // Check if the item is already in the cart
-    const existingItemIndex = cartItems.findIndex((cartItem) => cartItem.id === item.id);
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to add items to your cart",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const existingItemIndex = cartItems.findIndex((i) => i.id === item.id);
 
     if (existingItemIndex > -1) {
-      // Item already exists, increment quantity
       const updatedCartItems = [...cartItems];
       updatedCartItems[existingItemIndex].quantity += 1;
       setCartItems(updatedCartItems);
-      
-      if (user) {
-        // Update in database
-        await supabase
-          .from('cart_items')
-          .update({ quantity: updatedCartItems[existingItemIndex].quantity })
-          .eq('user_id', user.id)
-          .eq('product_id', item.id);
-      }
+
+      // Update DB quantity
+      await supabase
+        .from("cart_items")
+        .update({ quantity: updatedCartItems[existingItemIndex].quantity })
+        .eq("user_id", user.id)
+        .eq("product_id", item.id);
     } else {
-      // Item doesn't exist, add it with quantity 1
       const newItem = { ...item, quantity: 1 };
       setCartItems([...cartItems, newItem]);
-      
-      if (user) {
-        // Insert into database
-        await supabase
-          .from('cart_items')
-          .insert({
-            user_id: user.id,
-            product_id: item.id,
-            product_name: item.name,
-            product_image: item.image,
-            price: item.price,
-            quantity: 1
-          });
-      }
+
+      // Insert to DB
+      await supabase.from("cart_items").insert({
+        user_id: user.id,
+        product_id: item.id,
+        product_name: item.name,
+        product_image: item.image,
+        price: item.price,
+        quantity: 1,
+      });
     }
 
     toast({
@@ -131,16 +135,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeFromCart = async (id: number) => {
-    setCartItems(cartItems.filter((item) => item.id !== id));
-    
-    if (user) {
-      // Remove from database
-      await supabase
-        .from('cart_items')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('product_id', id);
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to remove items from your cart",
+        variant: "destructive",
+      });
+      return;
     }
+
+    setCartItems(cartItems.filter((item) => item.id !== id));
+
+    await supabase
+      .from("cart_items")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("product_id", id);
 
     toast({
       title: "Item removed",
@@ -149,34 +159,32 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const updateQuantity = async (id: number, quantity: number) => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to update cart items",
+        variant: "destructive",
+      });
+      return;
+    }
     if (quantity < 1) return;
 
     const updatedCartItems = cartItems.map((item) =>
       item.id === id ? { ...item, quantity } : item
     );
-
     setCartItems(updatedCartItems);
-    
-    if (user) {
-      // Update in database
-      await supabase
-        .from('cart_items')
-        .update({ quantity })
-        .eq('user_id', user.id)
-        .eq('product_id', id);
-    }
+
+    await supabase
+      .from("cart_items")
+      .update({ quantity })
+      .eq("user_id", user.id)
+      .eq("product_id", id);
   };
 
   const clearCart = async () => {
+    if (!user) return;
     setCartItems([]);
-    
-    if (user) {
-      // Clear all items from database
-      await supabase
-        .from('cart_items')
-        .delete()
-        .eq('user_id', user.id);
-    }
+    await supabase.from("cart_items").delete().eq("user_id", user.id);
   };
 
   return (

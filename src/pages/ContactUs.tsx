@@ -18,18 +18,37 @@ const ContactUs: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real implementation, this would send data to the server
-    console.log("Form submitted:", formData);
-    
-    toast({
-      title: "Message sent!",
-      description: "We'll get back to you as soon as possible.",
-      variant: "default",
-    });
-    
-    setFormData({ name: "", email: "", subject: "", message: "" });
+
+    try {
+      const response = await fetch('/functions/v1/send-contact-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Message sent!",
+          description: "We'll get back to you as soon as possible.",
+          variant: "default",
+        });
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      } else {
+        toast({
+          title: "Sending failed",
+          description: "Unable to send your message right now.",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Sending failed",
+        description: "Please check your internet connection or try again later.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
