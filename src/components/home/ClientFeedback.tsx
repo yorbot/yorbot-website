@@ -1,53 +1,36 @@
 
 import React, { useState, useEffect } from "react";
 import { Star } from "lucide-react";
-
-const testimonials = [
-  {
-    id: 1,
-    name: "Rahul Sharma",
-    rating: 5,
-    comment: "Great quality components and fast delivery. The Arduino board I ordered works perfectly for my robotics project.",
-    image: "https://randomuser.me/api/portraits/men/1.jpg",
-  },
-  {
-    id: 2,
-    name: "Priya Patel",
-    rating: 5,
-    comment: "Excellent customer service! They helped me choose the right sensors for my college project. Highly recommend.",
-    image: "https://randomuser.me/api/portraits/women/2.jpg",
-  },
-  {
-    id: 3,
-    name: "Arjun Singh",
-    rating: 4,
-    comment: "The DIY kit was perfect for my son's school project. Instructions were clear and all parts were included.",
-    image: "https://randomuser.me/api/portraits/men/3.jpg",
-  },
-  {
-    id: 4,
-    name: "Neha Gupta",
-    rating: 5,
-    comment: "The 3D printing service exceeded my expectations. The quality was amazing and turnaround time was quick.",
-    image: "https://randomuser.me/api/portraits/women/4.jpg",
-  },
-];
+import { useClientFeedback } from "@/hooks/useClientFeedback";
 
 const ClientFeedback: React.FC = () => {
+  const { data: testimonials, isLoading, error } = useClientFeedback();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
-  // Auto-rotate testimonials every 5 seconds
   useEffect(() => {
+    if (!testimonials || testimonials.length === 0) return;
     const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1));
+      setCurrentTestimonial((prev) =>
+        prev === testimonials.length - 1 ? 0 : prev + 1
+      );
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [testimonials]);
 
   // Manual navigation
   const goToTestimonial = (index: number) => {
     setCurrentTestimonial(index);
   };
+
+  if (isLoading) {
+    return <div className="py-12 text-center text-gray-400">Loading feedback...</div>;
+  }
+  if (error) {
+    return <div className="py-12 text-center text-red-500">Error loading feedback.</div>;
+  }
+  if (!testimonials || testimonials.length === 0) {
+    return <div className="py-12 text-center text-gray-500">No feedback available.</div>;
+  }
 
   return (
     <div className="py-12 bg-white">
@@ -57,7 +40,7 @@ const ClientFeedback: React.FC = () => {
         <div className="relative max-w-4xl mx-auto">
           {/* Desktop: Display multiple testimonials */}
           <div className="hidden md:grid grid-cols-2 gap-6">
-            {testimonials.map((testimonial) => (
+            {testimonials.map((testimonial: any) => (
               <div
                 key={testimonial.id}
                 className="bg-gray-50 rounded-lg p-6 shadow-sm"
@@ -88,7 +71,7 @@ const ClientFeedback: React.FC = () => {
 
           {/* Mobile: Slider for testimonials */}
           <div className="md:hidden">
-            {testimonials.map((testimonial, index) => (
+            {testimonials.map((testimonial: any, index: number) => (
               <div
                 key={testimonial.id}
                 className={`transition-opacity duration-500 ${
@@ -120,7 +103,7 @@ const ClientFeedback: React.FC = () => {
 
             {/* Navigation dots */}
             <div className="flex justify-center mt-4 space-x-2">
-              {testimonials.map((_, index) => (
+              {testimonials.map((_: any, index: number) => (
                 <button
                   key={index}
                   onClick={() => goToTestimonial(index)}

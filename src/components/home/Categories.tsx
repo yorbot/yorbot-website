@@ -1,93 +1,11 @@
+
 import React, { useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-
-const categories = [
-  {
-    id: 1,
-    name: "Development Boards",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-    slug: "development-boards",
-    subcategories: [
-      "Arduino",
-      "Raspberry Pi",
-      "ESP32/ESP8266",
-      "Boards Compatible with Arduino",
-      "Boards Compatible with Raspberry Pi",
-      "GPS Boards"
-    ]
-  },
-  {
-    id: 2,
-    name: "Sensors",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",
-    slug: "sensors",
-    subcategories: [
-      "LiDAR Sensors",
-      "Ultrasonic Sensors",
-      "Temperature Sensors",
-      "Humidity Sensors",
-      "Motion Sensors",
-      "Gas Sensors"
-    ]
-  },
-  {
-    id: 3,
-    name: "3D Printer & Accessories",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80",
-    slug: "3d-printer",
-  },
-  {
-    id: 4,
-    name: "Drone Parts",
-    image: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?auto=format&fit=crop&w=600&q=80",
-    slug: "drone-parts",
-  },
-  {
-    id: 5,
-    name: "Motors, Pumps, Drivers & Actuators",
-    image: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?auto=format&fit=crop&w=600&q=80",
-    slug: "motors-and-drivers",
-  },
-  {
-    id: 6,
-    name: "E-Bike",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80",
-    slug: "ebike",
-  },
-  {
-    id: 7,
-    name: "Display & Electric Parts",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",
-    slug: "display-and-electric",
-  },
-  {
-    id: 8,
-    name: "Resistors, Wires & Cables",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-    slug: "resistors-and-wires",
-  },
-  {
-    id: 9,
-    name: "Project Kits",
-    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=600&q=80",
-    slug: "project-kits",
-  },
-  {
-    id: 10,
-    name: "Tools & Equipment",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-    slug: "tools-and-equipment",
-  },
-  {
-    id: 11,
-    name: "Mechanical Parts",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",
-    slug: "mechanical-parts",
-  },
-];
+import { useCategories } from "@/hooks/useCategories";
 
 const Categories: React.FC = () => {
+  const { data: categories, isLoading, error } = useCategories();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -102,6 +20,14 @@ const Categories: React.FC = () => {
     }
   };
 
+  if (isLoading) {
+    return <div className="py-12 bg-gray-50 text-center text-gray-500">Loading categories...</div>;
+  }
+
+  if (error || !categories) {
+    return <div className="py-12 bg-gray-50 text-center text-red-500">Failed to load categories.</div>;
+  }
+
   return (
     <div className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -115,7 +41,6 @@ const Categories: React.FC = () => {
             <ArrowRight size={16} className="ml-1" />
           </Link>
         </div>
-
         {/* Mobile: Scrollable categories with arrows */}
         <div className="relative md:hidden">
           <button
@@ -130,7 +55,7 @@ const Categories: React.FC = () => {
             ref={scrollRef}
             className="flex overflow-x-auto pb-4 hide-scrollbar gap-4"
           >
-            {categories.map((category) => (
+            {categories.map((category: any) => (
               <Link
                 key={category.id}
                 to={`/shop/${category.slug}`}
@@ -139,7 +64,7 @@ const Categories: React.FC = () => {
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:scale-105">
                   <div className="h-32 overflow-hidden">
                     <img
-                      src={category.image}
+                      src={category.image_url}
                       alt={category.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
@@ -175,7 +100,7 @@ const Categories: React.FC = () => {
 
         {/* Desktop: Grid layout */}
         <div className="hidden md:grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-          {categories.map((category) => (
+          {categories.map((category: any) => (
             <Link
               key={category.id}
               to={`/shop/${category.slug}`}
@@ -184,7 +109,7 @@ const Categories: React.FC = () => {
               <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full transition-all hover:shadow-md">
                 <div className="h-40 overflow-hidden">
                   <img
-                    src={category.image}
+                    src={category.image_url}
                     alt={category.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
