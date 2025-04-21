@@ -3,6 +3,7 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./AuthContext";
+import { toast } from "sonner";
 
 export type CartItem = {
   id: number;
@@ -23,7 +24,7 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// Define type for the cart_items table row
+// Helper type for the database rows
 type CartItemRow = {
   id: number;
   user_id: string;
@@ -38,7 +39,7 @@ type CartItemRow = {
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
   const { user } = useAuth();
 
   // Calculate cart count
@@ -49,16 +50,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       if (user) {
         // Load from backend cart_items table
         const { data, error } = await supabase
-          .from<CartItemRow>("cart_items")
-          .select("*")
-          .eq("user_id", user.id);
+          .from('cart_items')
+          .select('*')
+          .eq('user_id', user.id);
 
         if (error) {
           console.error("Error loading cart items:", error);
           return;
         }
+        
         if (data) {
-          const formattedItems = data.map((item) => ({
+          const formattedItems = data.map((item: CartItemRow) => ({
             id: item.product_id,
             name: item.product_name,
             image: item.product_image,
@@ -92,10 +94,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const addToCart = async (item: Omit<CartItem, "quantity">) => {
     if (!user) {
-      toast({
-        title: "Sign in required",
+      toast("Sign in required", {
         description: "Please sign in to add items to your cart",
-        variant: "destructive",
       });
       return;
     }
@@ -109,16 +109,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
       // Update DB quantity
       await supabase
-        .from("cart_items")
+        .from('cart_items')
         .update({ quantity: updatedCartItems[existingItemIndex].quantity })
-        .eq("user_id", user.id)
-        .eq("product_id", item.id);
+        .eq('user_id', user.id)
+        .eq('product_id', item.id);
     } else {
       const newItem = { ...item, quantity: 1 };
       setCartItems([...cartItems, newItem]);
 
       // Insert to DB
-      await supabase.from("cart_items").insert({
+      await supabase.from('cart_items').insert({
         user_id: user.id,
         product_id: item.id,
         product_name: item.name,
@@ -128,18 +128,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       });
     }
 
-    toast({
-      title: "Item added to cart",
+    toast("Item added to cart", {
       description: `${item.name} has been added to your cart.`,
     });
   };
 
   const removeFromCart = async (id: number) => {
     if (!user) {
-      toast({
-        title: "Sign in required",
+      toast("Sign in required", {
         description: "Please sign in to remove items from your cart",
-        variant: "destructive",
       });
       return;
     }
@@ -147,23 +144,20 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setCartItems(cartItems.filter((item) => item.id !== id));
 
     await supabase
-      .from("cart_items")
+      .from('cart_items')
       .delete()
-      .eq("user_id", user.id)
-      .eq("product_id", id);
+      .eq('user_id', user.id)
+      .eq('product_id', id);
 
-    toast({
-      title: "Item removed",
+    toast("Item removed", {
       description: "Item has been removed from your cart.",
     });
   };
 
   const updateQuantity = async (id: number, quantity: number) => {
     if (!user) {
-      toast({
-        title: "Sign in required",
+      toast("Sign in required", {
         description: "Please sign in to update cart items",
-        variant: "destructive",
       });
       return;
     }
@@ -175,16 +169,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setCartItems(updatedCartItems);
 
     await supabase
-      .from("cart_items")
+      .from('cart_items')
       .update({ quantity })
-      .eq("user_id", user.id)
-      .eq("product_id", id);
+      .eq('user_id', user.id)
+      .eq('product_id', id);
   };
 
   const clearCart = async () => {
     if (!user) return;
     setCartItems([]);
-    await supabase.from("cart_items").delete().eq("user_id", user.id);
+    await supabase.from('cart_items').delete().eq('user_id', user.id);
   };
 
   return (

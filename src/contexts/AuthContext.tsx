@@ -3,6 +3,7 @@ import React, { createContext, useState, useEffect, useContext, ReactNode } from
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 type AuthContextType = {
   session: Session | null;
@@ -20,7 +21,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
+  const { toast: uiToast } = useToast();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -29,13 +30,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(currentSession?.user ?? null);
 
         if (event === "SIGNED_IN") {
-          toast({
-            title: "Signed in successfully",
+          toast("Signed in successfully", {
             description: "Welcome to Yorbot!",
           });
         } else if (event === "SIGNED_OUT") {
-          toast({
-            title: "Signed out",
+          toast("Signed out", {
             description: "You have been signed out successfully",
           });
         }
@@ -51,7 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, []);
 
   // Remove email confirmation requirement - Supabase project config handles this, so no code here
 
@@ -71,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     if (!error) {
-      toast({
+      uiToast({
         title: "Account created",
         description: "You can now sign in without email confirmation.",
       });
@@ -85,12 +84,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin,
-      },
-    });
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+      
+      if (error) {
+        console.error("Google sign in error:", error);
+        toast("Google Sign-In Failed", {
+          description: error.message || "Please try again later.",
+        });
+      }
+    } catch (error) {
+      console.error("Google sign in exception:", error);
+      toast("Google Sign-In Failed", {
+        description: "An unexpected error occurred. Please try again later.",
+      });
+    }
   };
 
   return (
