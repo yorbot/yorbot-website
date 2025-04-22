@@ -1,7 +1,17 @@
 
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, MapPin, ArrowDown, Linkedin, Instagram, Twitter, Facebook, Youtube } from "lucide-react";
+import {
+  Phone,
+  Mail,
+  MapPin,
+  ArrowDown,
+  Linkedin,
+  Instagram,
+  Twitter,
+  Facebook,
+  Youtube
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface SocialLink {
@@ -36,53 +46,60 @@ const Footer: React.FC = () => {
       try {
         // Fetch social links
         const { data: socialData, error: socialError } = await supabase
-          .from('social_links')
-          .select('*')
-          .eq('is_active', true)
-          .order('display_order');
-        
+          .from("social_links")
+          .select("*")
+          .eq("is_active", true)
+          .order("display_order");
+
         if (socialError) {
-          console.error('Error fetching social links:', socialError);
-        } else if (socialData) {
-          setSocialLinks(socialData);
+          console.error("Error fetching social links:", socialError);
+        } else if (socialData && Array.isArray(socialData)) {
+          setSocialLinks(socialData as SocialLink[]);
         }
-        
+
         // Fetch site settings
         const { data: settingsData, error: settingsError } = await supabase
-          .from('site_settings')
-          .select('*');
-        
+          .from("site_settings")
+          .select("*");
+
         if (settingsError) {
-          console.error('Error fetching site settings:', settingsError);
-        } else if (settingsData) {
+          console.error("Error fetching site settings:", settingsError);
+        } else if (settingsData && Array.isArray(settingsData)) {
           const settings: Record<string, string> = {};
-          settingsData.forEach(setting => {
-            settings[setting.key] = setting.value;
+          settingsData.forEach((setting: SiteSetting) => {
+            settings[setting.key] = setting.value ?? "";
           });
-          setSiteSettings({
-            ...siteSettings,
+          setSiteSettings((prev) => ({
+            ...prev,
             ...settings
-          });
+          }));
         }
       } catch (error) {
-        console.error('Error fetching footer data:', error);
+        console.error("Error fetching footer data:", error);
       } finally {
         setLoading(false);
       }
     }
 
     fetchData();
+    // eslint-disable-next-line
   }, []);
 
   // Map social media icon names to Lucide components
   const getSocialIcon = (iconName: string) => {
     switch (iconName.toLowerCase()) {
-      case 'linkedin': return Linkedin;
-      case 'instagram': return Instagram;
-      case 'twitter': return Twitter;
-      case 'facebook': return Facebook;
-      case 'youtube': return Youtube;
-      default: return Linkedin;
+      case "linkedin":
+        return Linkedin;
+      case "instagram":
+        return Instagram;
+      case "twitter":
+        return Twitter;
+      case "facebook":
+        return Facebook;
+      case "youtube":
+        return Youtube;
+      default:
+        return Linkedin;
     }
   };
 
@@ -98,14 +115,12 @@ const Footer: React.FC = () => {
                 Empowering your robotic and electronic projects
               </p>
             </div>
-            
             {siteSettings.phone && (
               <div className="flex items-center mb-2">
                 <Phone size={16} className="mr-2" />
                 <span className="text-sm">{siteSettings.phone}</span>
               </div>
             )}
-            
             {siteSettings.email && (
               <div className="flex items-center mb-2">
                 <Mail size={16} className="mr-2" />
@@ -114,14 +129,12 @@ const Footer: React.FC = () => {
                 </a>
               </div>
             )}
-            
             {siteSettings.address && (
               <div className="flex items-start mb-4">
                 <MapPin size={16} className="mr-2 mt-1 flex-shrink-0" />
                 <span className="text-sm">{siteSettings.address}</span>
               </div>
             )}
-            
             {/* Social Media Icons */}
             <div className="flex space-x-4 mb-6">
               {socialLinks.map((social) => {
@@ -149,26 +162,42 @@ const Footer: React.FC = () => {
               onClick={() => setAccountOpen(!accountOpen)}
             >
               <h3 className="text-lg font-semibold">My Account</h3>
-              <ArrowDown className={`md:hidden h-4 w-4 transition-transform ${accountOpen ? 'rotate-180' : ''}`} />
+              <ArrowDown
+                className={`md:hidden h-4 w-4 transition-transform ${
+                  accountOpen ? "rotate-180" : ""
+                }`}
+              />
             </div>
-            <ul className={`space-y-2 ${accountOpen ? 'block' : 'hidden md:block'}`}>
+            <ul className={`space-y-2 ${accountOpen ? "block" : "hidden md:block"}`}>
               <li>
-                <Link to="/profile" className="text-sm text-gray-300 hover:text-yorbot-orange">
+                <Link
+                  to="/profile"
+                  className="text-sm text-gray-300 hover:text-yorbot-orange"
+                >
                   My Profile
                 </Link>
               </li>
               <li>
-                <Link to="/profile/orders" className="text-sm text-gray-300 hover:text-yorbot-orange">
+                <Link
+                  to="/profile/orders"
+                  className="text-sm text-gray-300 hover:text-yorbot-orange"
+                >
                   Order History
                 </Link>
               </li>
               <li>
-                <Link to="/wishlist" className="text-sm text-gray-300 hover:text-yorbot-orange">
+                <Link
+                  to="/wishlist"
+                  className="text-sm text-gray-300 hover:text-yorbot-orange"
+                >
                   Wishlist
                 </Link>
               </li>
               <li>
-                <Link to="/cart" className="text-sm text-gray-300 hover:text-yorbot-orange">
+                <Link
+                  to="/cart"
+                  className="text-sm text-gray-300 hover:text-yorbot-orange"
+                >
                   Cart
                 </Link>
               </li>
@@ -182,31 +211,50 @@ const Footer: React.FC = () => {
               onClick={() => setInfoOpen(!infoOpen)}
             >
               <h3 className="text-lg font-semibold">Information</h3>
-              <ArrowDown className={`md:hidden h-4 w-4 transition-transform ${infoOpen ? 'rotate-180' : ''}`} />
+              <ArrowDown
+                className={`md:hidden h-4 w-4 transition-transform ${
+                  infoOpen ? "rotate-180" : ""
+                }`}
+              />
             </div>
-            <ul className={`space-y-2 ${infoOpen ? 'block' : 'hidden md:block'}`}>
+            <ul className={`space-y-2 ${infoOpen ? "block" : "hidden md:block"}`}>
               <li>
-                <Link to="/about-us" className="text-sm text-gray-300 hover:text-yorbot-orange">
+                <Link
+                  to="/about-us"
+                  className="text-sm text-gray-300 hover:text-yorbot-orange"
+                >
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/contact-us" className="text-sm text-gray-300 hover:text-yorbot-orange">
+                <Link
+                  to="/contact-us"
+                  className="text-sm text-gray-300 hover:text-yorbot-orange"
+                >
                   Contact Us
                 </Link>
               </li>
               <li>
-                <Link to="/privacy-policy" className="text-sm text-gray-300 hover:text-yorbot-orange">
+                <Link
+                  to="/privacy-policy"
+                  className="text-sm text-gray-300 hover:text-yorbot-orange"
+                >
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link to="/terms-and-conditions" className="text-sm text-gray-300 hover:text-yorbot-orange">
+                <Link
+                  to="/terms-and-conditions"
+                  className="text-sm text-gray-300 hover:text-yorbot-orange"
+                >
                   Terms & Conditions
                 </Link>
               </li>
               <li>
-                <Link to="/shipping-and-refund" className="text-sm text-gray-300 hover:text-yorbot-orange">
+                <Link
+                  to="/shipping-and-refund"
+                  className="text-sm text-gray-300 hover:text-yorbot-orange"
+                >
                   Shipping & Refund
                 </Link>
               </li>

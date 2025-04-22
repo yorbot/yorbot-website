@@ -75,6 +75,36 @@ export type Database = {
         }
         Relationships: []
       }
+      client_testimonials: {
+        Row: {
+          comment: string
+          created_at: string | null
+          id: number
+          image_url: string
+          is_featured: boolean | null
+          name: string
+          rating: number
+        }
+        Insert: {
+          comment: string
+          created_at?: string | null
+          id?: number
+          image_url: string
+          is_featured?: boolean | null
+          name: string
+          rating: number
+        }
+        Update: {
+          comment?: string
+          created_at?: string | null
+          id?: number
+          image_url?: string
+          is_featured?: boolean | null
+          name?: string
+          rating?: number
+        }
+        Relationships: []
+      }
       contact_messages: {
         Row: {
           created_at: string | null
@@ -239,6 +269,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_settings: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: number
+          key: string
+          updated_at: string | null
+          value: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          key: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          key?: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Relationships: []
+      }
+      social_links: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          icon: string
+          id: number
+          is_active: boolean | null
+          platform: string
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          icon: string
+          id?: number
+          is_active?: boolean | null
+          platform: string
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          icon?: string
+          id?: number
+          is_active?: boolean | null
+          platform?: string
+          url?: string
+        }
+        Relationships: []
       }
       subcategories: {
         Row: {

@@ -9,6 +9,7 @@ interface Testimonial {
   rating: number;
   comment: string;
   image_url: string;
+  is_featured?: boolean;
 }
 
 const ClientFeedback: React.FC = () => {
@@ -20,20 +21,20 @@ const ClientFeedback: React.FC = () => {
     async function fetchTestimonials() {
       try {
         const { data, error } = await supabase
-          .from('client_testimonials')
-          .select('*')
-          .order('is_featured', { ascending: false });
-        
+          .from("client_testimonials")
+          .select("*")
+          .order("is_featured", { ascending: false });
+
         if (error) {
-          console.error('Error fetching testimonials:', error);
+          console.error("Error fetching testimonials:", error);
           return;
         }
-        
-        if (data && data.length > 0) {
-          setTestimonials(data);
+
+        if (data && Array.isArray(data) && data.length > 0) {
+          setTestimonials(data as Testimonial[]);
         }
       } catch (error) {
-        console.error('Error fetching testimonials:', error);
+        console.error("Error fetching testimonials:", error);
       } finally {
         setLoading(false);
       }
@@ -42,17 +43,17 @@ const ClientFeedback: React.FC = () => {
     fetchTestimonials();
   }, []);
 
-  // Auto-rotate testimonials every 5 seconds
   useEffect(() => {
     if (testimonials.length === 0) return;
-    
+
     const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1));
+      setCurrentTestimonial((prev) =>
+        prev === testimonials.length - 1 ? 0 : prev + 1
+      );
     }, 5000);
     return () => clearInterval(interval);
   }, [testimonials.length]);
 
-  // Manual navigation
   const goToTestimonial = (index: number) => {
     setCurrentTestimonial(index);
   };
@@ -61,7 +62,9 @@ const ClientFeedback: React.FC = () => {
     return (
       <div className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Client Feedback</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+            Client Feedback
+          </h2>
           <div className="flex justify-center">
             <div className="w-full max-w-4xl bg-gray-100 h-52 animate-pulse rounded-lg"></div>
           </div>
@@ -77,8 +80,9 @@ const ClientFeedback: React.FC = () => {
   return (
     <div className="py-12 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Client Feedback</h2>
-
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+          Client Feedback
+        </h2>
         <div className="relative max-w-4xl mx-auto">
           {/* Desktop: Display multiple testimonials */}
           <div className="hidden md:grid grid-cols-2 gap-6">
@@ -100,7 +104,11 @@ const ClientFeedback: React.FC = () => {
                         <Star
                           key={i}
                           size={16}
-                          className={i < testimonial.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}
+                          className={
+                            i < testimonial.rating
+                              ? "text-yellow-500 fill-yellow-500"
+                              : "text-gray-300"
+                          }
                         />
                       ))}
                     </div>
@@ -133,16 +141,21 @@ const ClientFeedback: React.FC = () => {
                         <Star
                           key={i}
                           size={16}
-                          className={i < testimonial.rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}
+                          className={
+                            i < testimonial.rating
+                              ? "text-yellow-500 fill-yellow-500"
+                              : "text-gray-300"
+                          }
                         />
                       ))}
                     </div>
                   </div>
-                  <p className="text-gray-600 italic text-center">{testimonial.comment}</p>
+                  <p className="text-gray-600 italic text-center">
+                    {testimonial.comment}
+                  </p>
                 </div>
               </div>
             ))}
-
             {/* Navigation dots */}
             <div className="flex justify-center mt-4 space-x-2">
               {testimonials.map((_, index) => (
@@ -150,7 +163,9 @@ const ClientFeedback: React.FC = () => {
                   key={index}
                   onClick={() => goToTestimonial(index)}
                   className={`w-2 h-2 rounded-full ${
-                    index === currentTestimonial ? "bg-yorbot-orange" : "bg-gray-300"
+                    index === currentTestimonial
+                      ? "bg-yorbot-orange"
+                      : "bg-gray-300"
                   }`}
                   aria-label={`Go to testimonial ${index + 1}`}
                 ></button>
