@@ -1,53 +1,78 @@
 
 import React, { useState, useEffect } from "react";
 import { Star } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-const testimonials = [
-  {
-    id: 1,
-    name: "Rahul Sharma",
-    rating: 5,
-    comment: "Great quality components and fast delivery. The Arduino board I ordered works perfectly for my robotics project.",
-    image: "https://randomuser.me/api/portraits/men/1.jpg",
-  },
-  {
-    id: 2,
-    name: "Priya Patel",
-    rating: 5,
-    comment: "Excellent customer service! They helped me choose the right sensors for my college project. Highly recommend.",
-    image: "https://randomuser.me/api/portraits/women/2.jpg",
-  },
-  {
-    id: 3,
-    name: "Arjun Singh",
-    rating: 4,
-    comment: "The DIY kit was perfect for my son's school project. Instructions were clear and all parts were included.",
-    image: "https://randomuser.me/api/portraits/men/3.jpg",
-  },
-  {
-    id: 4,
-    name: "Neha Gupta",
-    rating: 5,
-    comment: "The 3D printing service exceeded my expectations. The quality was amazing and turnaround time was quick.",
-    image: "https://randomuser.me/api/portraits/women/4.jpg",
-  },
-];
+interface Testimonial {
+  id: number;
+  name: string;
+  rating: number;
+  comment: string;
+  image_url: string;
+}
 
 const ClientFeedback: React.FC = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchTestimonials() {
+      try {
+        const { data, error } = await supabase
+          .from('client_testimonials')
+          .select('*')
+          .order('is_featured', { ascending: false });
+        
+        if (error) {
+          console.error('Error fetching testimonials:', error);
+          return;
+        }
+        
+        if (data && data.length > 0) {
+          setTestimonials(data);
+        }
+      } catch (error) {
+        console.error('Error fetching testimonials:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTestimonials();
+  }, []);
 
   // Auto-rotate testimonials every 5 seconds
   useEffect(() => {
+    if (testimonials.length === 0) return;
+    
     const interval = setInterval(() => {
       setCurrentTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1));
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [testimonials.length]);
 
   // Manual navigation
   const goToTestimonial = (index: number) => {
     setCurrentTestimonial(index);
   };
+
+  if (loading) {
+    return (
+      <div className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Client Feedback</h2>
+          <div className="flex justify-center">
+            <div className="w-full max-w-4xl bg-gray-100 h-52 animate-pulse rounded-lg"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (testimonials.length === 0) {
+    return null;
+  }
 
   return (
     <div className="py-12 bg-white">
@@ -64,7 +89,7 @@ const ClientFeedback: React.FC = () => {
               >
                 <div className="flex items-center mb-4">
                   <img
-                    src={testimonial.image}
+                    src={testimonial.image_url}
                     alt={testimonial.name}
                     className="w-12 h-12 rounded-full mr-4"
                   />
@@ -98,7 +123,7 @@ const ClientFeedback: React.FC = () => {
                 <div className="bg-gray-50 rounded-lg p-6 shadow-sm">
                   <div className="flex flex-col items-center mb-4 text-center">
                     <img
-                      src={testimonial.image}
+                      src={testimonial.image_url}
                       alt={testimonial.name}
                       className="w-16 h-16 rounded-full mb-2"
                     />

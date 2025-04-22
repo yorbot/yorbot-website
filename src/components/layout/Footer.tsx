@@ -1,19 +1,90 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, ArrowDown, Linkedin, Instagram, Twitter, Facebook, Youtube } from "lucide-react";
+import { Phone, Mail, MapPin, ArrowDown, Linkedin, Instagram, Twitter, Facebook, Youtube } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface SocialLink {
+  id: number;
+  platform: string;
+  url: string;
+  icon: string;
+  is_active: boolean;
+  display_order: number;
+}
+
+interface SiteSetting {
+  id: number;
+  key: string;
+  value: string;
+  description: string;
+}
 
 const Footer: React.FC = () => {
   const [accountOpen, setAccountOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+  const [siteSettings, setSiteSettings] = useState<Record<string, string>>({
+    phone: "+91 1234567890",
+    email: "yorbot21@gmail.com",
+    address: ""
+  });
+  const [loading, setLoading] = useState(true);
 
-  const socialLinks = [
-    { icon: Linkedin, href: "https://linkedin.com/company/yorbot", label: "LinkedIn" },
-    { icon: Instagram, href: "https://instagram.com/yorbot", label: "Instagram" },
-    { icon: Twitter, href: "https://twitter.com/yorbot", label: "Twitter" },
-    { icon: Facebook, href: "https://facebook.com/yorbot", label: "Facebook" },
-    { icon: Youtube, href: "https://youtube.com/yorbot", label: "YouTube" }
-  ];
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        // Fetch social links
+        const { data: socialData, error: socialError } = await supabase
+          .from('social_links')
+          .select('*')
+          .eq('is_active', true)
+          .order('display_order');
+        
+        if (socialError) {
+          console.error('Error fetching social links:', socialError);
+        } else if (socialData) {
+          setSocialLinks(socialData);
+        }
+        
+        // Fetch site settings
+        const { data: settingsData, error: settingsError } = await supabase
+          .from('site_settings')
+          .select('*');
+        
+        if (settingsError) {
+          console.error('Error fetching site settings:', settingsError);
+        } else if (settingsData) {
+          const settings: Record<string, string> = {};
+          settingsData.forEach(setting => {
+            settings[setting.key] = setting.value;
+          });
+          setSiteSettings({
+            ...siteSettings,
+            ...settings
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching footer data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  // Map social media icon names to Lucide components
+  const getSocialIcon = (iconName: string) => {
+    switch (iconName.toLowerCase()) {
+      case 'linkedin': return Linkedin;
+      case 'instagram': return Instagram;
+      case 'twitter': return Twitter;
+      case 'facebook': return Facebook;
+      case 'youtube': return Youtube;
+      default: return Linkedin;
+    }
+  };
 
   return (
     <footer className="bg-yorbot-darkGray text-white pt-12 pb-6">
@@ -27,30 +98,47 @@ const Footer: React.FC = () => {
                 Empowering your robotic and electronic projects
               </p>
             </div>
-            <div className="flex items-center mb-2">
-              <Phone size={16} className="mr-2" />
-              <span className="text-sm">+91 1234567890</span>
-            </div>
-            <div className="flex items-center mb-4">
-              <Mail size={16} className="mr-2" />
-              <a href="mailto:yorbot21@gmail.com" className="text-sm">
-                yorbot21@gmail.com
-              </a>
-            </div>
+            
+            {siteSettings.phone && (
+              <div className="flex items-center mb-2">
+                <Phone size={16} className="mr-2" />
+                <span className="text-sm">{siteSettings.phone}</span>
+              </div>
+            )}
+            
+            {siteSettings.email && (
+              <div className="flex items-center mb-2">
+                <Mail size={16} className="mr-2" />
+                <a href={`mailto:${siteSettings.email}`} className="text-sm">
+                  {siteSettings.email}
+                </a>
+              </div>
+            )}
+            
+            {siteSettings.address && (
+              <div className="flex items-start mb-4">
+                <MapPin size={16} className="mr-2 mt-1 flex-shrink-0" />
+                <span className="text-sm">{siteSettings.address}</span>
+              </div>
+            )}
+            
             {/* Social Media Icons */}
             <div className="flex space-x-4 mb-6">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-yorbot-orange transition-colors"
-                  aria-label={social.label}
-                >
-                  <social.icon size={20} />
-                </a>
-              ))}
+              {socialLinks.map((social) => {
+                const IconComponent = getSocialIcon(social.icon);
+                return (
+                  <a
+                    key={social.id}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-300 hover:text-yorbot-orange transition-colors"
+                    aria-label={social.platform}
+                  >
+                    <IconComponent size={20} />
+                  </a>
+                );
+              })}
             </div>
           </div>
 

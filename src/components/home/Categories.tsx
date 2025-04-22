@@ -1,94 +1,64 @@
-import React, { useRef } from "react";
+
+import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-const categories = [
-  {
-    id: 1,
-    name: "Development Boards",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-    slug: "development-boards",
-    subcategories: [
-      "Arduino",
-      "Raspberry Pi",
-      "ESP32/ESP8266",
-      "Boards Compatible with Arduino",
-      "Boards Compatible with Raspberry Pi",
-      "GPS Boards"
-    ]
-  },
-  {
-    id: 2,
-    name: "Sensors",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",
-    slug: "sensors",
-    subcategories: [
-      "LiDAR Sensors",
-      "Ultrasonic Sensors",
-      "Temperature Sensors",
-      "Humidity Sensors",
-      "Motion Sensors",
-      "Gas Sensors"
-    ]
-  },
-  {
-    id: 3,
-    name: "3D Printer & Accessories",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80",
-    slug: "3d-printer",
-  },
-  {
-    id: 4,
-    name: "Drone Parts",
-    image: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?auto=format&fit=crop&w=600&q=80",
-    slug: "drone-parts",
-  },
-  {
-    id: 5,
-    name: "Motors, Pumps, Drivers & Actuators",
-    image: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?auto=format&fit=crop&w=600&q=80",
-    slug: "motors-and-drivers",
-  },
-  {
-    id: 6,
-    name: "E-Bike",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80",
-    slug: "ebike",
-  },
-  {
-    id: 7,
-    name: "Display & Electric Parts",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",
-    slug: "display-and-electric",
-  },
-  {
-    id: 8,
-    name: "Resistors, Wires & Cables",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-    slug: "resistors-and-wires",
-  },
-  {
-    id: 9,
-    name: "Project Kits",
-    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=600&q=80",
-    slug: "project-kits",
-  },
-  {
-    id: 10,
-    name: "Tools & Equipment",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-    slug: "tools-and-equipment",
-  },
-  {
-    id: 11,
-    name: "Mechanical Parts",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",
-    slug: "mechanical-parts",
-  },
-];
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  image_url: string;
+  subcategories?: { id: number; name: string; slug: string }[];
+}
 
 const Categories: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        // Fetch categories
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from('app_categories')
+          .select('*')
+          .order('id');
+        
+        if (categoriesError) {
+          console.error('Error fetching categories:', categoriesError);
+          return;
+        }
+        
+        if (categoriesData && categoriesData.length > 0) {
+          // Fetch subcategories for each category
+          const categoriesWithSubs = await Promise.all(
+            categoriesData.map(async (category) => {
+              const { data: subcategoriesData } = await supabase
+                .from('app_subcategories')
+                .select('*')
+                .eq('category_id', category.id)
+                .order('id');
+              
+              return {
+                ...category,
+                subcategories: subcategoriesData || []
+              };
+            })
+          );
+          
+          setCategories(categoriesWithSubs);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchCategories();
+  }, []);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -101,6 +71,32 @@ const Categories: React.FC = () => {
       }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold">Categories</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden h-full animate-pulse">
+                <div className="h-40 bg-gray-200"></div>
+                <div className="p-4 flex justify-center">
+                  <div className="h-5 w-24 bg-gray-200 rounded"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (categories.length === 0) {
+    return null;
+  }
 
   return (
     <div className="py-12 bg-gray-50">
@@ -139,7 +135,7 @@ const Categories: React.FC = () => {
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:scale-105">
                   <div className="h-32 overflow-hidden">
                     <img
-                      src={category.image}
+                      src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                       alt={category.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
@@ -184,7 +180,7 @@ const Categories: React.FC = () => {
               <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full transition-all hover:shadow-md">
                 <div className="h-40 overflow-hidden">
                   <img
-                    src={category.image}
+                    src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                     alt={category.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
