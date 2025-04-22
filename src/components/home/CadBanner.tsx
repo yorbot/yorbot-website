@@ -6,11 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
 interface Banner {
   id: number;
   title: string;
-  subtitle: string;
-  image_url: string;
-  link: string;
-  button_text: string;
-  is_active: boolean;
+  subtitle?: string | null;
+  image_url?: string | null;
+  link?: string | null;
+  button_text?: string | null;
+  is_active?: boolean | null;
 }
 
 const CadBanner: React.FC = () => {
@@ -21,21 +21,19 @@ const CadBanner: React.FC = () => {
     async function fetchBanner() {
       try {
         const { data, error } = await supabase
-          .from('banners')
-          .select('*')
-          .eq('type', 'cad')
-          .eq('is_active', true)
-          .order('updated_at', { ascending: false })
+          .from("banners")
+          .select("*")
+          .eq("type", "cad")
+          .eq("is_active", true)
+          .order("updated_at", { ascending: false })
           .limit(1)
-          .single();
-        
-        if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned" error code
-          console.error('Error fetching CAD banner:', error);
-          return;
+          .maybeSingle();
+
+        if (error) {
+          console.error("Error fetching CAD banner:", error);
         }
-        
         if (data) {
-          setBanner(data);
+          setBanner(data as Banner);
         } else {
           // Fallback to default banner if none in database
           setBanner({
@@ -49,7 +47,7 @@ const CadBanner: React.FC = () => {
           });
         }
       } catch (error) {
-        console.error('Error fetching CAD banner:', error);
+        console.error("Error fetching CAD banner:", error);
       } finally {
         setLoading(false);
       }
@@ -75,10 +73,10 @@ const CadBanner: React.FC = () => {
   return (
     <div className="py-10 md:py-16">
       <div className="container mx-auto px-4">
-        <div 
+        <div
           className="relative rounded-xl overflow-hidden bg-cover bg-center h-64 md:h-80"
-          style={{ 
-            backgroundImage: `url('${banner.image_url}')` 
+          style={{
+            backgroundImage: `url('${banner.image_url}')`
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent"></div>
@@ -86,11 +84,13 @@ const CadBanner: React.FC = () => {
             <h2 className="text-white text-2xl md:text-4xl font-bold mb-4">
               {banner.title}
             </h2>
-            <p className="text-white text-sm md:text-base mb-6 max-w-md">
-              {banner.subtitle}
-            </p>
+            {banner.subtitle && (
+              <p className="text-white text-sm md:text-base mb-6 max-w-md">
+                {banner.subtitle}
+              </p>
+            )}
             <Link
-              to={banner.link}
+              to={banner.link || "/contact-us"}
               className="inline-block bg-white text-yorbot-orange px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors w-fit"
             >
               {banner.button_text || "Contact Us"}

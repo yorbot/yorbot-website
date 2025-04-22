@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -28,12 +27,12 @@ const HeroBanner: React.FC = () => {
           .eq('type', 'hero')
           .eq('is_active', true)
           .order('position');
-        
+
         if (error) {
           console.error('Error fetching banners:', error);
           return;
         }
-        
+
         if (data && data.length > 0) {
           setBanners(data);
         } else {
@@ -78,7 +77,6 @@ const HeroBanner: React.FC = () => {
     fetchBanners();
   }, []);
 
-  // Auto-rotate banners every 6 seconds
   useEffect(() => {
     if (banners.length === 0) return;
     
@@ -88,7 +86,6 @@ const HeroBanner: React.FC = () => {
     return () => clearInterval(interval);
   }, [banners.length]);
 
-  // Manual navigation
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
   };
@@ -111,7 +108,6 @@ const HeroBanner: React.FC = () => {
 
   return (
     <div className="relative h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden">
-      {/* Slides */}
       {banners.map((banner, index) => (
         <div
           key={banner.id}
@@ -139,7 +135,6 @@ const HeroBanner: React.FC = () => {
         </div>
       ))}
 
-      {/* Navigation dots */}
       <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
         {banners.map((_, index) => (
           <button

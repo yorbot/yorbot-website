@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -20,34 +19,33 @@ const Categories: React.FC = () => {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        // Fetch categories
+        // Fetch categories from new renamed table
         const { data: categoriesData, error: categoriesError } = await supabase
-          .from('app_categories')
+          .from('categories')
           .select('*')
           .order('id');
-        
+
         if (categoriesError) {
           console.error('Error fetching categories:', categoriesError);
           return;
         }
-        
+
         if (categoriesData && categoriesData.length > 0) {
           // Fetch subcategories for each category
           const categoriesWithSubs = await Promise.all(
             categoriesData.map(async (category) => {
               const { data: subcategoriesData } = await supabase
-                .from('app_subcategories')
-                .select('*')
+                .from('subcategories')
+                .select('id,name,slug')
                 .eq('category_id', category.id)
                 .order('id');
-              
               return {
                 ...category,
-                subcategories: subcategoriesData || []
+                subcategories: subcategoriesData as { id: number; name: string; slug: string }[] || []
               };
             })
           );
-          
+
           setCategories(categoriesWithSubs);
         }
       } catch (error) {
