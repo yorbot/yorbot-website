@@ -4,79 +4,124 @@ import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
 
+// Types for table rows
 interface Category {
   id: number;
   name: string;
   slug: string;
-  image_url: string;
+  image_url: string | null;
 }
-
 interface Subcategory {
   id: number;
   name: string;
   slug: string;
   category_id: number;
 }
-
+interface Product {
+  id: number;
+  name: string;
+  slug: string;
+  image_url: string | null;
+  price: number;
+  sale_price: number | null;
+  description: string | null;
+}
 interface CategoryWithSubcategories extends Category {
   subcategories: Subcategory[];
 }
 
 const Shop: React.FC = () => {
-  const { category } = useParams();
+  const { category, subcategory } = useParams();
   const [categories, setCategories] = useState<CategoryWithSubcategories[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<CategoryWithSubcategories | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch All Categories and Their Subcategories
   useEffect(() => {
-    async function fetchData() {
-      try {
-        // Fetch categories from the categories table (not app_categories)
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from('categories')
-          .select('*')
-          .order('id');
-        
-        if (categoriesError) {
-          console.error('Error fetching categories:', categoriesError);
-          return;
-        }
-        
-        if (categoriesData) {
-          // Fetch subcategories for each category
-          const categoriesWithSubs = await Promise.all(
-            categoriesData.map(async (cat) => {
-              const { data: subcategoriesData } = await supabase
-                .from('subcategories')
-                .select('*')
-                .eq('category_id', cat.id)
-                .order('id');
-              
-              return {
-                ...cat,
-                subcategories: subcategoriesData || []
-              };
-            })
-          );
-          
-          setCategories(categoriesWithSubs);
-          
-          // Find selected category if category param exists
-          if (category) {
-            const found = categoriesWithSubs.find(cat => cat.slug === category) || null;
-            setSelectedCategory(found);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
+    async function fetchCategoriesAndSubs() {
+      setLoading(true);
+      // fetch categories
+      const { data: cats, error: catsErr } = await supabase
+        .from("categories")
+        .select("*")
+        .order("id");
+      if (catsErr) {
+        setCategories([]);
         setLoading(false);
+        return;
+      }
+      // fetch subcategories
+      const { data: subs } = await supabase.from("subcategories").select("*");
+      const categoriesWithSubs: CategoryWithSubcategories[] = (cats || []).map(cat => ({
+        ...cat,
+        subcategories: (subs || []).filter(sub => sub.category_id === cat.id),
+      }));
+      setCategories(categoriesWithSubs);
+
+      // Set selectedCategory
+      if (category) {
+        const catObj = categoriesWithSubs.find(c => c.slug === category) || null;
+        setSelectedCategory(catObj);
+
+        // Set selectedSubcategory
+        if (subcategory && catObj) {
+          const subObj = catObj.subcategories.find(s => s.slug === subcategory) || null;
+          setSelectedSubcategory(subObj);
+        } else {
+          setSelectedSubcategory(null);
+        }
+      } else {
+        setSelectedCategory(null);
+        setSelectedSubcategory(null);
+      }
+      setLoading(false);
+    }
+    fetchCategoriesAndSubs();
+  }, [category, subcategory]);
+
+  // When a subcategory is selected, fetch products for that subcategory
+  useEffect(() => {
+    async function fetchProductsForSub() {
+      if (subcategory && selectedSubcategory) {
+        setLoading(true);
+        const { data: prods, error: prodsErr } = await supabase
+          .from("products")
+          .select("*")
+          .eq("subcategory_id", selectedSubcategory.id)
+          .order("created_at", { ascending: false });
+        setProducts(prods || []);
+        setLoading(false);
+      } else {
+        setProducts([]);
       }
     }
+    fetchProductsForSub();
+  }, [subcategory, selectedSubcategory]);
 
-    fetchData();
-  }, [category]);
+  // Loading/Spinner
+  if (loading) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, idx) => (
+              <div key={idx} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm animate-pulse">
+                <div className="h-48 bg-gray-200"></div>
+                <div className="p-4">
+                  <div className="h-6 w-24 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 w-32 bg-gray-200 rounded mt-2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
+  // MAIN LOGIC
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -90,94 +135,134 @@ const Shop: React.FC = () => {
               <span className="font-semibold">{selectedCategory.name}</span>
             </>
           )}
+          {subcategory && selectedSubcategory && (
+            <>
+              <span className="mx-2">/</span>
+              <span className="font-semibold">{selectedSubcategory.name}</span>
+            </>
+          )}
         </div>
-        
+
         <h1 className="text-3xl font-bold mb-8">
-          {category ? (selectedCategory?.name || 'Category not found') : 'All Categories'}
+          {!category ? "All Categories"
+            : !subcategory ? (selectedCategory?.name || "Category not found")
+            : selectedSubcategory?.name || "Subcategory not found"}
         </h1>
-        
-        {loading ? (
+
+        {/* 1. NO CATEGORIES AT ALL */}
+        {categories.length === 0 && (
+          <div className="text-center py-8">
+            <h2 className="text-xl font-medium text-gray-600">No categories found</h2>
+            <p className="text-gray-500 mt-2">Add categories from your admin panel to see them here.</p>
+          </div>
+        )}
+
+        {/* 2. SHOW ALL CATEGORIES */}
+        {!category && categories.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm animate-pulse">
-                <div className="h-48 bg-gray-200"></div>
-                <div className="p-4">
-                  <div className="h-6 w-24 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 w-32 bg-gray-200 rounded mt-2"></div>
-                </div>
+            {categories.map(cat => (
+              <div key={cat.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+                <Link to={`/shop/${cat.slug}`}>
+                  <div className="h-48 overflow-hidden">
+                    <img
+                      src={cat.image_url || "https://via.placeholder.com/300x200?text=Category"}
+                      alt={cat.name}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h2 className="text-lg font-semibold mb-2 hover:text-yorbot-orange transition-colors">
+                      {cat.name}
+                    </h2>
+                    {(cat.subcategories && cat.subcategories.length > 0) && (
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        {cat.subcategories.slice(0, 3).map((sub) => (
+                          <li key={sub.id} className="hover:text-yorbot-orange">
+                            <Link to={`/shop/${cat.slug}/${sub.slug}`}>• {sub.name}</Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </Link>
               </div>
             ))}
           </div>
-        ) : categories.length === 0 ? (
-          <div className="text-center py-8">
-            <h2 className="text-xl font-medium text-gray-600">No categories found</h2>
-            <p className="text-gray-500 mt-2">Categories will appear here once they are added.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {!category ? (
-              // Show all categories
-              categories.map((cat) => (
-                <div key={cat.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-                  <Link to={`/shop/${cat.slug}`}>
+        )}
+
+        {/* 3. SELECTED CATEGORY: SHOW ITS SUBCATEGORIES */}
+        {category && selectedCategory && !subcategory && (
+          selectedCategory.subcategories.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {selectedCategory.subcategories.map(sub => (
+                <div key={sub.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+                  <Link to={`/shop/${selectedCategory.slug}/${sub.slug}`}>
+                    <div className="p-4">
+                      <h2 className="text-lg font-semibold hover:text-yorbot-orange transition-colors">
+                        {sub.name}
+                      </h2>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="col-span-full text-center py-8">
+              <h2 className="text-xl font-medium text-gray-600">No subcategories found</h2>
+              <p className="text-gray-500 mt-2">Add subcategories from your admin panel to see them here.</p>
+            </div>
+          )
+        )}
+
+        {/* 4. SELECTED SUBCATEGORY: SHOW PRODUCTS */}
+        {subcategory && selectedSubcategory && (
+          products.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {products.map(prod => (
+                <div key={prod.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+                  <Link to={`/product/${prod.slug}`}>
                     <div className="h-48 overflow-hidden">
-                      <img 
-                        src={cat.image_url || "https://via.placeholder.com/300x200?text=Category"} 
-                        alt={cat.name} 
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      <img
+                        src={prod.image_url || "https://via.placeholder.com/300x300?text=Product"}
+                        alt={prod.name}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                       />
                     </div>
                     <div className="p-4">
-                      <h2 className="text-lg font-semibold mb-2 hover:text-yorbot-orange transition-colors">
-                        {cat.name}
-                      </h2>
-                      {cat.subcategories && cat.subcategories.length > 0 && (
-                        <ul className="text-sm text-gray-600 space-y-1">
-                          {cat.subcategories.slice(0, 3).map((sub) => (
-                            <li key={sub.id} className="hover:text-yorbot-orange">
-                              <Link to={`/shop/${cat.slug}/${sub.slug}`}>
-                                • {sub.name}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
+                      <h3 className="text-lg font-semibold group-hover:text-yorbot-orange transition-colors">
+                        {prod.name}
+                      </h3>
+                      <div className="mt-2 flex items-center justify-between">
+                        <span className="font-semibold">₹{prod.price.toFixed(2)}</span>
+                        {prod.sale_price && (
+                          <span className="text-sm text-gray-500 line-through">₹{prod.sale_price.toFixed(2)}</span>
+                        )}
+                      </div>
+                      {prod.description && (
+                        <p className="text-gray-600 mt-1 text-sm line-clamp-2">{prod.description}</p>
                       )}
                     </div>
                   </Link>
                 </div>
-              ))
-            ) : selectedCategory ? (
-              // Show subcategories of selected category
-              selectedCategory.subcategories.length > 0 ? (
-                selectedCategory.subcategories.map((subcategory) => (
-                  <div key={subcategory.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-                    <Link to={`/shop/${category}/${subcategory.slug}`}>
-                      <div className="p-4">
-                        <h2 className="text-lg font-semibold hover:text-yorbot-orange transition-colors">
-                          {subcategory.name}
-                        </h2>
-                      </div>
-                    </Link>
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-full text-center py-8">
-                  <h2 className="text-xl font-medium text-gray-600">No subcategories found</h2>
-                  <p className="text-gray-500 mt-2">Subcategories will appear here once they are added.</p>
-                </div>
-              )
-            ) : (
-              <div className="col-span-full text-center py-8">
-                <h2 className="text-xl font-medium text-gray-600">Category not found</h2>
-                <p className="text-gray-500 mt-2">
-                  <Link to="/shop" className="text-yorbot-orange hover:underline">
-                    Return to all categories
-                  </Link>
-                </p>
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="col-span-full text-center py-8">
+              <h2 className="text-xl font-medium text-gray-600">No products found</h2>
+              <p className="text-gray-500 mt-2">No products added in this subcategory yet. Please add from your admin panel.</p>
+            </div>
+          )
         )}
+
+        {/* Category/subcategory not found error */}
+        {(category && !selectedCategory) || (subcategory && !selectedSubcategory) ? (
+          <div className="col-span-full text-center py-8">
+            <h2 className="text-xl font-medium text-gray-600">Not found</h2>
+            <p className="text-gray-500 mt-2">
+              <Link to="/shop" className="text-yorbot-orange hover:underline">Return to all categories</Link>
+            </p>
+          </div>
+        ) : null}
       </div>
     </Layout>
   );
