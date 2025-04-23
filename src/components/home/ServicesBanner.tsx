@@ -1,94 +1,94 @@
-
-import React from "react";
-import { Truck, Headphones, Shield, Star } from "lucide-react";
-
-const services = [
-  {
-    id: 1,
-    icon: Truck,
-    title: "Free Shipping",
-    description: "On orders above 1,000rs",
-  },
-  {
-    id: 2,
-    icon: Headphones,
-    title: "Customer Support 24/7",
-    description: "Dedicated assistance",
-  },
-  {
-    id: 3,
-    icon: Shield,
-    title: "Secure Payment",
-    description: "100% secure checkout",
-  },
-  {
-    id: 4,
-    icon: Star,
-    title: "Quality Assurance",
-    description: "Tested & certified",
-  },
-];
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { fetchServices } from "@/utils/supabaseContent";
 
 const ServicesBanner: React.FC = () => {
-  const [currentService, setCurrentService] = React.useState(0);
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // For mobile, rotate through services every 3 seconds
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      if (window.innerWidth < 768) {
-        setCurrentService((prev) => (prev === services.length - 1 ? 0 : prev + 1));
-      }
-    }, 3000);
-    return () => clearInterval(interval);
+  useEffect(() => {
+    fetchServices().then((data) => {
+      setServices(data);
+      setLoading(false);
+    });
   }, []);
 
-  return (
-    <div className="bg-white py-6 md:py-8">
-      <div className="container mx-auto px-4">
-        {/* Mobile view - slider */}
-        <div className="md:hidden">
-          <div className="overflow-hidden">
-            <div className="flex flex-col items-center">
-              {services.map((service, index) => (
-                <div
-                  key={service.id}
-                  className={`flex flex-col items-center transition-opacity duration-500 ${
-                    index === currentService ? "opacity-100" : "hidden"
-                  }`}
-                >
-                  <service.icon className="w-8 h-8 mb-2 text-yorbot-orange" />
-                  <h3 className="font-semibold text-base mb-1">{service.title}</h3>
-                  <p className="text-yorbot-gray text-xs text-center">{service.description}</p>
-                </div>
-              ))}
-            </div>
+  if (loading) {
+    return (
+      <div className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold">Our Services</h2>
           </div>
-          <div className="flex justify-center mt-4 space-x-2">
-            {services.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentService(index)}
-                className={`w-2 h-2 rounded-full ${
-                  index === currentService ? "bg-yorbot-orange" : "bg-gray-300"
-                }`}
-                aria-label={`Go to service ${index + 1}`}
-              ></button>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[...Array(3)].map((_, index) => (
+              <div key={index} className="bg-gray-100 rounded-lg p-6 animate-pulse">
+                <div className="h-12 w-12 bg-gray-200 rounded-full mb-4"></div>
+                <div className="h-6 w-32 bg-gray-200 rounded mb-3"></div>
+                <div className="h-4 w-full bg-gray-200 rounded mb-2"></div>
+                <div className="h-4 w-2/3 bg-gray-200 rounded mb-4"></div>
+                <div className="h-4 w-24 bg-gray-200 rounded"></div>
+              </div>
             ))}
           </div>
         </div>
+      </div>
+    );
+  }
 
-        {/* Desktop view - grid */}
-        <div className="hidden md:grid grid-cols-4 gap-6">
+  if (services.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="py-12 bg-white">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold">Our Services</h2>
+          <Link
+            to="/services"
+            className="hidden md:flex items-center text-yorbot-orange hover:underline"
+          >
+            <span>View All</span>
+            <ArrowRight size={16} className="ml-1" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {services.map((service) => (
             <div
               key={service.id}
-              className="flex flex-col items-center text-center"
+              className="bg-gray-50 rounded-lg p-6 transition-all hover:shadow-md"
             >
-              <service.icon className="w-9 h-9 mb-2 text-yorbot-orange" />
-              <h3 className="font-semibold text-base mb-1">{service.title}</h3>
-              <p className="text-yorbot-gray text-xs">{service.description}</p>
+              <div className="mb-4">
+                <img
+                  src={service.image_url}
+                  alt={service.title}
+                  className="w-12 h-12 object-contain"
+                />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+              <p className="text-gray-600 mb-4">{service.description}</p>
+              <Link
+                to={`/services/${service.slug}`}
+                className="text-yorbot-orange hover:underline flex items-center"
+              >
+                <span>Learn More</span>
+                <ArrowRight size={16} className="ml-1" />
+              </Link>
             </div>
           ))}
+        </div>
+
+        <div className="flex justify-center mt-6 md:hidden">
+          <Link
+            to="/services"
+            className="flex items-center text-yorbot-orange hover:underline"
+          >
+            <span>View All Services</span>
+            <ArrowRight size={16} className="ml-1" />
+          </Link>
         </div>
       </div>
     </div>
