@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -38,7 +39,7 @@ const ServicesBanner: React.FC = () => {
   }
 
   if (services.length === 0) {
-    return null;
+    return null; // Don't render the section at all if there are no services
   }
 
   return (

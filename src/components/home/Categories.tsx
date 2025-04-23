@@ -1,7 +1,8 @@
+
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { fetchCategories, fetchSubcategories } from "@/utils/supabaseContent";
 
 interface Category {
   id: number;
@@ -17,45 +18,36 @@ const Categories: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchCategories() {
+    async function fetchCategoriesData() {
       try {
-        // Fetch categories from new renamed table
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from('categories')
-          .select('*')
-          .order('id');
-
-        if (categoriesError) {
-          console.error('Error fetching categories:', categoriesError);
-          return;
-        }
+        // Fetch categories
+        const categoriesData = await fetchCategories();
 
         if (categoriesData && categoriesData.length > 0) {
           // Fetch subcategories for each category
           const categoriesWithSubs = await Promise.all(
             categoriesData.map(async (category) => {
-              const { data: subcategoriesData } = await supabase
-                .from('subcategories')
-                .select('id,name,slug')
-                .eq('category_id', category.id)
-                .order('id');
+              const subcategoriesData = await fetchSubcategories(category.id);
               return {
                 ...category,
-                subcategories: subcategoriesData as { id: number; name: string; slug: string }[] || []
+                subcategories: subcategoriesData || []
               };
             })
           );
 
           setCategories(categoriesWithSubs);
+        } else {
+          setCategories([]);
         }
       } catch (error) {
         console.error('Error fetching categories:', error);
+        setCategories([]);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchCategories();
+    fetchCategoriesData();
   }, []);
 
   const scroll = (direction: "left" | "right") => {
@@ -93,7 +85,7 @@ const Categories: React.FC = () => {
   }
 
   if (categories.length === 0) {
-    return null;
+    return null; // Don't render the section at all if there are no categories
   }
 
   return (

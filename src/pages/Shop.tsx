@@ -31,9 +31,9 @@ const Shop: React.FC = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch categories
+        // Fetch categories from the categories table (not app_categories)
         const { data: categoriesData, error: categoriesError } = await supabase
-          .from('app_categories')
+          .from('categories')
           .select('*')
           .order('id');
         
@@ -47,7 +47,7 @@ const Shop: React.FC = () => {
           const categoriesWithSubs = await Promise.all(
             categoriesData.map(async (cat) => {
               const { data: subcategoriesData } = await supabase
-                .from('app_subcategories')
+                .from('subcategories')
                 .select('*')
                 .eq('category_id', cat.id)
                 .order('id');
@@ -108,6 +108,11 @@ const Shop: React.FC = () => {
               </div>
             ))}
           </div>
+        ) : categories.length === 0 ? (
+          <div className="text-center py-8">
+            <h2 className="text-xl font-medium text-gray-600">No categories found</h2>
+            <p className="text-gray-500 mt-2">Categories will appear here once they are added.</p>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {!category ? (
@@ -141,19 +146,35 @@ const Shop: React.FC = () => {
                   </Link>
                 </div>
               ))
-            ) : (
+            ) : selectedCategory ? (
               // Show subcategories of selected category
-              selectedCategory?.subcategories.map((subcategory) => (
-                <div key={subcategory.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-                  <Link to={`/shop/${category}/${subcategory.slug}`}>
-                    <div className="p-4">
-                      <h2 className="text-lg font-semibold hover:text-yorbot-orange transition-colors">
-                        {subcategory.name}
-                      </h2>
-                    </div>
-                  </Link>
+              selectedCategory.subcategories.length > 0 ? (
+                selectedCategory.subcategories.map((subcategory) => (
+                  <div key={subcategory.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <Link to={`/shop/${category}/${subcategory.slug}`}>
+                      <div className="p-4">
+                        <h2 className="text-lg font-semibold hover:text-yorbot-orange transition-colors">
+                          {subcategory.name}
+                        </h2>
+                      </div>
+                    </Link>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">
+                  <h2 className="text-xl font-medium text-gray-600">No subcategories found</h2>
+                  <p className="text-gray-500 mt-2">Subcategories will appear here once they are added.</p>
                 </div>
-              ))
+              )
+            ) : (
+              <div className="col-span-full text-center py-8">
+                <h2 className="text-xl font-medium text-gray-600">Category not found</h2>
+                <p className="text-gray-500 mt-2">
+                  <Link to="/shop" className="text-yorbot-orange hover:underline">
+                    Return to all categories
+                  </Link>
+                </p>
+              </div>
             )}
           </div>
         )}
