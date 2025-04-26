@@ -3,19 +3,32 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { fetchContentSection } from "@/utils/supabaseContent";
+import { useToast } from "@/hooks/use-toast";
 
 const PrivacyPolicy: React.FC = () => {
   const [content, setContent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function loadContent() {
-      const data = await fetchContentSection('privacy-policy');
-      setContent(data?.[0]?.content || null);
-      setLoading(false);
+      try {
+        const data = await fetchContentSection('privacy-policy');
+        console.log("Privacy policy content fetched:", data);
+        setContent(data?.[0]?.content || null);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching privacy-policy content:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load content. Please try again later.",
+          variant: "destructive",
+        });
+        setLoading(false);
+      }
     }
     loadContent();
-  }, []);
+  }, [toast]);
 
   return (
     <Layout>
@@ -41,7 +54,7 @@ const PrivacyPolicy: React.FC = () => {
                 {typeof content === 'string' ? (
                   <div dangerouslySetInnerHTML={{ __html: content }} />
                 ) : (
-                  <div>{JSON.stringify(content)}</div>
+                  <div dangerouslySetInnerHTML={{ __html: JSON.stringify(content) === '{}' ? '' : content?.html || '' }} />
                 )}
               </div>
             ) : (
