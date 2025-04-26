@@ -1,9 +1,22 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import { fetchContentSection } from "@/utils/supabaseContent";
 
 const TermsAndConditions: React.FC = () => {
+  const [content, setContent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadContent() {
+      const data = await fetchContentSection('terms-and-conditions');
+      setContent(data?.[0]?.content || null);
+      setLoading(false);
+    }
+    loadContent();
+  }, []);
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -17,21 +30,25 @@ const TermsAndConditions: React.FC = () => {
           <h1 className="text-3xl font-bold mb-8 text-center">Terms and Conditions</h1>
           
           <div className="bg-white rounded-lg shadow-sm p-8 mb-10">
-            {/* Empty skeleton for admin to fill */}
-            <div className="space-y-6">
-              <p className="text-gray-600">
-                Terms and conditions content will be added by admin. This section will include:
-              </p>
-              
-              <ul className="list-disc list-inside text-gray-600 pl-4 space-y-2">
-                <li>User agreement and terms of service</li>
-                <li>Ordering and payment policies</li>
-                <li>Shipping and delivery information</li>
-                <li>Returns and refunds policy</li>
-                <li>Warranties and disclaimers</li>
-                <li>Legal notices and compliance information</li>
-              </ul>
-            </div>
+            {loading ? (
+              <div className="animate-pulse space-y-4">
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+              </div>
+            ) : content ? (
+              <div className="prose max-w-none">
+                {typeof content === 'string' ? (
+                  <div dangerouslySetInnerHTML={{ __html: content }} />
+                ) : (
+                  <div>{JSON.stringify(content)}</div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center text-gray-600">
+                <p>Content will be added by admin. Please add content from the admin panel.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,9 +1,22 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import { fetchContentSection } from "@/utils/supabaseContent";
 
 const AboutUs: React.FC = () => {
+  const [content, setContent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadContent() {
+      const data = await fetchContentSection('about-us');
+      setContent(data?.[0]?.content || null);
+      setLoading(false);
+    }
+    loadContent();
+  }, []);
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -17,20 +30,25 @@ const AboutUs: React.FC = () => {
           <h1 className="text-3xl font-bold mb-8 text-center">About Yorbot</h1>
           
           <div className="bg-white rounded-lg shadow-sm p-8 mb-10">
-            {/* Empty skeleton for admin to fill */}
-            <div className="space-y-6">
-              <p className="text-gray-600">
-                About us content will be added by admin. This section will include:
-              </p>
-              
-              <ul className="list-disc list-inside text-gray-600 pl-4 space-y-2">
-                <li>Company history and mission</li>
-                <li>Team information</li>
-                <li>Company values</li>
-                <li>Achievements and milestones</li>
-                <li>Technology and innovation focus</li>
-              </ul>
-            </div>
+            {loading ? (
+              <div className="animate-pulse space-y-4">
+                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+              </div>
+            ) : content ? (
+              <div className="prose max-w-none">
+                {typeof content === 'string' ? (
+                  <div dangerouslySetInnerHTML={{ __html: content }} />
+                ) : (
+                  <div>{JSON.stringify(content)}</div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center text-gray-600">
+                <p>Content will be added by admin. Please add content from the admin panel.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

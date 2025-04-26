@@ -231,6 +231,7 @@ export type Database = {
           category_id: number | null
           created_at: string | null
           description: string | null
+          discount_percentage: number | null
           featured: boolean | null
           id: number
           image_url: string | null
@@ -241,6 +242,7 @@ export type Database = {
           specifications: Json | null
           stock: number | null
           subcategory_id: number | null
+          tags: string[] | null
           updated_at: string | null
         }
         Insert: {
@@ -248,6 +250,7 @@ export type Database = {
           category_id?: number | null
           created_at?: string | null
           description?: string | null
+          discount_percentage?: number | null
           featured?: boolean | null
           id?: number
           image_url?: string | null
@@ -258,6 +261,7 @@ export type Database = {
           specifications?: Json | null
           stock?: number | null
           subcategory_id?: number | null
+          tags?: string[] | null
           updated_at?: string | null
         }
         Update: {
@@ -265,6 +269,7 @@ export type Database = {
           category_id?: number | null
           created_at?: string | null
           description?: string | null
+          discount_percentage?: number | null
           featured?: boolean | null
           id?: number
           image_url?: string | null
@@ -275,6 +280,7 @@ export type Database = {
           specifications?: Json | null
           stock?: number | null
           subcategory_id?: number | null
+          tags?: string[] | null
           updated_at?: string | null
         }
         Relationships: [
@@ -386,6 +392,7 @@ export type Database = {
           category_id: number | null
           created_at: string | null
           id: number
+          image_url: string | null
           name: string
           slug: string
         }
@@ -393,6 +400,7 @@ export type Database = {
           category_id?: number | null
           created_at?: string | null
           id?: number
+          image_url?: string | null
           name: string
           slug: string
         }
@@ -400,6 +408,7 @@ export type Database = {
           category_id?: number | null
           created_at?: string | null
           id?: number
+          image_url?: string | null
           name?: string
           slug?: string
         }
