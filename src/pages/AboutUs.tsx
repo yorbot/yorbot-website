@@ -6,7 +6,7 @@ import { fetchContentSection } from "@/utils/supabaseContent";
 import { useToast } from "@/hooks/use-toast";
 
 const AboutUs: React.FC = () => {
-  const [content, setContent] = useState<any>(null);
+  const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -15,7 +15,13 @@ const AboutUs: React.FC = () => {
       try {
         const data = await fetchContentSection('about-us');
         console.log("About us content fetched:", data);
-        setContent(data?.[0]?.content || null);
+        
+        // Check if content exists and is a string
+        const contentValue = data?.content ? 
+          (typeof data.content === 'string' ? data.content : JSON.stringify(data.content)) 
+          : null;
+        
+        setContent(contentValue);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching about-us content:", error);
@@ -50,13 +56,7 @@ const AboutUs: React.FC = () => {
                 <div className="h-4 bg-gray-200 rounded w-5/6"></div>
               </div>
             ) : content ? (
-              <div className="prose max-w-none">
-                {typeof content === 'string' ? (
-                  <div dangerouslySetInnerHTML={{ __html: content }} />
-                ) : (
-                  <div dangerouslySetInnerHTML={{ __html: JSON.stringify(content) === '{}' ? '' : content?.html || '' }} />
-                )}
-              </div>
+              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
             ) : (
               <div className="text-center text-gray-600">
                 <p>Content will be added by admin. Please add content from the admin panel.</p>

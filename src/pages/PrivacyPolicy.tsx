@@ -6,7 +6,7 @@ import { fetchContentSection } from "@/utils/supabaseContent";
 import { useToast } from "@/hooks/use-toast";
 
 const PrivacyPolicy: React.FC = () => {
-  const [content, setContent] = useState<any>(null);
+  const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
@@ -15,7 +15,12 @@ const PrivacyPolicy: React.FC = () => {
       try {
         const data = await fetchContentSection('privacy-policy');
         console.log("Privacy policy content fetched:", data);
-        setContent(data?.[0]?.content || null);
+        
+        const contentValue = data?.content ? 
+          (typeof data.content === 'string' ? data.content : JSON.stringify(data.content)) 
+          : null;
+        
+        setContent(contentValue);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching privacy-policy content:", error);
@@ -50,13 +55,7 @@ const PrivacyPolicy: React.FC = () => {
                 <div className="h-4 bg-gray-200 rounded w-5/6"></div>
               </div>
             ) : content ? (
-              <div className="prose max-w-none">
-                {typeof content === 'string' ? (
-                  <div dangerouslySetInnerHTML={{ __html: content }} />
-                ) : (
-                  <div dangerouslySetInnerHTML={{ __html: JSON.stringify(content) === '{}' ? '' : content?.html || '' }} />
-                )}
-              </div>
+              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
             ) : (
               <div className="text-center text-gray-600">
                 <p>Content will be added by admin. Please add content from the admin panel.</p>
