@@ -16,7 +16,7 @@ const AboutUs: React.FC = () => {
         const data = await fetchContentSection('about-us');
         console.log("About us content fetched:", data);
         
-        // Check if content exists and is a string
+        // Extract content from the data
         const contentValue = data?.content ? 
           (typeof data.content === 'string' ? data.content : JSON.stringify(data.content)) 
           : null;

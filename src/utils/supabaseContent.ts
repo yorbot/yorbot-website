@@ -55,13 +55,13 @@ export async function fetchSubcategories(categoryId?: number) {
   return data;
 }
 
-// Fetch a section by name (e.g. 'about-us', 'homepage-banner'), or fetch all
+// Fetch a section by name (e.g. 'about-us', 'privacy-policy'), or fetch all
 export async function fetchContentSection(section_name: string) {
   const { data, error } = await supabase
     .from("content_sections")
     .select("*")
     .eq("section_name", section_name)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error(`Error fetching content section '${section_name}':`, error);
