@@ -162,30 +162,6 @@ export type Database = {
         }
         Relationships: []
       }
-      content_sections: {
-        Row: {
-          content: Json
-          created_at: string | null
-          id: number
-          section_name: string
-          updated_at: string | null
-        }
-        Insert: {
-          content: Json
-          created_at?: string | null
-          id?: number
-          section_name: string
-          updated_at?: string | null
-        }
-        Update: {
-          content?: Json
-          created_at?: string | null
-          id?: number
-          section_name?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       coupons: {
         Row: {
           code: string

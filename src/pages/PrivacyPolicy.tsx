@@ -50,7 +50,12 @@ const PrivacyPolicy: React.FC = () => {
                 <div className="h-4 bg-gray-200 rounded w-5/6"></div>
               </div>
             ) : content ? (
-              <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: content }} />
+              <div 
+                className="prose prose-lg max-w-none"
+                dangerouslySetInnerHTML={{ 
+                  __html: content 
+                }} 
+              />
             ) : (
               <div className="text-center text-gray-600">
                 <p>Content will be added by admin. Please add content from the admin panel.</p>
