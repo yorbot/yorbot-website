@@ -5,7 +5,7 @@ import Layout from "@/components/layout/Layout";
 import { fetchPageContent } from "@/utils/supabaseContent";
 import { useToast } from "@/hooks/use-toast";
 
-const TermsAndConditions: React.FC = () => {
+const ShippingAndRefund: React.FC = () => {
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -13,12 +13,12 @@ const TermsAndConditions: React.FC = () => {
   useEffect(() => {
     async function loadContent() {
       try {
-        const data = await fetchPageContent('terms-and-conditions');
-        console.log("Terms and conditions content fetched:", data);
+        const data = await fetchPageContent('shipping-and-refund');
+        console.log("Shipping and refund content fetched:", data);
         setContent(data?.content || null);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching terms-and-conditions content:", error);
+        console.error("Error fetching shipping-and-refund content:", error);
         toast({
           title: "Error",
           description: "Failed to load content. Please try again later.",
@@ -36,11 +36,11 @@ const TermsAndConditions: React.FC = () => {
         <div className="flex items-center mb-6">
           <Link to="/" className="text-gray-500 hover:text-yorbot-orange">Home</Link>
           <span className="mx-2">/</span>
-          <span className="font-semibold">Terms and Conditions</span>
+          <span className="font-semibold">Shipping & Refund</span>
         </div>
         
         <div className="max-w-5xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 text-center">Terms and Conditions</h1>
+          <h1 className="text-3xl font-bold mb-8 text-center">Shipping & Refund Policy</h1>
           
           <div className="bg-white rounded-lg shadow-sm p-8 mb-10">
             {loading ? (
@@ -68,4 +68,4 @@ const TermsAndConditions: React.FC = () => {
   );
 };
 
-export default TermsAndConditions;
+export default ShippingAndRefund;

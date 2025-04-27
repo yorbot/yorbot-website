@@ -51,7 +51,7 @@ const AboutUs: React.FC = () => {
               </div>
             ) : content ? (
               <div 
-                className="prose prose-lg max-w-none"
+                className="prose prose-lg max-w-none prose-headings:text-yorbot-orange prose-a:text-yorbot-orange"
                 dangerouslySetInnerHTML={{ 
                   __html: content 
                 }} 

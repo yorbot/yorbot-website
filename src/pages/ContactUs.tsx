@@ -1,8 +1,10 @@
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Phone, Mail, MapPin } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const ContactUs: React.FC = () => {
   const { toast } = useToast();
@@ -12,6 +14,7 @@ const ContactUs: React.FC = () => {
     subject: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -20,13 +23,22 @@ const ContactUs: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      const response = await fetch('/functions/v1/send-contact-message', {
+      const functionUrl = 'https://wowttldmxhrtjvaavfth.supabase.co/functions/v1/send-contact-message';
+      const { data: authData } = await supabase.auth.getSession();
+      
+      const response = await fetch(functionUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authData.session?.access_token || ''}`
+        },
         body: JSON.stringify(formData),
       });
+
+      const result = await response.json();
 
       if (response.ok) {
         toast({
@@ -38,16 +50,19 @@ const ContactUs: React.FC = () => {
       } else {
         toast({
           title: "Sending failed",
-          description: "Unable to send your message right now.",
+          description: result.error || "Unable to send your message right now.",
           variant: "destructive",
         });
       }
     } catch (err) {
+      console.error("Error sending contact message:", err);
       toast({
         title: "Sending failed",
         description: "Please check your internet connection or try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -169,9 +184,17 @@ const ContactUs: React.FC = () => {
                 <div>
                   <button
                     type="submit"
-                    className="w-full bg-yorbot-orange text-white py-3 rounded-md font-medium hover:bg-orange-600 transition-colors"
+                    disabled={isSubmitting}
+                    className="w-full bg-yorbot-orange text-white py-3 rounded-md font-medium hover:bg-orange-600 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Send Message
+                    {isSubmitting ? (
+                      <>
+                        <span className="inline-block animate-spin mr-2">⟳</span>
+                        Sending...
+                      </>
+                    ) : (
+                      "Send Message"
+                    )}
                   </button>
                 </div>
               </div>

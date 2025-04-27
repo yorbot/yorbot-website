@@ -1,9 +1,11 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import AboutUs from "./pages/AboutUs";
 import ContactUs from "./pages/ContactUs";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import ShippingAndRefund from "./pages/ShippingAndRefund";
 import Shop from "./pages/Shop";
 import Product from "./pages/Product";
 import Cart from "./pages/Cart";
@@ -37,6 +39,7 @@ function App() {
               <Route path="/contact-us" element={<ContactUs />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+              <Route path="/shipping-and-refund" element={<ShippingAndRefund />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/shop/:category" element={<Shop />} />
               <Route path="/shop/:category/:subcategory" element={<Shop />} />
