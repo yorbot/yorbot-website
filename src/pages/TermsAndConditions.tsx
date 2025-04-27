@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { fetchContentSection } from "@/utils/supabaseContent";
+import { fetchPageContent } from "@/utils/supabaseContent";
 import { useToast } from "@/hooks/use-toast";
 
 const TermsAndConditions: React.FC = () => {
@@ -13,14 +13,9 @@ const TermsAndConditions: React.FC = () => {
   useEffect(() => {
     async function loadContent() {
       try {
-        const data = await fetchContentSection('terms-and-conditions');
+        const data = await fetchPageContent('terms-and-conditions');
         console.log("Terms and conditions content fetched:", data);
-        
-        const contentValue = data?.content ? 
-          (typeof data.content === 'string' ? data.content : JSON.stringify(data.content)) 
-          : null;
-        
-        setContent(contentValue);
+        setContent(data?.content || null);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching terms-and-conditions content:", error);

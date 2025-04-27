@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { fetchContentSection } from "@/utils/supabaseContent";
+import { fetchPageContent } from "@/utils/supabaseContent";
 import { useToast } from "@/hooks/use-toast";
 
 const PrivacyPolicy: React.FC = () => {
@@ -13,14 +13,9 @@ const PrivacyPolicy: React.FC = () => {
   useEffect(() => {
     async function loadContent() {
       try {
-        const data = await fetchContentSection('privacy-policy');
+        const data = await fetchPageContent('privacy-policy');
         console.log("Privacy policy content fetched:", data);
-        
-        const contentValue = data?.content ? 
-          (typeof data.content === 'string' ? data.content : JSON.stringify(data.content)) 
-          : null;
-        
-        setContent(contentValue);
+        setContent(data?.content || null);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching privacy-policy content:", error);

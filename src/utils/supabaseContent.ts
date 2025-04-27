@@ -24,7 +24,6 @@ export async function fetchServices() {
   return data;
 }
 
-// Fetch categories and subcategories
 export async function fetchCategories() {
   const { data, error } = await supabase
     .from("categories")
@@ -55,16 +54,15 @@ export async function fetchSubcategories(categoryId?: number) {
   return data;
 }
 
-// Fetch a section by name (e.g. 'about-us', 'privacy-policy'), or fetch all
-export async function fetchContentSection(section_name: string) {
+export async function fetchPageContent(slug: string) {
   const { data, error } = await supabase
-    .from("content_sections")
+    .from("content_pages")
     .select("*")
-    .eq("section_name", section_name)
+    .eq("slug", slug)
     .maybeSingle();
 
   if (error) {
-    console.error(`Error fetching content section '${section_name}':`, error);
+    console.error(`Error fetching page content for '${slug}':`, error);
     return null;
   }
   
