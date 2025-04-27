@@ -51,6 +51,50 @@ export type Database = {
         }
         Relationships: []
       }
+      cart_items: {
+        Row: {
+          created_at: string | null
+          id: number
+          price: number
+          product_id: number
+          product_image: string | null
+          product_name: string
+          quantity: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          price: number
+          product_id: number
+          product_image?: string | null
+          product_name: string
+          quantity?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          price?: number
+          product_id?: number
+          product_image?: string | null
+          product_name?: string
+          quantity?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string | null
@@ -443,12 +487,75 @@ export type Database = {
         }
         Relationships: []
       }
+      wishlist_items: {
+        Row: {
+          created_at: string | null
+          id: number
+          in_stock: boolean | null
+          price: number
+          product_id: number
+          product_image: string | null
+          product_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          in_stock?: boolean | null
+          price: number
+          product_id: number
+          product_image?: string | null
+          product_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          in_stock?: boolean | null
+          price?: number
+          product_id?: number
+          product_image?: string | null
+          product_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      add_to_cart: {
+        Args: {
+          p_user_id: string
+          p_product_id: number
+          p_product_name: string
+          p_product_image: string
+          p_price: number
+          p_quantity: number
+        }
+        Returns: undefined
+      }
+      clear_cart: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      remove_from_cart: {
+        Args: { p_user_id: string; p_product_id: number }
+        Returns: undefined
+      }
+      update_cart_item_quantity: {
+        Args: { p_user_id: string; p_product_id: number; p_quantity: number }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
