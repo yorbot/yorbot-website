@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
 import { fetchServices } from "@/utils/supabaseContent";
 
 const ServicesBanner: React.FC = () => {
@@ -29,6 +29,7 @@ const ServicesBanner: React.FC = () => {
                 <div className="h-6 w-32 bg-gray-200 rounded mb-3"></div>
                 <div className="h-4 w-full bg-gray-200 rounded mb-2"></div>
                 <div className="h-4 w-2/3 bg-gray-200 rounded mb-4"></div>
+                <div className="h-4 w-24 bg-gray-200 rounded mb-3"></div>
                 <div className="h-4 w-24 bg-gray-200 rounded"></div>
               </div>
             ))}
@@ -71,13 +72,22 @@ const ServicesBanner: React.FC = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
               <p className="text-gray-600 mb-4">{service.description}</p>
-              <Link
-                to={`/services/${service.slug}`}
-                className="text-yorbot-orange hover:underline flex items-center"
-              >
-                <span>Learn More</span>
-                <ArrowRight size={16} className="ml-1" />
-              </Link>
+              <div className="flex flex-col space-y-2">
+                <Link
+                  to={`/services/${service.slug}`}
+                  className="text-yorbot-orange hover:underline flex items-center"
+                >
+                  <span>Learn More</span>
+                  <ArrowRight size={16} className="ml-1" />
+                </Link>
+                <Link
+                  to="/contact-us"
+                  className="text-yorbot-orange hover:underline flex items-center"
+                >
+                  <Phone size={16} className="mr-1" />
+                  <span>Contact Us</span>
+                </Link>
+              </div>
             </div>
           ))}
         </div>

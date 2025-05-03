@@ -18,6 +18,7 @@ import Educational from "./pages/Educational";
 import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import Services from "./pages/Services";
 
 import { Toaster } from "@/components/ui/sonner";
 
@@ -69,6 +70,8 @@ function App() {
               <Route path="/educational" element={<Educational />} />
               <Route path="/sign-in" element={<SignIn />} />
               <Route path="/sign-up" element={<SignUp />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/services/:serviceSlug" element={<Services />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <Toaster />
