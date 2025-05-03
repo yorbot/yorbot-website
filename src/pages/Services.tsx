@@ -22,8 +22,8 @@ const Services: React.FC = () => {
         </div>
 
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">Our Services</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 fade-in">Our Services</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto fade-in">
             We provide comprehensive solutions tailored to meet your needs. Explore our services or contact us for custom requirements.
           </p>
         </div>
@@ -31,7 +31,7 @@ const Services: React.FC = () => {
         <div className="flex justify-center mt-8">
           <Link
             to="/contact-us"
-            className="bg-yorbot-orange text-white px-6 py-3 rounded-md hover:bg-orange-600 transition-colors"
+            className="bg-yorbot-orange text-white px-6 py-3 rounded-md hover:bg-orange-600 transition-colors hover-scale"
           >
             Contact Us About Our Services
           </Link>
