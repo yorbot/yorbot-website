@@ -28,14 +28,25 @@ const AnimatedBackground: React.FC = () => {
       speedX: number;
       speedY: number;
       opacity: number;
+      color: string;
 
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
         this.size = Math.random() * 3 + 0.5; // Size between 0.5 and 3.5
-        this.speedX = (Math.random() - 0.5) * 0.5; // Horizontal speed
-        this.speedY = (Math.random() - 0.5) * 0.5; // Vertical speed
-        this.opacity = Math.random() * 0.5 + 0.1; // Opacity between 0.1 and 0.6
+        this.speedX = (Math.random() - 0.5) * 0.3; // Reduced speed for softer movement
+        this.speedY = (Math.random() - 0.5) * 0.3; // Reduced speed for softer movement
+        this.opacity = Math.random() * 0.4 + 0.1; // Opacity between 0.1 and 0.5
+        
+        // Color palette - soft business-like colors
+        const colors = [
+          'rgba(30, 41, 59, 1)', // Slate blue
+          'rgba(71, 85, 105, 1)', // Soft blue-gray
+          'rgba(148, 163, 184, 1)', // Light blue-gray
+          'rgba(248, 113, 113, 0.5)', // Soft red (brand accent)
+          'rgba(251, 146, 60, 0.5)', // Soft orange (matching yorbot-orange)
+        ];
+        this.color = colors[Math.floor(Math.random() * colors.length)];
       }
 
       update() {
@@ -55,13 +66,13 @@ const AnimatedBackground: React.FC = () => {
         
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(30, 41, 59, ${this.opacity})`; // Slate blue color
+        ctx.fillStyle = this.color.replace('1)', `${this.opacity})`); // Apply opacity
         ctx.fill();
       }
     }
 
-    // Create an array of particles
-    const particleCount = Math.min(50, Math.floor((canvas.width * canvas.height) / 25000)); // Responsive particle count
+    // Create an array of particles - responsive to screen size
+    const particleCount = Math.min(100, Math.floor((canvas.width * canvas.height) / 15000)); 
     const particles: Particle[] = [];
 
     for (let i = 0; i < particleCount; i++) {
@@ -75,12 +86,17 @@ const AnimatedBackground: React.FC = () => {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const distance = Math.sqrt(dx * dx + dy * dy);
-          const maxDistance = 150;
+          const maxDistance = 170; // Increased connection distance
 
           if (distance < maxDistance) {
+            // Get the base color from the first particle for consistency in lines
+            const baseColor = particles[i].color;
+            // Create gradient opacity based on distance
+            const opacity = 0.15 * (1 - distance / maxDistance);
+            
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(30, 41, 59, ${0.1 * (1 - distance / maxDistance)})`;
-            ctx.lineWidth = 0.5;
+            ctx.strokeStyle = baseColor.replace('1)', `${opacity})`);
+            ctx.lineWidth = 0.8; // Slightly thicker lines
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
             ctx.stroke();
@@ -91,7 +107,9 @@ const AnimatedBackground: React.FC = () => {
 
     // Animation loop
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Clear with a slight blur effect for trails
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Update and draw particles
       for (let i = 0; i < particles.length; i++) {
@@ -114,7 +132,10 @@ const AnimatedBackground: React.FC = () => {
   return (
     <canvas 
       ref={canvasRef} 
-      className="fixed top-0 left-0 w-full h-full -z-10 opacity-30"
+      className="fixed top-0 left-0 w-full h-full -z-10 opacity-40"
+      style={{
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,240,245,0.95) 100%)',
+      }}
     />
   );
 };
