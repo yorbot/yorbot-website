@@ -1,36 +1,29 @@
 
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-
-const services = [
-  {
-    id: 1,
-    name: "FDM 3D Printing",
-    description: "High-quality 3D printing service for functional parts and prototypes",
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    id: 2,
-    name: "SLA 3D Printing",
-    description: "Precision resin printing for detailed parts and models",
-    image: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    id: 3,
-    name: "CNC Cutting",
-    description: "Professional CNC machining for accurate custom components",
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=600&q=80",
-  },
-  {
-    id: 4,
-    name: "Laser Cutting",
-    description: "Precise laser cutting services for various materials",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80",
-  },
-];
+import { fetchServices } from "@/utils/supabaseContent";
+import { toast } from "sonner";
 
 const OurServices: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [services, setServices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadServices = async () => {
+      try {
+        const servicesData = await fetchServices();
+        setServices(servicesData);
+      } catch (error) {
+        console.error("Error loading services:", error);
+        toast.error("Failed to load services");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadServices();
+  }, []);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -43,6 +36,33 @@ const OurServices: React.FC = () => {
       }
     }
   };
+
+  if (loading) {
+    return (
+      <div className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Our Services</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((index) => (
+              <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden animate-pulse">
+                <div className="h-48 bg-gray-200"></div>
+                <div className="p-6">
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-5/6 mb-5"></div>
+                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (services.length === 0) {
+    return null; // Don't render the section if there are no services
+  }
 
   return (
     <div className="py-12 bg-gray-50">
@@ -73,19 +93,19 @@ const OurServices: React.FC = () => {
               >
                 <div className="h-40 overflow-hidden">
                   <img
-                    src={service.image}
-                    alt={service.name}
+                    src={service.image_url || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80"}
+                    alt={service.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-2">{service.name}</h3>
+                  <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
                   <p className="text-sm text-gray-600 mb-4">{service.description}</p>
                   <Link
-                    to="/contact-us"
+                    to={`/services/${service.slug}`}
                     className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors"
                   >
-                    Contact Us
+                    Learn More
                   </Link>
                 </div>
               </div>
@@ -112,19 +132,19 @@ const OurServices: React.FC = () => {
             >
               <div className="h-48 overflow-hidden">
                 <img
-                  src={service.image}
-                  alt={service.name}
+                  src={service.image_url || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80"}
+                  alt={service.title}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-semibold mb-3">{service.name}</h3>
+                <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
                 <p className="text-gray-600 mb-5">{service.description}</p>
                 <Link
-                  to="/contact-us"
+                  to={`/services/${service.slug}`}
                   className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors"
                 >
-                  Contact Us
+                  Learn More
                 </Link>
               </div>
             </div>
