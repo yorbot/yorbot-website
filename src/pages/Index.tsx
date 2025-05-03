@@ -2,7 +2,6 @@
 import React from "react";
 import Layout from "@/components/layout/Layout";
 import HeroBanner from "@/components/home/HeroBanner";
-import ServicesBanner from "@/components/home/ServicesBanner";
 import Categories from "@/components/home/Categories";
 import CadBanner from "@/components/home/CadBanner";
 import MechanicalParts from "@/components/home/MechanicalParts";
@@ -13,7 +12,6 @@ const Index: React.FC = () => {
   return (
     <Layout>
       <HeroBanner />
-      <ServicesBanner />
       <Categories />
       <CadBanner />
       <MechanicalParts />

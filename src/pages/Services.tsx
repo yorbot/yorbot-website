@@ -2,7 +2,6 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { Phone } from "lucide-react";
 
 const Services: React.FC = () => {
   const { serviceSlug } = useParams();
@@ -32,9 +31,8 @@ const Services: React.FC = () => {
         <div className="flex justify-center mt-8">
           <Link
             to="/contact-us"
-            className="flex items-center justify-center bg-yorbot-orange text-white px-6 py-3 rounded-md hover:bg-orange-600 transition-colors"
+            className="bg-yorbot-orange text-white px-6 py-3 rounded-md hover:bg-orange-600 transition-colors"
           >
-            <Phone size={20} className="mr-2" />
             Contact Us About Our Services
           </Link>
         </div>

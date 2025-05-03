@@ -3,7 +3,6 @@ import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { fetchServices } from "@/utils/supabaseContent";
 import { toast } from "sonner";
-import { Phone } from "lucide-react";
 
 const OurServices: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -51,7 +50,6 @@ const OurServices: React.FC = () => {
                   <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
                   <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
                   <div className="h-4 bg-gray-200 rounded w-5/6 mb-5"></div>
-                  <div className="h-10 bg-gray-200 rounded w-full mb-3"></div>
                   <div className="h-10 bg-gray-200 rounded w-full"></div>
                 </div>
               </div>
@@ -104,16 +102,9 @@ const OurServices: React.FC = () => {
                   <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
                   <p className="text-sm text-gray-600 mb-4">{service.description}</p>
                   <Link
-                    to={`/services/${service.slug}`}
-                    className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors mb-2"
-                  >
-                    Learn More
-                  </Link>
-                  <Link
                     to="/contact-us"
-                    className="flex items-center justify-center w-full bg-white border border-yorbot-orange text-yorbot-orange py-2 rounded-md hover:bg-gray-50 transition-colors"
+                    className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors"
                   >
-                    <Phone size={16} className="mr-2" />
                     Contact Us
                   </Link>
                 </div>
@@ -150,16 +141,9 @@ const OurServices: React.FC = () => {
                 <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
                 <p className="text-gray-600 mb-5">{service.description}</p>
                 <Link
-                  to={`/services/${service.slug}`}
-                  className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors mb-3"
-                >
-                  Learn More
-                </Link>
-                <Link
                   to="/contact-us"
-                  className="flex items-center justify-center w-full bg-white border border-yorbot-orange text-yorbot-orange py-2 rounded-md hover:bg-gray-50 transition-colors"
+                  className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors"
                 >
-                  <Phone size={16} className="mr-2" />
                   Contact Us
                 </Link>
               </div>
