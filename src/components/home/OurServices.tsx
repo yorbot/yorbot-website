@@ -41,16 +41,16 @@ const OurServices: React.FC = () => {
     return (
       <div className="py-12 bg-transparent">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Our Services</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-200">Our Services</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((index) => (
               <div key={index} className="glass-card overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-200 bg-opacity-50"></div>
+                <div className="h-48 bg-gray-800 bg-opacity-50"></div>
                 <div className="p-6">
-                  <div className="h-6 bg-gray-200 bg-opacity-50 rounded w-3/4 mb-3"></div>
-                  <div className="h-4 bg-gray-200 bg-opacity-50 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 bg-opacity-50 rounded w-5/6 mb-5"></div>
-                  <div className="h-10 bg-gray-200 bg-opacity-50 rounded w-full"></div>
+                  <div className="h-6 bg-gray-800 bg-opacity-50 rounded w-3/4 mb-3"></div>
+                  <div className="h-4 bg-gray-800 bg-opacity-50 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-800 bg-opacity-50 rounded w-5/6 mb-5"></div>
+                  <div className="h-10 bg-gray-800 bg-opacity-50 rounded w-full"></div>
                 </div>
               </div>
             ))}
@@ -67,13 +67,13 @@ const OurServices: React.FC = () => {
   return (
     <div className="py-12 bg-transparent">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Our Services</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-200">Our Services</h2>
 
         {/* Mobile: Scrollable services */}
         <div className="relative md:hidden">
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 glass-button bg-white rounded-full p-2 shadow-md"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 glass-button bg-gray-800 rounded-full p-2 shadow-lg text-gray-200"
             aria-label="Scroll left"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform rotate-180">
@@ -99,8 +99,8 @@ const OurServices: React.FC = () => {
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
-                  <p className="text-sm text-gray-600 mb-4">{service.description}</p>
+                  <h3 className="text-lg font-semibold mb-2 text-gray-200">{service.title}</h3>
+                  <p className="text-sm text-gray-400 mb-4">{service.description}</p>
                   <Link
                     to="/contact-us"
                     className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors"
@@ -114,7 +114,7 @@ const OurServices: React.FC = () => {
           
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 glass-button bg-white rounded-full p-2 shadow-md"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 glass-button bg-gray-800 rounded-full p-2 shadow-lg text-gray-200"
             aria-label="Scroll right"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -138,8 +138,8 @@ const OurServices: React.FC = () => {
                 />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-semibold mb-3">{service.title}</h3>
-                <p className="text-gray-600 mb-5">{service.description}</p>
+                <h3 className="text-xl font-semibold mb-3 text-gray-200">{service.title}</h3>
+                <p className="text-gray-400 mb-5">{service.description}</p>
                 <Link
                   to="/contact-us"
                   className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors"

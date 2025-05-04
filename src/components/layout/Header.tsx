@@ -64,7 +64,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className={`w-full bg-white z-50 ${scrolled ? "shadow-md" : ""}`}>
+    <header className={`w-full bg-gray-900 bg-opacity-80 backdrop-blur-md z-50 ${scrolled ? "shadow-md shadow-black/20" : ""}`}>
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center">

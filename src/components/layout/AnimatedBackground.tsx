@@ -38,13 +38,13 @@ const AnimatedBackground: React.FC = () => {
         this.speedY = (Math.random() - 0.5) * 0.3; // Reduced speed for softer movement
         this.opacity = Math.random() * 0.4 + 0.1; // Opacity between 0.1 and 0.5
         
-        // Color palette - soft business-like colors
+        // Color palette - soft colors for dark background
         const colors = [
-          'rgba(30, 41, 59, 1)', // Slate blue
-          'rgba(71, 85, 105, 1)', // Soft blue-gray
-          'rgba(148, 163, 184, 1)', // Light blue-gray
-          'rgba(248, 113, 113, 0.5)', // Soft red (brand accent)
-          'rgba(251, 146, 60, 0.5)', // Soft orange (matching yorbot-orange)
+          'rgba(100, 149, 237, 1)', // Cornflower blue
+          'rgba(135, 206, 250, 1)', // Light sky blue
+          'rgba(248, 113, 113, 0.5)', // Soft red
+          'rgba(251, 146, 60, 0.5)', // Soft orange
+          'rgba(140, 140, 140, 0.7)', // Soft white/gray
         ];
         this.color = colors[Math.floor(Math.random() * colors.length)];
       }
@@ -86,7 +86,7 @@ const AnimatedBackground: React.FC = () => {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const distance = Math.sqrt(dx * dx + dy * dy);
-          const maxDistance = 170; // Increased connection distance
+          const maxDistance = 170; // Connection distance
 
           if (distance < maxDistance) {
             // Get the base color from the first particle for consistency in lines
@@ -108,7 +108,7 @@ const AnimatedBackground: React.FC = () => {
     // Animation loop
     const animate = () => {
       // Clear with a slight blur effect for trails
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.01)'; // More transparent to preserve trails
+      ctx.fillStyle = 'rgba(20, 20, 30, 0.05)'; // Dark background with trail effect
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Update and draw particles
@@ -132,9 +132,9 @@ const AnimatedBackground: React.FC = () => {
   return (
     <canvas 
       ref={canvasRef} 
-      className="fixed top-0 left-0 w-full h-full -z-10 opacity-50"
+      className="fixed top-0 left-0 w-full h-full -z-10"
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(240,240,245,0.85) 100%)',
+        background: 'linear-gradient(135deg, rgba(20,20,35,0.95) 0%, rgba(30,30,45,0.95) 100%)', // Dark gradient background
       }}
     />
   );

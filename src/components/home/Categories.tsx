@@ -67,14 +67,14 @@ const Categories: React.FC = () => {
       <div className="py-12 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold">Categories</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-200">Categories</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {[...Array(6)].map((_, index) => (
               <div key={index} className="glass-card overflow-hidden h-full animate-pulse">
-                <div className="h-40 bg-gray-200 bg-opacity-50"></div>
+                <div className="h-40 bg-gray-800 bg-opacity-50"></div>
                 <div className="p-4 flex justify-center">
-                  <div className="h-5 w-24 bg-gray-200 bg-opacity-50 rounded"></div>
+                  <div className="h-5 w-24 bg-gray-800 bg-opacity-50 rounded"></div>
                 </div>
               </div>
             ))}
@@ -92,7 +92,7 @@ const Categories: React.FC = () => {
     <div className="py-12 bg-transparent">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold">Categories</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-200">Categories</h2>
           <Link
             to="/shop"
             className="hidden md:flex items-center text-yorbot-orange hover:underline"
@@ -106,7 +106,7 @@ const Categories: React.FC = () => {
         <div className="relative md:hidden">
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 glass-button bg-white rounded-full p-2 shadow-md"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 glass-button rounded-full p-2 shadow-lg text-gray-200"
             aria-label="Scroll left"
           >
             <ArrowRight size={16} className="transform rotate-180" />
@@ -131,7 +131,7 @@ const Categories: React.FC = () => {
                     />
                   </div>
                   <div className="p-3 text-center">
-                    <h3 className="text-sm font-medium group-hover:text-yorbot-orange transition-colors">
+                    <h3 className="text-sm font-medium text-gray-300 group-hover:text-yorbot-orange transition-colors">
                       {category.name}
                     </h3>
                   </div>
@@ -142,7 +142,7 @@ const Categories: React.FC = () => {
           
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 glass-button bg-white rounded-full p-2 shadow-md"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 glass-button rounded-full p-2 shadow-lg text-gray-200"
             aria-label="Scroll right"
           >
             <ArrowRight size={16} />
@@ -167,7 +167,7 @@ const Categories: React.FC = () => {
               to={`/shop/${category.slug}`}
               className="group"
             >
-              <div className="glass-card h-full transition-all hover:shadow-md">
+              <div className="glass-card h-full transition-all hover:shadow-md hover:shadow-black/20">
                 <div className="h-40 overflow-hidden">
                   <img
                     src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
@@ -176,7 +176,7 @@ const Categories: React.FC = () => {
                   />
                 </div>
                 <div className="p-4 text-center">
-                  <h3 className="font-medium group-hover:text-yorbot-orange transition-colors">
+                  <h3 className="font-medium text-gray-300 group-hover:text-yorbot-orange transition-colors">
                     {category.name}
                   </h3>
                 </div>
