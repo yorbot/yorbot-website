@@ -20,12 +20,12 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Services from "./pages/Services";
 
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
 
 // Context Providers
 import { AuthProvider } from "./contexts/AuthContext";
-import { CartProvider } from "./contexts/CartContext";
-import { WishlistProvider } from "./contexts/WishlistContext";
+import { CartProvider } from "./contexts/CartProvider";
+import { WishlistProvider } from "./contexts/WishlistProvider";
 import RequireAuth from "./components/auth/RequireAuth";
 
 function App() {
