@@ -39,18 +39,18 @@ const OurServices: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="py-12 bg-gray-50">
+      <div className="py-12 bg-transparent">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Our Services</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((index) => (
-              <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-200"></div>
+              <div key={index} className="glass-card overflow-hidden animate-pulse">
+                <div className="h-48 bg-gray-200 bg-opacity-50"></div>
                 <div className="p-6">
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-5/6 mb-5"></div>
-                  <div className="h-10 bg-gray-200 rounded w-full"></div>
+                  <div className="h-6 bg-gray-200 bg-opacity-50 rounded w-3/4 mb-3"></div>
+                  <div className="h-4 bg-gray-200 bg-opacity-50 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-gray-200 bg-opacity-50 rounded w-5/6 mb-5"></div>
+                  <div className="h-10 bg-gray-200 bg-opacity-50 rounded w-full"></div>
                 </div>
               </div>
             ))}
@@ -65,7 +65,7 @@ const OurServices: React.FC = () => {
   }
 
   return (
-    <div className="py-12 bg-gray-50">
+    <div className="py-12 bg-transparent">
       <div className="container mx-auto px-4">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Our Services</h2>
 
@@ -73,7 +73,7 @@ const OurServices: React.FC = () => {
         <div className="relative md:hidden">
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 glass-button bg-white rounded-full p-2 shadow-md"
             aria-label="Scroll left"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform rotate-180">
@@ -89,13 +89,13 @@ const OurServices: React.FC = () => {
             {services.map((service) => (
               <div
                 key={service.id}
-                className="flex-shrink-0 w-64 bg-white rounded-lg shadow-sm overflow-hidden"
+                className="flex-shrink-0 w-64 glass-card overflow-hidden"
               >
                 <div className="h-40 overflow-hidden">
                   <img
                     src={service.image_url || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80"}
                     alt={service.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 <div className="p-4">
@@ -114,7 +114,7 @@ const OurServices: React.FC = () => {
           
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 glass-button bg-white rounded-full p-2 shadow-md"
             aria-label="Scroll right"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -128,7 +128,7 @@ const OurServices: React.FC = () => {
           {services.map((service) => (
             <div
               key={service.id}
-              className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:translate-y-[-5px]"
+              className="glass-card overflow-hidden transition-transform hover:translate-y-[-5px]"
             >
               <div className="h-48 overflow-hidden">
                 <img

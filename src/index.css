@@ -99,7 +99,7 @@
   body {
     @apply bg-background text-foreground;
     /* Removing the original gradient as we now use the canvas for background */
-    background: #ffffff;
+    background: transparent;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -133,8 +133,25 @@
     @apply translate-y-0 opacity-100;
   }
   
+  /* Glass effect classes */
   .glass-effect {
-    @apply bg-white bg-opacity-70 backdrop-blur-sm border border-white border-opacity-20 shadow-lg;
+    @apply bg-white bg-opacity-40 backdrop-blur-sm border border-white border-opacity-20 shadow-lg;
+  }
+
+  .glass-effect-dark {
+    @apply bg-gray-900 bg-opacity-40 backdrop-blur-sm border border-gray-800 border-opacity-20 shadow-lg;
+  }
+  
+  .glass-card {
+    @apply bg-white bg-opacity-60 backdrop-blur-sm rounded-lg shadow-md border border-white border-opacity-30 transition-all duration-300 hover:bg-opacity-70;
+  }
+
+  .glass-button {
+    @apply backdrop-blur-sm bg-opacity-80 transition-all hover:bg-opacity-100;
+  }
+
+  .transparent-bg {
+    @apply bg-opacity-70 backdrop-filter backdrop-blur-sm;
   }
 }
 
@@ -169,4 +186,20 @@
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
+}
+
+/* Background elements */
+.bg-transparent-white {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.bg-transparent-card {
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .bg-transparent-card {
+  background-color: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(30, 41, 59, 0.2);
 }

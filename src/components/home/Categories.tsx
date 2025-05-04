@@ -64,17 +64,17 @@ const Categories: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="py-12 bg-gray-50">
+      <div className="py-12 bg-transparent">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold">Categories</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
             {[...Array(6)].map((_, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden h-full animate-pulse">
-                <div className="h-40 bg-gray-200"></div>
+              <div key={index} className="glass-card overflow-hidden h-full animate-pulse">
+                <div className="h-40 bg-gray-200 bg-opacity-50"></div>
                 <div className="p-4 flex justify-center">
-                  <div className="h-5 w-24 bg-gray-200 rounded"></div>
+                  <div className="h-5 w-24 bg-gray-200 bg-opacity-50 rounded"></div>
                 </div>
               </div>
             ))}
@@ -89,7 +89,7 @@ const Categories: React.FC = () => {
   }
 
   return (
-    <div className="py-12 bg-gray-50">
+    <div className="py-12 bg-transparent">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold">Categories</h2>
@@ -106,7 +106,7 @@ const Categories: React.FC = () => {
         <div className="relative md:hidden">
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 glass-button bg-white rounded-full p-2 shadow-md"
             aria-label="Scroll left"
           >
             <ArrowRight size={16} className="transform rotate-180" />
@@ -122,7 +122,7 @@ const Categories: React.FC = () => {
                 to={`/shop/${category.slug}`}
                 className="flex-shrink-0 w-40 group"
               >
-                <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:scale-105">
+                <div className="glass-card overflow-hidden transition-transform hover:scale-105">
                   <div className="h-32 overflow-hidden">
                     <img
                       src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
@@ -142,7 +142,7 @@ const Categories: React.FC = () => {
           
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 glass-button bg-white rounded-full p-2 shadow-md"
             aria-label="Scroll right"
           >
             <ArrowRight size={16} />
@@ -167,7 +167,7 @@ const Categories: React.FC = () => {
               to={`/shop/${category.slug}`}
               className="group"
             >
-              <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full transition-all hover:shadow-md">
+              <div className="glass-card h-full transition-all hover:shadow-md">
                 <div className="h-40 overflow-hidden">
                   <img
                     src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}

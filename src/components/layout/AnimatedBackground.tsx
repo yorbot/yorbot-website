@@ -108,7 +108,7 @@ const AnimatedBackground: React.FC = () => {
     // Animation loop
     const animate = () => {
       // Clear with a slight blur effect for trails
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.01)'; // More transparent to preserve trails
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Update and draw particles
@@ -132,9 +132,9 @@ const AnimatedBackground: React.FC = () => {
   return (
     <canvas 
       ref={canvasRef} 
-      className="fixed top-0 left-0 w-full h-full -z-10 opacity-40"
+      className="fixed top-0 left-0 w-full h-full -z-10 opacity-50"
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,240,245,0.95) 100%)',
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(240,240,245,0.85) 100%)',
       }}
     />
   );
