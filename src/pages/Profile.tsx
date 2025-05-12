@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const Profile: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -98,7 +98,7 @@ const Profile: React.FC = () => {
           state: formData.state,
           postal_code: formData.postalCode,
           country: formData.country,
-          updated_at: new Date(),
+          updated_at: new Date().toISOString(),
         })
         .eq('id', user.id);
 

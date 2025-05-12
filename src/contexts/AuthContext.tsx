@@ -2,7 +2,7 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { toast } from "sonner";
 
 type AuthContextType = {
@@ -52,8 +52,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  // Remove email confirmation requirement - Supabase project config handles this, so no code here
-
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error };
@@ -65,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       password,
       options: {
         data: metadata,
-        emailRedirectTo: window.location.origin, // Disable confirmation email flow on Supabase side via settings
+        emailRedirectTo: window.location.origin,
       },
     });
 
