@@ -17,7 +17,7 @@ export interface CartItem {
 interface CartContextType {
   cart: CartItem[];
   cartCount: number;
-  addToCart: (product: CartItem) => Promise<void>;
+  addToCart: (product: Omit<CartItem, "id">) => Promise<void>;
   removeFromCart: (id: string) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -76,7 +76,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('user_id', user.id);
         
       if (error) throw error;
-      setCart(data || []);
+      
+      if (data) {
+        // Transform the data to match our CartItem interface
+        const transformedData: CartItem[] = data.map(item => ({
+          id: item.id.toString(),
+          product_id: item.product_id.toString(),
+          quantity: item.quantity,
+          name: item.product_name,
+          price: item.price,
+          image: item.product_image || ''
+        }));
+        
+        setCart(transformedData);
+      }
     } catch (error) {
       console.error('Error loading cart items:', error);
       toast({
@@ -88,7 +101,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const addToCart = async (product: CartItem) => {
+  const addToCart = async (product: Omit<CartItem, "id">) => {
     setIsLoading(true);
     
     try {
@@ -111,20 +124,36 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           .insert([
             {
               user_id: user.id,
-              product_id: product.product_id,
+              product_id: parseInt(product.product_id),
               quantity: product.quantity,
-              name: product.name,
+              product_name: product.name,
               price: product.price,
-              image: product.image
+              product_image: product.image
             }
           ])
           .select();
           
         if (error) throw error;
-        setCart(prevCart => [...prevCart, data[0]]);
+        
+        if (data && data[0]) {
+          const newItem: CartItem = {
+            id: data[0].id.toString(),
+            product_id: data[0].product_id.toString(),
+            quantity: data[0].quantity,
+            name: data[0].product_name,
+            price: data[0].price,
+            image: data[0].product_image || ''
+          };
+          
+          setCart(prevCart => [...prevCart, newItem]);
+        }
       } else {
         // Add to local cart if not logged in
-        setCart(prevCart => [...prevCart, product]);
+        const newItem: CartItem = {
+          ...product,
+          id: Date.now().toString() // Generate a temporary ID
+        };
+        setCart(prevCart => [...prevCart, newItem]);
       }
       
       toast({
@@ -152,7 +181,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { error } = await supabase
           .from('cart_items')
           .delete()
-          .eq('id', id);
+          .eq('id', parseInt(id));
           
         if (error) throw error;
       }
@@ -190,7 +219,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { error } = await supabase
           .from('cart_items')
           .update({ quantity })
-          .eq('id', id);
+          .eq('id', parseInt(id));
           
         if (error) throw error;
       }

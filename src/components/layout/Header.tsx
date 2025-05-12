@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, Heart, User, Menu, LogIn } from "lucide-react";
 import SearchBar from "../SearchBar";
-import { useCart } from "@/contexts/CartContext";
-import { useWishlist } from "@/contexts/WishlistContext";
+import { useCart } from "@/contexts/CartProvider";
+import { useWishlist } from "@/contexts/WishlistProvider";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Header: React.FC = () => {
