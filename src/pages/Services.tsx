@@ -30,17 +30,17 @@ const Services: React.FC = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-12 text-gray-800" ref={servicesRef}>
+      <div className="container mx-auto px-4 py-12" ref={servicesRef}>
         <div className="flex items-center mb-6">
-          <Link to="/" className="text-gray-600 hover:text-yorbot-orange">
+          <Link to="/" className="text-gray-500 hover:text-yorbot-orange">
             Home
           </Link>
-          <span className="mx-2 text-gray-500">/</span>
-          <span className="font-semibold text-gray-700">Services</span>
+          <span className="mx-2">/</span>
+          <span className="font-semibold">Services</span>
           {serviceSlug && (
             <>
-              <span className="mx-2 text-gray-500">/</span>
-              <span className="font-semibold capitalize text-gray-700">
+              <span className="mx-2">/</span>
+              <span className="font-semibold capitalize">
                 {serviceSlug.replace(/-/g, " ")}
               </span>
             </>
@@ -48,7 +48,7 @@ const Services: React.FC = () => {
         </div>
 
         <div className="text-center mb-12 glass-effect rounded-lg p-8 slide-up">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4 fade-in text-gray-800">
+          <h1 className="text-3xl md:text-4xl font-bold mb-4 fade-in">
             Our Services
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto fade-in">

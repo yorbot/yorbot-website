@@ -20,7 +20,7 @@ const AnimatedBackground: React.FC = () => {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Create particles for circuit-like connections (robotics theme)
+    // Create particles
     class Particle {
       x: number;
       y: number;
@@ -29,42 +29,24 @@ const AnimatedBackground: React.FC = () => {
       speedY: number;
       opacity: number;
       color: string;
-      isNode: boolean;
 
-      constructor(isNode = false) {
+      constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.isNode = isNode;
+        this.size = Math.random() * 3 + 0.5; // Size between 0.5 and 3.5
+        this.speedX = (Math.random() - 0.5) * 0.3; // Reduced speed for softer movement
+        this.speedY = (Math.random() - 0.5) * 0.3; // Reduced speed for softer movement
+        this.opacity = Math.random() * 0.4 + 0.1; // Opacity between 0.1 and 0.5
         
-        if (isNode) {
-          // Nodes are larger connection points
-          this.size = Math.random() * 4 + 3; // Size between 3 and 7
-          this.speedX = (Math.random() - 0.5) * 0.1; // Very slow movement for nodes
-          this.speedY = (Math.random() - 0.5) * 0.1;
-          this.opacity = 0.7 + Math.random() * 0.3; // Higher opacity for nodes
-        } else {
-          // Regular particles
-          this.size = Math.random() * 2 + 0.5; // Size between 0.5 and 2.5
-          this.speedX = (Math.random() - 0.5) * 0.3; // Regular speed for particles
-          this.speedY = (Math.random() - 0.5) * 0.3;
-          this.opacity = 0.2 + Math.random() * 0.3; // Lower opacity for regular particles
-        }
-        
-        // Color palette - robotics theme (blues, cyans, and accent orange)
+        // Color palette - soft business-like colors
         const colors = [
-          'rgba(0, 149, 217, 1)', // Blue
-          'rgba(0, 183, 235, 1)', // Cyan
-          'rgba(94, 140, 222, 1)', // Light blue
-          'rgba(255, 137, 51, 1)', // Orange accent (for circuit nodes)
-          'rgba(180, 180, 210, 1)', // Light gray/blue
+          'rgba(30, 41, 59, 1)', // Slate blue
+          'rgba(71, 85, 105, 1)', // Soft blue-gray
+          'rgba(148, 163, 184, 1)', // Light blue-gray
+          'rgba(248, 113, 113, 0.5)', // Soft red (brand accent)
+          'rgba(251, 146, 60, 0.5)', // Soft orange (matching yorbot-orange)
         ];
-        
-        // Nodes have a higher chance of being orange (circuit node effect)
-        if (isNode && Math.random() > 0.5) {
-          this.color = colors[3]; // Orange for some nodes
-        } else {
-          this.color = colors[Math.floor(Math.random() * colors.length)];
-        }
+        this.color = colors[Math.floor(Math.random() * colors.length)];
       }
 
       update() {
@@ -82,91 +64,42 @@ const AnimatedBackground: React.FC = () => {
       draw() {
         if (!ctx) return;
         
-        // Draw circuit node/particle
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = this.color.replace('1)', `${this.opacity})`);
+        ctx.fillStyle = this.color.replace('1)', `${this.opacity})`); // Apply opacity
         ctx.fill();
-        
-        // For nodes, add a subtle glow effect
-        if (this.isNode) {
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
-          ctx.fillStyle = this.color.replace('1)', '0.05)');
-          ctx.fill();
-        }
       }
     }
 
     // Create an array of particles - responsive to screen size
-    const particleCount = Math.min(80, Math.floor((canvas.width * canvas.height) / 18000));
-    const nodeCount = Math.floor(particleCount / 5); // About 20% of particles are nodes
+    const particleCount = Math.min(100, Math.floor((canvas.width * canvas.height) / 15000)); 
     const particles: Particle[] = [];
 
-    // Create nodes first (larger connection points)
-    for (let i = 0; i < nodeCount; i++) {
-      particles.push(new Particle(true));
-    }
-    
-    // Then regular particles
     for (let i = 0; i < particleCount; i++) {
-      particles.push(new Particle(false));
+      particles.push(new Particle());
     }
 
-    // Create connections between particles (circuit-like connections)
+    // Create connections between particles
     const connectParticles = () => {
-      // First, connect all nodes to their closest node (circuit backbone)
-      for (let i = 0; i < nodeCount; i++) {
-        let closestNodeIndex = -1;
-        let minDistance = Infinity;
-        
-        for (let j = 0; j < nodeCount; j++) {
-          if (i !== j) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const maxDistance = 170; // Increased connection distance
+
+          if (distance < maxDistance) {
+            // Get the base color from the first particle for consistency in lines
+            const baseColor = particles[i].color;
+            // Create gradient opacity based on distance
+            const opacity = 0.15 * (1 - distance / maxDistance);
             
-            if (distance < minDistance && distance < canvas.width / 3) {
-              minDistance = distance;
-              closestNodeIndex = j;
-            }
-          }
-        }
-        
-        // Draw connection to closest node
-        if (closestNodeIndex !== -1) {
-          const opacity = 0.15 * (1 - minDistance / (canvas.width / 3));
-          ctx.beginPath();
-          ctx.strokeStyle = particles[i].color.replace('1)', `${opacity})`);
-          ctx.lineWidth = 0.8;
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[closestNodeIndex].x, particles[closestNodeIndex].y);
-          ctx.stroke();
-        }
-      }
-      
-      // Then, connect regular particles to nearby nodes or particles
-      for (let i = nodeCount; i < particles.length; i++) {
-        for (let j = 0; j < particles.length; j++) {
-          if (i !== j) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const maxDistance = particles[j].isNode ? 150 : 100; // Longer connections to nodes
-            
-            if (distance < maxDistance) {
-              // Draw connections with gradient opacity based on distance
-              const opacity = particles[j].isNode ? 
-                0.2 * (1 - distance / maxDistance) : 
-                0.1 * (1 - distance / maxDistance);
-              
-              ctx.beginPath();
-              ctx.strokeStyle = particles[j].color.replace('1)', `${opacity})`);
-              ctx.lineWidth = particles[j].isNode ? 0.8 : 0.5; // Thicker lines to nodes
-              ctx.moveTo(particles[i].x, particles[i].y);
-              ctx.lineTo(particles[j].x, particles[j].y);
-              ctx.stroke();
-            }
+            ctx.beginPath();
+            ctx.strokeStyle = baseColor.replace('1)', `${opacity})`);
+            ctx.lineWidth = 0.8; // Slightly thicker lines
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
           }
         }
       }
@@ -175,7 +108,7 @@ const AnimatedBackground: React.FC = () => {
     // Animation loop
     const animate = () => {
       // Clear with a slight blur effect for trails
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; // White background with trail effect
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Update and draw particles
@@ -199,9 +132,9 @@ const AnimatedBackground: React.FC = () => {
   return (
     <canvas 
       ref={canvasRef} 
-      className="fixed top-0 left-0 w-full h-full -z-10"
+      className="fixed top-0 left-0 w-full h-full -z-10 opacity-40"
       style={{
-        background: 'linear-gradient(135deg, rgba(250,250,255,0.97) 0%, rgba(245,245,250,0.97) 100%)', // Light gradient background
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,240,245,0.95) 100%)',
       }}
     />
   );

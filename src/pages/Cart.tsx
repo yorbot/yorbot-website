@@ -1,14 +1,15 @@
+
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { MinusCircle, PlusCircle, X } from "lucide-react";
-import { useCart } from "@/contexts/CartProvider";
+import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 const Cart: React.FC = () => {
-  const { cart: cartItems, updateQuantity, removeFromCart, cartCount } = useCart();
+  const { cartItems, cartCount, updateQuantity, removeFromCart } = useCart();
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();

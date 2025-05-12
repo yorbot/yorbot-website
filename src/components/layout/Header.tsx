@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, Heart, User, Menu, LogIn } from "lucide-react";
 import SearchBar from "../SearchBar";
-import { useCart } from "@/contexts/CartProvider";
-import { useWishlist } from "@/contexts/WishlistProvider";
+import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Header: React.FC = () => {
@@ -65,7 +64,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className={`w-full bg-gray-900 bg-opacity-80 backdrop-blur-md z-50 ${scrolled ? "shadow-md shadow-black/20" : ""}`}>
+    <header className={`w-full bg-white z-50 ${scrolled ? "shadow-md" : ""}`}>
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center">

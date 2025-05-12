@@ -552,10 +552,6 @@ export type Database = {
         Args: { p_user_id: string; p_product_id: number }
         Returns: undefined
       }
-      swap_banner_positions: {
-        Args: { banner1_id: number; banner2_id: number }
-        Returns: undefined
-      }
       update_cart_item_quantity: {
         Args: { p_user_id: string; p_product_id: number; p_quantity: number }
         Returns: undefined
