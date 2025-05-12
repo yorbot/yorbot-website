@@ -3,12 +3,11 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { fetchPageContent } from "@/utils/supabaseContent";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 const ShippingAndRefund: React.FC = () => {
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     async function loadContent() {
@@ -19,16 +18,14 @@ const ShippingAndRefund: React.FC = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching shipping-and-refund content:", error);
-        toast({
-          title: "Error",
+        toast("Error", {
           description: "Failed to load content. Please try again later.",
-          variant: "destructive",
         });
         setLoading(false);
       }
     }
     loadContent();
-  }, [toast]);
+  }, []);
 
   return (
     <Layout>

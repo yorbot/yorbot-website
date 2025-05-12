@@ -21,7 +21,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Services from "./pages/Services";
 
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 
 // Context Providers
 import { AuthProvider } from "./contexts/AuthContext";

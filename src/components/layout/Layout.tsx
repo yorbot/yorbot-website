@@ -2,7 +2,6 @@
 import React from "react";
 import Header from "./Header";
 import Footer from "./Footer";
-import { Toaster } from "@/components/ui/toaster";
 import AnimatedBackground from "./AnimatedBackground";
 
 interface LayoutProps {
@@ -16,7 +15,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <Header />
       <main className="flex-grow relative z-10">{children}</main>
       <Footer />
-      <Toaster />
     </div>
   );
 };

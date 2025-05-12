@@ -5,13 +5,12 @@ import Layout from "@/components/layout/Layout";
 import { MinusCircle, PlusCircle, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Cart: React.FC = () => {
   const { cartItems, cartCount, updateQuantity, removeFromCart } = useCart();
   const { user } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
 
   const [couponCode, setCouponCode] = React.useState("");
@@ -26,10 +25,8 @@ const Cart: React.FC = () => {
   // Apply coupon code
   const applyCoupon = async () => {
     if (!couponCode) {
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "Please enter a coupon code",
-        variant: "destructive",
       });
       return;
     }
@@ -43,10 +40,8 @@ const Cart: React.FC = () => {
         .single();
 
       if (error || !coupons) {
-        toast({
-          title: "Invalid coupon",
+        toast("Invalid coupon", {
           description: "This coupon code is not valid.",
-          variant: "destructive",
         });
         setDiscountApplied(0);
         return;
@@ -54,10 +49,8 @@ const Cart: React.FC = () => {
 
       // Check if coupon is expired
       if (coupons.expires_at && new Date(coupons.expires_at) < new Date()) {
-        toast({
-          title: "Expired coupon",
+        toast("Expired coupon", {
           description: "This coupon has expired.",
-          variant: "destructive",
         });
         setDiscountApplied(0);
         return;
@@ -65,10 +58,8 @@ const Cart: React.FC = () => {
 
       // Check if coupon is usable (max_uses)
       if (coupons.max_uses && coupons.used_count >= coupons.max_uses) {
-        toast({
-          title: "Coupon limit reached",
+        toast("Coupon limit reached", {
           description: "This coupon has reached its usage limit.",
-          variant: "destructive",
         });
         setDiscountApplied(0);
         return;
@@ -76,10 +67,8 @@ const Cart: React.FC = () => {
 
       // Check minimum order value
       if (coupons.minimum_order_value && subtotal < coupons.minimum_order_value) {
-        toast({
-          title: "Minimum order value not met",
+        toast("Minimum order value not met", {
           description: `This coupon requires a minimum order of ₹${coupons.minimum_order_value.toFixed(2)}.`,
-          variant: "destructive",
         });
         setDiscountApplied(0);
         return;
@@ -94,24 +83,20 @@ const Cart: React.FC = () => {
       }
 
       setDiscountApplied(discount);
-      toast({
-        title: "Coupon applied successfully!",
+      toast("Coupon applied successfully!", {
         description: `You saved ₹${discount.toFixed(2)} with this coupon.`,
       });
     } catch (error) {
       console.error("Error applying coupon:", error);
-      toast({
-        title: "Error",
+      toast("Error", {
         description: "An error occurred while applying the coupon.",
-        variant: "destructive",
       });
     }
   };
 
   const handleCheckout = () => {
     if (!user) {
-      toast({
-        title: "Sign in required",
+      toast("Sign in required", {
         description: "Please sign in to proceed to checkout.",
       });
       navigate("/sign-in", { state: { from: { pathname: "/checkout" } } });
