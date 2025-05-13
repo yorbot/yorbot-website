@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -17,15 +18,6 @@ interface Subcategory {
   slug: string;
   category_id: number;
 }
-interface Product {
-  id: number;
-  name: string;
-  slug: string;
-  image_url: string | null;
-  price: number;
-  sale_price: number | null;
-  description: string | null;
-}
 interface CategoryWithSubcategories extends Category {
   subcategories: Subcategory[];
 }
@@ -35,14 +27,12 @@ const Shop: React.FC = () => {
   const [categories, setCategories] = useState<CategoryWithSubcategories[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<CategoryWithSubcategories | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch All Categories and Their Subcategories
   useEffect(() => {
     async function fetchCategoriesAndSubs() {
       setLoading(true);
-      // fetch categories
       const { data: cats, error: catsErr } = await supabase
         .from("categories")
         .select("*")
@@ -52,7 +42,6 @@ const Shop: React.FC = () => {
         setLoading(false);
         return;
       }
-      // fetch subcategories
       const { data: subs } = await supabase.from("subcategories").select("*");
       const categoriesWithSubs: CategoryWithSubcategories[] = (cats || []).map(cat => ({
         ...cat,
@@ -60,12 +49,9 @@ const Shop: React.FC = () => {
       }));
       setCategories(categoriesWithSubs);
 
-      // Set selectedCategory
       if (category) {
         const catObj = categoriesWithSubs.find(c => c.slug === category) || null;
         setSelectedCategory(catObj);
-
-        // Set selectedSubcategory
         if (subcategory && catObj) {
           const subObj = catObj.subcategories.find(s => s.slug === subcategory) || null;
           setSelectedSubcategory(subObj);
@@ -80,9 +66,6 @@ const Shop: React.FC = () => {
     }
     fetchCategoriesAndSubs();
   }, [category, subcategory]);
-
-  // Find currently selected category and subcategory objects
-  // (already handled above in existing useEffect)
 
   // Get the IDs for fetching products
   const selectedCatId = selectedCategory?.id ?? undefined;
