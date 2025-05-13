@@ -1,8 +1,8 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
+import { useShopProducts } from "@/hooks/useShopProducts";
 
 // Types for table rows
 interface Category {
@@ -81,27 +81,16 @@ const Shop: React.FC = () => {
     fetchCategoriesAndSubs();
   }, [category, subcategory]);
 
-  // When a subcategory is selected, fetch products for that subcategory
-  useEffect(() => {
-    async function fetchProductsForSub() {
-      if (subcategory && selectedSubcategory) {
-        setLoading(true);
-        const { data: prods, error: prodsErr } = await supabase
-          .from("products")
-          .select("*")
-          .eq("subcategory_id", selectedSubcategory.id)
-          .order("created_at", { ascending: false });
-        setProducts(prods || []);
-        setLoading(false);
-      } else {
-        setProducts([]);
-      }
-    }
-    fetchProductsForSub();
-  }, [subcategory, selectedSubcategory]);
+  // Find currently selected category and subcategory objects
+  // (already handled above in existing useEffect)
+
+  // Get the IDs for fetching products
+  const selectedCatId = selectedCategory?.id ?? undefined;
+  const selectedSubId = selectedSubcategory?.id ?? undefined;
+  const { products, loading: productsLoading } = useShopProducts(selectedCatId, selectedSubId);
 
   // Loading/Spinner
-  if (loading) {
+  if (loading || productsLoading) {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-8">
@@ -190,10 +179,10 @@ const Shop: React.FC = () => {
           </div>
         )}
 
-        {/* 3. SELECTED CATEGORY: SHOW ITS SUBCATEGORIES */}
+        {/* 3. SELECTED CATEGORY: SHOW ITS SUBCATEGORIES OR PRODUCTS */}
         {category && selectedCategory && !subcategory && (
           selectedCategory.subcategories.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="mb-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {selectedCategory.subcategories.map(sub => (
                 <div key={sub.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
                   <Link to={`/shop/${selectedCategory.slug}/${sub.slug}`}>
@@ -206,12 +195,40 @@ const Shop: React.FC = () => {
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="col-span-full text-center py-8">
-              <h2 className="text-xl font-medium text-gray-600">No subcategories found</h2>
-              <p className="text-gray-500 mt-2">Add subcategories from your admin panel to see them here.</p>
-            </div>
-          )
+          ) : null
+        )}
+
+        {/* 3b. Show products for selected category (with or without subcategories) */}
+        {category && selectedCategory && !subcategory && products.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {products.map(prod => (
+              <div key={prod.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+                <Link to={`/product/${prod.slug}`}>
+                  <div className="h-48 overflow-hidden">
+                    <img
+                      src={prod.image_url || "https://via.placeholder.com/300x300?text=Product"}
+                      alt={prod.name}
+                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold group-hover:text-yorbot-orange transition-colors">
+                      {prod.name}
+                    </h3>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="font-semibold">₹{prod.price.toFixed(2)}</span>
+                      {prod.sale_price && (
+                        <span className="text-sm text-gray-500 line-through">₹{prod.sale_price.toFixed(2)}</span>
+                      )}
+                    </div>
+                    {prod.description && (
+                      <p className="text-gray-600 mt-1 text-sm line-clamp-2">{prod.description}</p>
+                    )}
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
         )}
 
         {/* 4. SELECTED SUBCATEGORY: SHOW PRODUCTS */}
