@@ -5,17 +5,18 @@ import { useAuth } from "./AuthContext";
 import { toast } from "sonner";
 
 export interface WishlistItem {
-  id: string;
+  id: number; // id is product_id, number type
   name: string;
   price: number;
   image: string;
+  inStock?: boolean | null; // now matches backend structure
 }
 
 interface WishlistContextType {
   wishlistItems: WishlistItem[];
   addToWishlist: (item: WishlistItem) => void;
-  removeFromWishlist: (id: string) => void;
-  isInWishlist: (id: string) => boolean;
+  removeFromWishlist: (id: number) => void;
+  isInWishlist: (id: number) => boolean;
   clearWishlist: () => void;
   wishlistCount: number;
 }
@@ -26,12 +27,10 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const { user } = useAuth();
 
-  // Load wishlist items from localStorage or database on mount
   useEffect(() => {
     const loadWishlistItems = async () => {
       try {
         if (user) {
-          // Fetch wishlist items from database
           const { data, error } = await supabase
             .from('wishlist_items')
             .select('*')
@@ -42,17 +41,16 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
             return;
           }
 
-          // Transform database items to WishlistItem format
           const items = data.map((item: any): WishlistItem => ({
             id: item.product_id,
             name: item.product_name,
-            price: item.price,
-            image: item.product_image
+            price: Number(item.price),
+            image: item.product_image || "",
+            inStock: item.in_stock ?? null
           }));
 
           setWishlistItems(items);
         } else {
-          // Load from localStorage if not logged in
           const storedWishlist = localStorage.getItem("wishlist");
           if (storedWishlist) {
             setWishlistItems(JSON.parse(storedWishlist));
@@ -66,17 +64,14 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
     loadWishlistItems();
   }, [user]);
 
-  // Save wishlist to localStorage whenever it changes
   useEffect(() => {
     if (!user) {
       localStorage.setItem("wishlist", JSON.stringify(wishlistItems));
     }
   }, [wishlistItems, user]);
 
-  // Add item to wishlist
   const addToWishlist = async (item: WishlistItem) => {
     try {
-      // Check if item already exists in wishlist
       if (isInWishlist(item.id)) {
         toast("Already in wishlist", {
           description: `${item.name} is already in your wishlist`
@@ -85,13 +80,13 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
       }
 
       if (user) {
-        // Add to database if logged in
         const { error } = await supabase.from("wishlist_items").insert({
           user_id: user.id,
           product_id: item.id,
           product_name: item.name,
           price: item.price,
           product_image: item.image,
+          in_stock: item.inStock
         });
 
         if (error) {
@@ -103,7 +98,6 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
         }
       }
 
-      // Update local state
       setWishlistItems([...wishlistItems, item]);
       toast("Added to wishlist", {
         description: `${item.name} has been added to your wishlist`
@@ -116,11 +110,9 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   };
 
-  // Remove item from wishlist
-  const removeFromWishlist = async (id: string) => {
+  const removeFromWishlist = async (id: number) => {
     try {
       if (user) {
-        // Remove from database if logged in
         const { error } = await supabase
           .from("wishlist_items")
           .delete()
@@ -136,7 +128,6 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
         }
       }
 
-      // Update local state
       setWishlistItems(wishlistItems.filter((item) => item.id !== id));
       toast("Item removed", {
         description: "Item has been removed from your wishlist"
@@ -149,16 +140,13 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   };
 
-  // Check if item is in wishlist
-  const isInWishlist = (id: string) => {
+  const isInWishlist = (id: number) => {
     return wishlistItems.some((item) => item.id === id);
   };
 
-  // Clear entire wishlist
   const clearWishlist = async () => {
     try {
       if (user) {
-        // Clear all items from database if logged in
         const { error } = await supabase
           .from("wishlist_items")
           .delete()
@@ -173,7 +161,6 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
         }
       }
 
-      // Update local state
       setWishlistItems([]);
       toast("Wishlist cleared", {
         description: "All items have been removed from your wishlist"
@@ -186,7 +173,6 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   };
 
-  // Calculate total items in wishlist
   const wishlistCount = wishlistItems.length;
 
   return (

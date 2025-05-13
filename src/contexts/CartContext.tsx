@@ -1,11 +1,11 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "../integrations/supabase/client";
-import { useAuth } from "./AuthContext"; 
+import { useAuth } from "./AuthContext";
 import { toast } from "sonner";
 
 export interface CartItem {
-  id: string;
+  id: number; // changed to number for product_id consistency
   name: string;
   price: number;
   quantity: number;
@@ -15,8 +15,8 @@ export interface CartItem {
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (item: CartItem) => void;
-  removeFromCart: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  removeFromCart: (id: number) => void; // updated to number type
+  updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
   cartCount: number;
 }
@@ -27,12 +27,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const { user } = useAuth();
 
-  // Load cart items from localStorage or database on mount
   useEffect(() => {
     const loadCartItems = async () => {
       try {
         if (user) {
-          // Fetch cart items from database
           const { data, error } = await supabase
             .from('cart_items')
             .select('*')
@@ -43,18 +41,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             return;
           }
 
-          // Transform database items to CartItem format
           const items = data.map((item: any): CartItem => ({
             id: item.product_id,
             name: item.product_name,
-            price: item.price,
-            quantity: item.quantity,
-            image: item.product_image
+            price: Number(item.price),
+            quantity: item.quantity || 1,
+            image: item.product_image || ""
           }));
 
           setCartItems(items);
         } else {
-          // Load from localStorage if not logged in
           const storedCart = localStorage.getItem("cart");
           if (storedCart) {
             setCartItems(JSON.parse(storedCart));
@@ -68,27 +64,23 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     loadCartItems();
   }, [user]);
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (!user) {
       localStorage.setItem("cart", JSON.stringify(cartItems));
     }
   }, [cartItems, user]);
 
-  // Add item to cart
   const addToCart = async (item: CartItem) => {
     try {
-      // Check if item already exists in cart
       const existingItem = cartItems.find((cartItem) => cartItem.id === item.id);
 
       if (existingItem) {
-        // Update quantity if item exists
         updateQuantity(item.id, existingItem.quantity + 1);
         return;
       }
 
       if (user) {
-        // Add to database if logged in
+        // Correct property mapping and use product_id as number
         const { error } = await supabase.from("cart_items").insert({
           user_id: user.id,
           product_id: item.id,
@@ -107,7 +99,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       }
 
-      // Update local state
       setCartItems([...cartItems, item]);
       toast("Added to cart", {
         description: `${item.name} has been added to your cart`
@@ -120,11 +111,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  // Remove item from cart
-  const removeFromCart = async (id: string) => {
+  const removeFromCart = async (id: number) => {
     try {
       if (user) {
-        // Remove from database if logged in
+        // product_id should be a number
         const { error } = await supabase
           .from("cart_items")
           .delete()
@@ -140,7 +130,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       }
 
-      // Update local state
       setCartItems(cartItems.filter((item) => item.id !== id));
       toast("Item removed", {
         description: "Item has been removed from your cart"
@@ -153,17 +142,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  // Update item quantity
-  const updateQuantity = async (id: string, quantity: number) => {
+  const updateQuantity = async (id: number, quantity: number) => {
     try {
-      // Don't allow quantities less than 1
       if (quantity < 1) {
         removeFromCart(id);
         return;
       }
 
       if (user) {
-        // Update quantity in database if logged in
         const { error } = await supabase
           .from("cart_items")
           .update({ quantity })
@@ -179,7 +165,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       }
 
-      // Update local state
       setCartItems(
         cartItems.map((item) =>
           item.id === id ? { ...item, quantity } : item
@@ -193,11 +178,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  // Clear entire cart
   const clearCart = async () => {
     try {
       if (user) {
-        // Clear all items from database if logged in
         const { error } = await supabase
           .from("cart_items")
           .delete()
@@ -212,7 +195,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       }
 
-      // Update local state
       setCartItems([]);
       toast("Cart cleared", {
         description: "All items have been removed from your cart"
@@ -225,7 +207,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  // Calculate total items in cart
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
