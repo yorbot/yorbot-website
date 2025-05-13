@@ -31,6 +31,7 @@ const Wishlist: React.FC = () => {
       name: item.name,
       image: item.image,
       price: item.price,
+      quantity: 1 // Add this field!
     });
   };
 
