@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -162,27 +161,25 @@ const Shop: React.FC = () => {
           </div>
         )}
 
-        {/* 3. SELECTED CATEGORY: SHOW ITS SUBCATEGORIES OR PRODUCTS */}
-        {category && selectedCategory && !subcategory && (
-          selectedCategory.subcategories.length > 0 ? (
-            <div className="mb-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {selectedCategory.subcategories.map(sub => (
-                <div key={sub.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-                  <Link to={`/shop/${selectedCategory.slug}/${sub.slug}`}>
-                    <div className="p-4">
-                      <h2 className="text-lg font-semibold hover:text-yorbot-orange transition-colors">
-                        {sub.name}
-                      </h2>
-                    </div>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          ) : null
+        {/* 3. SELECTED CATEGORY: SHOW ITS SUBCATEGORIES ONLY (NO PRODUCTS) */}
+        {category && selectedCategory && !subcategory && selectedCategory.subcategories.length > 0 && (
+          <div className="mb-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {selectedCategory.subcategories.map(sub => (
+              <div key={sub.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+                <Link to={`/shop/${selectedCategory.slug}/${sub.slug}`}>
+                  <div className="p-4">
+                    <h2 className="text-lg font-semibold hover:text-yorbot-orange transition-colors">
+                      {sub.name}
+                    </h2>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
         )}
 
-        {/* 3b. Show products for selected category (with or without subcategories) */}
-        {category && selectedCategory && !subcategory && products.length > 0 && (
+        {/* 3b. Show products for selected category only IF it has no subcategories */}
+        {category && selectedCategory && !subcategory && selectedCategory.subcategories.length === 0 && products.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map(prod => (
               <div key={prod.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
