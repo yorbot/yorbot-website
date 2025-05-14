@@ -21,22 +21,37 @@ export function useShopProducts(categoryId?: number, subcategoryId?: number) {
   useEffect(() => {
     async function fetchProducts() {
       setLoading(true);
-      let query = supabase.from("products").select("*").order("created_at", { ascending: false });
+      
+      let query = supabase.from("products").select("*");
 
       if (subcategoryId) {
+        // If a subcategory is selected, only show products from that subcategory
         query = query.eq("subcategory_id", subcategoryId);
       } else if (categoryId) {
-        // Show products that belong to this category and have no subcategory, or all products in this category
+        // If only a category is selected, show products from that category
         query = query.eq("category_id", categoryId);
       }
+
+      // Apply sorting
+      query = query.order("created_at", { ascending: false });
+      
       const { data, error } = await query;
-      setProducts(data || []);
+      
+      if (error) {
+        console.error("Error fetching products:", error);
+        setProducts([]);
+      } else {
+        setProducts(data || []);
+      }
+      
       setLoading(false);
     }
+
     if (categoryId || subcategoryId) {
       fetchProducts();
     } else {
       setProducts([]);
+      setLoading(false);
     }
   }, [categoryId, subcategoryId]);
 

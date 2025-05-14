@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -8,7 +9,7 @@ const MechanicalParts: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProducts().then((data) => {
+    fetchProducts("mechanical-parts").then((data) => {
       setProducts(data);
       setLoading(false);
     });
