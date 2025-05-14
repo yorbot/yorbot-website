@@ -1,31 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export async function fetchProducts(categorySlug?: string) {
-  let query = supabase
+export async function fetchProducts() {
+  const { data, error } = await supabase
     .from("products")
     .select("*")
     .order("created_at", { ascending: false });
-    
-  if (categorySlug) {
-    // First get the category ID for the slug
-    const { data: categoryData } = await supabase
-      .from("categories")
-      .select("id")
-      .eq("slug", categorySlug)
-      .single();
-    
-    if (categoryData?.id) {
-      query = query.eq("category_id", categoryData.id);
-    }
-  }
-  
-  const { data, error } = await query.limit(8); // Limit to 8 products
-  
   if (error) {
     console.error("Error fetching products:", error);
     return [];
   }
-  
   return data;
 }
 
