@@ -24,15 +24,25 @@ export function useShopProducts(categoryId?: number, subcategoryId?: number) {
       let query = supabase.from("products").select("*").order("created_at", { ascending: false });
 
       if (subcategoryId) {
+        // If subcategory is provided, only show products from that subcategory
         query = query.eq("subcategory_id", subcategoryId);
       } else if (categoryId) {
-        // Show products that belong to this category and have no subcategory, or all products in this category
+        // If only category is provided, show products that are directly in the category
         query = query.eq("category_id", categoryId);
       }
+
       const { data, error } = await query;
-      setProducts(data || []);
+      
+      if (error) {
+        console.error("Error fetching products:", error);
+        setProducts([]);
+      } else {
+        setProducts(data || []);
+      }
+      
       setLoading(false);
     }
+
     if (categoryId || subcategoryId) {
       fetchProducts();
     } else {

@@ -1,14 +1,54 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export async function fetchProducts() {
-  const { data, error } = await supabase
+export async function fetchProducts(categorySlug?: string, subcategorySlug?: string) {
+  let query = supabase
     .from("products")
     .select("*")
     .order("created_at", { ascending: false });
+  
+  // If we have both category and subcategory slugs, find products in that hierarchy
+  if (categorySlug && subcategorySlug) {
+    // First get the category ID
+    const { data: category } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("slug", categorySlug)
+      .single();
+    
+    // Then get the subcategory ID
+    if (category) {
+      const { data: subcategory } = await supabase
+        .from("subcategories")
+        .select("id")
+        .eq("slug", subcategorySlug)
+        .eq("category_id", category.id)
+        .single();
+      
+      if (subcategory) {
+        query = query.eq("subcategory_id", subcategory.id);
+      }
+    }
+  } 
+  // If we only have category slug, get products directly in that category
+  else if (categorySlug) {
+    const { data: category } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("slug", categorySlug)
+      .single();
+    
+    if (category) {
+      query = query.eq("category_id", category.id);
+    }
+  }
+  
+  const { data, error } = await query;
+  
   if (error) {
     console.error("Error fetching products:", error);
     return [];
   }
+  
   return data;
 }
 

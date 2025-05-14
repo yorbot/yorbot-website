@@ -1,17 +1,50 @@
-import React, { useEffect, useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { fetchProducts } from "@/utils/supabaseContent";
+import { supabase } from "@/integrations/supabase/client";
 
 const MechanicalParts: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProducts().then((data) => {
-      setProducts(data);
+    // Find the mechanical parts category first, then get its products
+    async function fetchMechanicalProducts() {
+      setLoading(true);
+      
+      // First, find the mechanical parts category by its slug
+      const { data: categories, error: categoryError } = await supabase
+        .from("categories")
+        .select("id")
+        .eq("slug", "mechanical-parts")
+        .maybeSingle();
+      
+      if (categoryError || !categories) {
+        console.error("Error finding mechanical parts category:", categoryError);
+        setLoading(false);
+        return;
+      }
+      
+      // Now fetch products that belong to this category
+      const { data: products, error: productsError } = await supabase
+        .from("products")
+        .select("*")
+        .eq("category_id", categories.id)
+        .order("created_at", { ascending: false })
+        .limit(4);
+      
+      if (productsError) {
+        console.error("Error fetching mechanical products:", productsError);
+        setProducts([]);
+      } else {
+        setProducts(products || []);
+      }
+      
       setLoading(false);
-    });
+    }
+    
+    fetchMechanicalProducts();
   }, []);
 
   if (loading) {
