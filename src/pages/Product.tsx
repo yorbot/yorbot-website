@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -86,7 +86,16 @@ const Product: React.FC = () => {
         return;
       }
       
-      // Fetch category and subcategory names if available
+      // Create a typed product object with default values for specifications and additional_images
+      const typedProduct: Product = {
+        ...productData,
+        specifications: Array.isArray(productData.specifications) ? productData.specifications : [],
+        additional_images: Array.isArray(productData.additional_images) ? productData.additional_images : [],
+        category_name: "",
+        subcategory_name: ""
+      };
+      
+      // Fetch category name if available
       if (productData.category_id) {
         const { data: categoryData } = await supabase
           .from("categories")
@@ -95,10 +104,11 @@ const Product: React.FC = () => {
           .single();
         
         if (categoryData) {
-          productData.category_name = categoryData.name;
+          typedProduct.category_name = categoryData.name;
         }
       }
       
+      // Fetch subcategory name if available
       if (productData.subcategory_id) {
         const { data: subcategoryData } = await supabase
           .from("subcategories")
@@ -107,31 +117,28 @@ const Product: React.FC = () => {
           .single();
         
         if (subcategoryData) {
-          productData.subcategory_name = subcategoryData.name;
+          typedProduct.subcategory_name = subcategoryData.name;
         }
       }
       
-      setProduct(productData);
-      setMainImage(productData.image_url);
+      setProduct(typedProduct);
+      setMainImage(typedProduct.image_url);
       
-      // Fetch related products (same category or subcategory)
-      let query = supabase.from("products").select("id, name, price, sale_price, discount_percentage, image_url, slug, stock");
-      
-      if (productData.subcategory_id) {
-        query = query.eq("subcategory_id", productData.subcategory_id);
-      } else if (productData.category_id) {
-        query = query.eq("category_id", productData.category_id);
-      }
-      
-      // Exclude current product and limit to 4
-      query = query.neq("id", productData.id).limit(4);
-      
-      const { data: relatedData, error: relatedError } = await query;
-      
-      if (!relatedError && relatedData) {
-        setRelatedProducts(relatedData);
-      } else {
-        console.error("Error fetching related products:", relatedError);
+      // Fetch related products from the same category
+      if (typedProduct.category_id) {
+        const { data: relatedData, error: relatedError } = await supabase
+          .from("products")
+          .select("id, name, price, sale_price, discount_percentage, image_url, slug, stock")
+          .eq("category_id", typedProduct.category_id)
+          .neq("id", typedProduct.id)
+          .order('created_at', { ascending: false })
+          .limit(4);
+        
+        if (!relatedError && relatedData) {
+          setRelatedProducts(relatedData);
+        } else {
+          console.error("Error fetching related products:", relatedError);
+        }
       }
       
       setLoading(false);
@@ -309,42 +316,39 @@ const Product: React.FC = () => {
           
           {/* Product Details */}
           <div>
-            <div className="mb-4 flex items-center justify-between">
-              <h1 className="text-2xl md:text-3xl font-bold">{product.name}</h1>
-              <span className={`px-3 py-1 rounded-full text-sm ${
-                inStock ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-              }`}>
-                {inStock ? "In Stock" : "Out of Stock"}
-              </span>
-            </div>
-            
-            <div className="mb-6">
-              {product.sale_price ? (
-                <div className="flex items-center">
-                  <span className="text-2xl font-bold text-yorbot-orange mr-2">
-                    ₹{product.sale_price.toFixed(2)}
-                  </span>
-                  <span className="text-lg text-gray-500 line-through">
+            <div className="mb-4 flex flex-col">
+              <div className="flex items-center justify-between">
+                <h1 className="text-2xl md:text-3xl font-bold">{product.name}</h1>
+              </div>
+              
+              <div className="flex items-center mt-2">
+                {product.sale_price ? (
+                  <div className="flex items-center">
+                    <span className="text-2xl font-bold text-yorbot-orange mr-2">
+                      ₹{product.sale_price.toFixed(2)}
+                    </span>
+                    <span className="text-lg text-gray-500 line-through">
+                      ₹{product.price.toFixed(2)}
+                    </span>
+                    {discountPercentage > 0 && (
+                      <span className="ml-2 bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">
+                        {discountPercentage}% OFF
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <span className="text-2xl font-bold">
                     ₹{product.price.toFixed(2)}
                   </span>
-                  {discountPercentage > 0 && (
-                    <span className="ml-2 bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">
-                      {discountPercentage}% OFF
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <span className="text-2xl font-bold">
-                  ₹{product.price.toFixed(2)}
+                )}
+                
+                <span className={`ml-3 px-3 py-1 rounded-full text-sm ${
+                  inStock ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                }`}>
+                  {inStock ? "In Stock" : "Out of Stock"}
                 </span>
-              )}
-            </div>
-            
-            {product.description && (
-              <div className="mb-6">
-                <p className="text-gray-700">{product.description}</p>
               </div>
-            )}
+            </div>
             
             <div className="mb-6">
               <div className="flex items-center mb-4">
@@ -420,8 +424,8 @@ const Product: React.FC = () => {
           </div>
         </div>
         
-        {/* Product Information Tabs */}
-        <div className="mb-10">
+        {/* Product Information Tabs with Grey Background */}
+        <div className="mb-10 bg-gray-100 rounded-lg p-6">
           <div className="border-b border-gray-200">
             <nav className="flex space-x-8" aria-label="Tabs">
               <button
@@ -507,7 +511,7 @@ const Product: React.FC = () => {
         {/* Related Products */}
         {relatedProducts.length > 0 && (
           <div>
-            <h2 className="text-2xl font-bold mb-6">Related Products</h2>
+            <h2 className="text-2xl font-bold mb-6">Products Related To This</h2>
             
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
               {relatedProducts.map((product) => (
