@@ -86,11 +86,26 @@ const Product: React.FC = () => {
         return;
       }
       
-      // Create a typed product object with default values for specifications and additional_images
+      // Process specifications to ensure correct typing
+      const processedSpecifications = Array.isArray(productData.specifications) 
+        ? productData.specifications.map((spec: any) => ({
+            name: spec.name || '',
+            value: spec.value || ''
+          }))
+        : [];
+      
+      // Process additional images to ensure correct typing
+      const processedAdditionalImages = Array.isArray(productData.additional_images)
+        ? productData.additional_images.map((img: any) => ({
+            url: typeof img === 'string' ? img : (img && img.url ? img.url : '')
+          }))
+        : [];
+      
+      // Create a typed product object with processed data
       const typedProduct: Product = {
         ...productData,
-        specifications: Array.isArray(productData.specifications) ? productData.specifications : [],
-        additional_images: Array.isArray(productData.additional_images) ? productData.additional_images : [],
+        specifications: processedSpecifications,
+        additional_images: processedAdditionalImages,
         category_name: "",
         subcategory_name: ""
       };
@@ -113,7 +128,7 @@ const Product: React.FC = () => {
         const { data: subcategoryData } = await supabase
           .from("subcategories")
           .select("name")
-          .eq("id", productData.subcategory_id)
+          .eq("slug", productData.subcategory_id)
           .single();
         
         if (subcategoryData) {
@@ -220,9 +235,9 @@ const Product: React.FC = () => {
   
   // Get all product images
   const allImages = [
-    product.image_url,
+    ...(product.image_url ? [product.image_url] : []),
     ...(product.additional_images?.map(img => img.url) || [])
-  ].filter(Boolean) as string[];
+  ].filter(Boolean);
   
   // Extract specifications and additional info from product data
   const specifications = product.specifications || [];
@@ -342,7 +357,7 @@ const Product: React.FC = () => {
                   </span>
                 )}
                 
-                <span className={`ml-3 px-3 py-1 rounded-full text-sm ${
+                <span className={`ml-auto px-3 py-1 rounded-full text-sm ${
                   inStock ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                 }`}>
                   {inStock ? "In Stock" : "Out of Stock"}
