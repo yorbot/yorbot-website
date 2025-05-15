@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Services from "./pages/Services";
+import AuthCallback from "./pages/AuthCallback";
 
 import { Toaster } from "sonner";
 
@@ -74,6 +75,7 @@ function App() {
                 <Route path="/sign-up" element={<SignUp />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/services/:serviceSlug" element={<Services />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <Toaster />

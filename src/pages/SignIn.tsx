@@ -59,6 +59,7 @@ const SignIn: React.FC = () => {
   const handleGoogleSignIn = async () => {
     try {
       setGoogleLoading(true);
+      console.log("Starting Google sign-in process");
       await signInWithGoogle();
       // The redirect will be handled by the OAuth provider
     } catch (error) {
