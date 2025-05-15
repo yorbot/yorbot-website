@@ -96,9 +96,14 @@ const Product: React.FC = () => {
       
       // Process additional images to ensure correct typing
       const processedAdditionalImages = Array.isArray(productData.additional_images)
-        ? productData.additional_images.map((img: any) => ({
-            url: typeof img === 'string' ? img : (img && img.url ? img.url : '')
-          }))
+        ? productData.additional_images.map((img: any) => {
+            if (typeof img === 'string') {
+              return { url: img };
+            } else if (img && typeof img === 'object') {
+              return { url: img.url || '' };
+            }
+            return { url: '' };
+          }).filter(img => img.url)
         : [];
       
       // Create a typed product object with processed data
@@ -128,7 +133,7 @@ const Product: React.FC = () => {
         const { data: subcategoryData } = await supabase
           .from("subcategories")
           .select("name")
-          .eq("slug", productData.subcategory_id)
+          .eq("id", productData.subcategory_id)
           .single();
         
         if (subcategoryData) {
@@ -233,11 +238,22 @@ const Product: React.FC = () => {
   const discountPercentage = product.discount_percentage || 
     (product.sale_price ? Math.round((1 - product.sale_price / product.price) * 100) : 0);
   
-  // Get all product images
-  const allImages = [
-    ...(product.image_url ? [product.image_url] : []),
-    ...(product.additional_images?.map(img => img.url) || [])
-  ].filter(Boolean);
+  // Get valid product images
+  const validImages = [];
+  
+  // Add main image if it exists
+  if (product.image_url) {
+    validImages.push(product.image_url);
+  }
+  
+  // Add additional images if they exist and have valid URLs
+  if (product.additional_images && Array.isArray(product.additional_images)) {
+    product.additional_images.forEach(img => {
+      if (img && img.url && typeof img.url === 'string' && img.url.trim() !== '') {
+        validImages.push(img.url);
+      }
+    });
+  }
   
   // Extract specifications and additional info from product data
   const specifications = product.specifications || [];
@@ -285,8 +301,8 @@ const Product: React.FC = () => {
             <div className="grid grid-cols-12 gap-4">
               {/* Thumbnails */}
               <div className="col-span-2 space-y-4">
-                {allImages.length > 0 ? (
-                  allImages.map((image, index) => (
+                {validImages.length > 0 ? (
+                  validImages.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setMainImage(image)}
@@ -298,6 +314,9 @@ const Product: React.FC = () => {
                         src={image} 
                         alt={`${product.name} - Thumbnail ${index + 1}`} 
                         className="w-full h-auto object-cover aspect-square"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
                       />
                     </button>
                   ))
@@ -318,6 +337,9 @@ const Product: React.FC = () => {
                       src={mainImage} 
                       alt={product.name} 
                       className="w-full h-auto object-contain aspect-square"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://via.placeholder.com/500?text=Image+Not+Available";
+                      }}
                     />
                   ) : (
                     <div className="bg-gray-100 aspect-square flex items-center justify-center">
@@ -542,6 +564,10 @@ const Product: React.FC = () => {
                           src={product.image_url} 
                           alt={product.name} 
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement!.innerHTML = '<div class="w-full h-full bg-gray-100 flex items-center justify-center"><span class="text-gray-400 text-xs">No image</span></div>';
+                          }}
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-100 flex items-center justify-center">
