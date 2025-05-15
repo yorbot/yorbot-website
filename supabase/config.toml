@@ -1,1 +1,12 @@
+
 project_id = "wowttldmxhrtjvaavfth"
+
+# Email settings for password resets with enhanced security
+[auth.email]
+enable_confirmations = false # Set to true in production for enhanced security
+double_confirm_changes = true
+enable_sign_up = true
+
+# Length settings for security
+[auth.passwords]
+min_length = 8

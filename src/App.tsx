@@ -21,6 +21,8 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import Services from "./pages/Services";
 import AuthCallback from "./pages/AuthCallback";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import { Toaster } from "sonner";
 
@@ -73,6 +75,8 @@ function App() {
                 <Route path="/educational" element={<Educational />} />
                 <Route path="/sign-in" element={<SignIn />} />
                 <Route path="/sign-up" element={<SignUp />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/services/:serviceSlug" element={<Services />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
