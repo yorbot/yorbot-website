@@ -6,6 +6,7 @@ import { Heart, ShoppingCart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface ProductImage {
   url: string;
@@ -86,13 +87,20 @@ const Product: React.FC = () => {
         return;
       }
       
+      console.log("Product data:", productData);
+      
       // Process specifications to ensure correct typing
       const processedSpecifications = Array.isArray(productData.specifications) 
         ? productData.specifications.map((spec: any) => ({
             name: spec.name || '',
             value: spec.value || ''
           }))
-        : [];
+        : typeof productData.specifications === 'object' && productData.specifications !== null
+          ? Object.entries(productData.specifications).map(([name, value]) => ({
+              name,
+              value: typeof value === 'string' ? value : JSON.stringify(value)
+            }))
+          : [];
       
       // Process additional images to ensure correct typing
       const processedAdditionalImages = Array.isArray(productData.additional_images)
@@ -315,6 +323,7 @@ const Product: React.FC = () => {
                         alt={`${product.name} - Thumbnail ${index + 1}`} 
                         className="w-full h-auto object-cover aspect-square"
                         onError={(e) => {
+                          // Hide broken image element
                           e.currentTarget.style.display = 'none';
                         }}
                       />
@@ -461,45 +470,16 @@ const Product: React.FC = () => {
           </div>
         </div>
         
-        {/* Product Information Tabs with Grey Background */}
+        {/* Product Information Tabs with shadcn UI */}
         <div className="mb-10 bg-gray-100 rounded-lg p-6">
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-8" aria-label="Tabs">
-              <button
-                onClick={() => setActiveTab("description")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "description"
-                    ? "border-yorbot-orange text-yorbot-orange"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                Description
-              </button>
-              <button
-                onClick={() => setActiveTab("specifications")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "specifications"
-                    ? "border-yorbot-orange text-yorbot-orange"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                Specifications
-              </button>
-              <button
-                onClick={() => setActiveTab("additional")}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === "additional"
-                    ? "border-yorbot-orange text-yorbot-orange"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                Additional Information
-              </button>
-            </nav>
-          </div>
-          
-          <div className="py-6">
-            {activeTab === "description" && (
+          <Tabs defaultValue="description" onValueChange={setActiveTab} value={activeTab}>
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="description">Description</TabsTrigger>
+              <TabsTrigger value="specifications">Specifications</TabsTrigger>
+              <TabsTrigger value="additional">Additional Information</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="description" className="pt-4">
               <div className="prose max-w-none">
                 {product.description ? (
                   <p>{product.description}</p>
@@ -507,11 +487,11 @@ const Product: React.FC = () => {
                   <p className="text-gray-500">No description available for this product.</p>
                 )}
               </div>
-            )}
+            </TabsContent>
             
-            {activeTab === "specifications" && (
+            <TabsContent value="specifications" className="pt-4">
               <div className="overflow-x-auto">
-                {specifications.length > 0 ? (
+                {specifications && specifications.length > 0 ? (
                   <table className="min-w-full divide-y divide-gray-200">
                     <tbody className="divide-y divide-gray-200">
                       {specifications.map((spec, index) => (
@@ -526,9 +506,9 @@ const Product: React.FC = () => {
                   <p className="text-gray-500">No specifications available for this product.</p>
                 )}
               </div>
-            )}
+            </TabsContent>
             
-            {activeTab === "additional" && (
+            <TabsContent value="additional" className="pt-4">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <tbody className="divide-y divide-gray-200">
@@ -541,8 +521,8 @@ const Product: React.FC = () => {
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
+            </TabsContent>
+          </Tabs>
         </div>
         
         {/* Related Products */}
@@ -565,8 +545,11 @@ const Product: React.FC = () => {
                           alt={product.name} 
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            e.currentTarget.parentElement!.innerHTML = '<div class="w-full h-full bg-gray-100 flex items-center justify-center"><span class="text-gray-400 text-xs">No image</span></div>';
+                            // Replace with placeholder div when image fails to load
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.innerHTML = '<div class="w-full h-full bg-gray-100 flex items-center justify-center"><span class="text-gray-400 text-xs">No image</span></div>';
+                            }
                           }}
                         />
                       ) : (
