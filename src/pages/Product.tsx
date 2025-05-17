@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -470,52 +469,52 @@ const Product: React.FC = () => {
           </div>
         </div>
         
-        {/* Product Information Tabs with shadcn UI */}
-        <div className="mb-10 bg-gray-100 rounded-lg p-6">
-          <Tabs defaultValue="description" onValueChange={setActiveTab} value={activeTab}>
-            <TabsList className="grid w-full grid-cols-3 mb-6">
+        {/* Product Information Tabs with shadcn UI - Updated styling */}
+        <div className="mb-10">
+          <Tabs defaultValue="description" onValueChange={setActiveTab} value={activeTab} className="w-full">
+            <TabsList className="w-full grid grid-cols-3">
               <TabsTrigger value="description">Description</TabsTrigger>
               <TabsTrigger value="specifications">Specifications</TabsTrigger>
               <TabsTrigger value="additional">Additional Information</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="description" className="pt-4">
+            <TabsContent value="description" className="bg-white rounded-lg p-6 shadow-sm">
               <div className="prose max-w-none">
                 {product.description ? (
-                  <p>{product.description}</p>
+                  <p className="text-gray-700 leading-relaxed">{product.description}</p>
                 ) : (
-                  <p className="text-gray-500">No description available for this product.</p>
+                  <p className="text-gray-500 italic text-center">No description available for this product.</p>
                 )}
               </div>
             </TabsContent>
             
-            <TabsContent value="specifications" className="pt-4">
+            <TabsContent value="specifications" className="bg-white rounded-lg p-6 shadow-sm">
               <div className="overflow-x-auto">
                 {specifications && specifications.length > 0 ? (
-                  <table className="min-w-full divide-y divide-gray-200">
+                  <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
                     <tbody className="divide-y divide-gray-200">
                       {specifications.map((spec, index) => (
                         <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900 w-1/3">{spec.name}</td>
-                          <td className="px-6 py-4 text-sm text-gray-500">{spec.value}</td>
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900 w-1/3 text-center border-r border-gray-200">{spec.name}</td>
+                          <td className="px-6 py-4 text-sm text-gray-700 text-center">{spec.value}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 ) : (
-                  <p className="text-gray-500">No specifications available for this product.</p>
+                  <p className="text-gray-500 italic text-center">No specifications available for this product.</p>
                 )}
               </div>
             </TabsContent>
             
-            <TabsContent value="additional" className="pt-4">
+            <TabsContent value="additional" className="bg-white rounded-lg p-6 shadow-sm">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg overflow-hidden">
                   <tbody className="divide-y divide-gray-200">
                     {additionalInfo.map((info, index) => (
                       <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900 w-1/3">{info.name}</td>
-                        <td className="px-6 py-4 text-sm text-gray-500">{info.value}</td>
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900 w-1/3 text-center border-r border-gray-200">{info.name}</td>
+                        <td className="px-6 py-4 text-sm text-gray-700 text-center">{info.value}</td>
                       </tr>
                     ))}
                   </tbody>
