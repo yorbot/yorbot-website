@@ -33,56 +33,60 @@ import { WishlistProvider } from "./contexts/WishlistContext";
 import RequireAuth from "./components/auth/RequireAuth";
 
 function App() {
+  console.log("App component is rendering");
+  
   return (
     <React.StrictMode>
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
             <Router>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/about-us" element={<AboutUs />} />
-                <Route path="/contact-us" element={<ContactUs />} />
-                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-                <Route path="/shipping-and-refund" element={<ShippingAndRefund />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/shop/:category" element={<Shop />} />
-                <Route path="/shop/:category/:subcategory" element={<Shop />} />
-                <Route path="/product/:slug" element={<Product />} />
-                <Route path="/cart" element={
-                  <RequireAuth>
-                    <Cart />
-                  </RequireAuth>
-                } />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/checkout" element={
-                  <RequireAuth>
-                    <Checkout />
-                  </RequireAuth>
-                } />
-                <Route path="/profile" element={
-                  <RequireAuth>
-                    <Profile />
-                  </RequireAuth>
-                } />
-                <Route path="/profile/orders/:id" element={
-                  <RequireAuth>
-                    <OrderDetails />
-                  </RequireAuth>
-                } />
-                <Route path="/blogs" element={<Blogs />} />
-                <Route path="/educational" element={<Educational />} />
-                <Route path="/sign-in" element={<SignIn />} />
-                <Route path="/sign-up" element={<SignUp />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/services/:serviceSlug" element={<Services />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              <Toaster />
+              <div className="min-h-screen bg-white">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/about-us" element={<AboutUs />} />
+                  <Route path="/contact-us" element={<ContactUs />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+                  <Route path="/shipping-and-refund" element={<ShippingAndRefund />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/shop/:category" element={<Shop />} />
+                  <Route path="/shop/:category/:subcategory" element={<Shop />} />
+                  <Route path="/product/:slug" element={<Product />} />
+                  <Route path="/cart" element={
+                    <RequireAuth>
+                      <Cart />
+                    </RequireAuth>
+                  } />
+                  <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/checkout" element={
+                    <RequireAuth>
+                      <Checkout />
+                    </RequireAuth>
+                  } />
+                  <Route path="/profile" element={
+                    <RequireAuth>
+                      <Profile />
+                    </RequireAuth>
+                  } />
+                  <Route path="/profile/orders/:id" element={
+                    <RequireAuth>
+                      <OrderDetails />
+                    </RequireAuth>
+                  } />
+                  <Route path="/blogs" element={<Blogs />} />
+                  <Route path="/educational" element={<Educational />} />
+                  <Route path="/sign-in" element={<SignIn />} />
+                  <Route path="/sign-up" element={<SignUp />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/services/:serviceSlug" element={<Services />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <Toaster />
+              </div>
             </Router>
           </WishlistProvider>
         </CartProvider>

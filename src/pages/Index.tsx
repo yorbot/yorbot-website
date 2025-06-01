@@ -9,14 +9,18 @@ import OurServices from "@/components/home/OurServices";
 import ClientFeedback from "@/components/home/ClientFeedback";
 
 const Index: React.FC = () => {
+  console.log("Index page is rendering");
+  
   return (
     <Layout>
-      <HeroBanner />
-      <Categories />
-      <CadBanner />
-      <MechanicalParts />
-      <OurServices />
-      <ClientFeedback />
+      <div className="min-h-screen">
+        <HeroBanner />
+        <Categories />
+        <CadBanner />
+        <MechanicalParts />
+        <OurServices />
+        <ClientFeedback />
+      </div>
     </Layout>
   );
 };
