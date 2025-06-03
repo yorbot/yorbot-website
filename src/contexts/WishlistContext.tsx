@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "../integrations/supabase/client";
 import { useAuth } from "./AuthContext";
@@ -73,8 +74,7 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
     try {
       if (isInWishlist(item.id)) {
         toast("Already in wishlist", {
-          description: `${item.name} is already in your wishlist`,
-          duration: 2000,
+          description: `${item.name} is already in your wishlist`
         });
         return;
       }
@@ -92,8 +92,7 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
         if (error) {
           console.error("Error adding item to wishlist:", error);
           toast("Failed to add to wishlist", {
-            description: "Please try again",
-            duration: 2000,
+            description: "Please try again"
           });
           return;
         }
@@ -101,14 +100,12 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
 
       setWishlistItems([...wishlistItems, item]);
       toast("Added to wishlist", {
-        description: `${item.name} has been added to your wishlist`,
-        duration: 2000,
+        description: `${item.name} has been added to your wishlist`
       });
     } catch (error) {
       console.error("Error adding to wishlist:", error);
       toast("Failed to add to wishlist", {
-        description: "Please try again",
-        duration: 2000,
+        description: "Please try again"
       });
     }
   };
@@ -125,8 +122,7 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
         if (error) {
           console.error("Error removing item from wishlist:", error);
           toast("Failed to remove item", {
-            description: "Please try again",
-            duration: 2000,
+            description: "Please try again"
           });
           return;
         }
@@ -134,14 +130,12 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
 
       setWishlistItems(wishlistItems.filter((item) => item.id !== id));
       toast("Item removed", {
-        description: "Item has been removed from your wishlist",
-        duration: 2000,
+        description: "Item has been removed from your wishlist"
       });
     } catch (error) {
       console.error("Error removing from wishlist:", error);
       toast("Failed to remove item", {
-        description: "Please try again",
-        duration: 2000,
+        description: "Please try again"
       });
     }
   };
@@ -161,8 +155,7 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
         if (error) {
           console.error("Error clearing wishlist:", error);
           toast("Failed to clear wishlist", {
-            description: "Please try again",
-            duration: 2000,
+            description: "Please try again"
           });
           return;
         }
@@ -170,14 +163,12 @@ export const WishlistProvider: React.FC<{ children: ReactNode }> = ({ children }
 
       setWishlistItems([]);
       toast("Wishlist cleared", {
-        description: "All items have been removed from your wishlist",
-        duration: 2000,
+        description: "All items have been removed from your wishlist"
       });
     } catch (error) {
       console.error("Error clearing wishlist:", error);
       toast("Failed to clear wishlist", {
-        description: "Please try again",
-        duration: 2000,
+        description: "Please try again"
       });
     }
   };
