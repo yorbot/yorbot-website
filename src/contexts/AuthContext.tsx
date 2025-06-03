@@ -11,7 +11,6 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<{ error: any | null }>;
   signUp: (email: string, password: string, metadata?: any) => Promise<{ error: any | null }>;
   signOut: () => Promise<void>;
-  logout: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
 };
 
@@ -79,10 +78,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await supabase.auth.signOut();
   };
 
-  const logout = async () => {
-    await supabase.auth.signOut();
-  };
-
   const signInWithGoogle = async () => {
     try {
       console.log("Initiating Google sign in with redirect URL:", `${window.location.origin}/auth/callback`);
@@ -113,7 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user, isLoading, signIn, signUp, signOut, logout, signInWithGoogle }}>
+    <AuthContext.Provider value={{ session, user, isLoading, signIn, signUp, signOut, signInWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );

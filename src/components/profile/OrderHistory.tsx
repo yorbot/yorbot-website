@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,13 +44,7 @@ const OrderHistory: React.FC = () => {
           return;
         }
 
-        // Transform the data to match our Order interface
-        const transformedOrders = (data || []).map((order: any) => ({
-          ...order,
-          items: Array.isArray(order.items) ? order.items : []
-        }));
-
-        setOrders(transformedOrders);
+        setOrders(data || []);
       } catch (error) {
         console.error('Error:', error);
         toast("Failed to load order history", {
@@ -164,7 +159,7 @@ const OrderHistory: React.FC = () => {
 
             <div className="flex flex-col sm:flex-row gap-2">
               <Link
-                to={`/profile/orders/${order.id}`}
+                to={`/order-details/${order.id}`}
                 className="bg-yorbot-orange text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-orange-600 transition-colors text-center"
               >
                 View Details

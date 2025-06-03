@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -97,23 +96,25 @@ const Profile: React.FC = () => {
         .eq('id', user.id);
 
       if (error) {
-        toast("Error", {
+        toast({
+          title: "Error",
           description: "Failed to update profile. Please try again.",
-          duration: 2000,
+          variant: "destructive",
         });
         console.error('Error updating profile:', error);
         return;
       }
 
-      toast("Profile updated", {
+      toast({
+        title: "Profile updated",
         description: "Your profile has been updated successfully.",
-        duration: 2000,
       });
     } catch (error) {
       console.error('Error:', error);
-      toast("Error", {
+      toast({
+        title: "Error",
         description: "An unexpected error occurred. Please try again.",
-        duration: 2000,
+        variant: "destructive",
       });
     } finally {
       setIsEditing(false);
