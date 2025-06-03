@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, Heart, User, Menu, LogIn } from "lucide-react";
@@ -16,6 +17,10 @@ const Header: React.FC = () => {
   const { wishlistCount } = useWishlist();
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  console.log("Header - Cart count:", cartCount);
+  console.log("Header - Wishlist count:", wishlistCount);
+  console.log("Header - User:", user);
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -63,6 +68,14 @@ const Header: React.FC = () => {
     }
   };
 
+  const handleCartClick = () => {
+    if (user) {
+      navigate("/cart");
+    } else {
+      navigate("/sign-in", { state: { from: { pathname: "/cart" } } });
+    }
+  };
+
   return (
     <header className={`w-full bg-white z-50 ${scrolled ? "shadow-md" : ""}`}>
       <div className="container mx-auto px-4 py-4">
@@ -88,14 +101,14 @@ const Header: React.FC = () => {
                 </span>
               )}
             </Link>
-            <Link to="/cart" className="relative">
+            <button onClick={handleCartClick} className="relative">
               <ShoppingCart className="w-6 h-6" />
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-yorbot-orange text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
-            </Link>
+            </button>
             <button onClick={handleProfileClick}>
               <User className="w-6 h-6" />
             </button>
@@ -162,14 +175,17 @@ const Header: React.FC = () => {
                 </span>
               )}
             </Link>
-            <Link to="/cart" className="relative" onClick={toggleMobileMenu}>
+            <button onClick={() => {
+              handleCartClick();
+              toggleMobileMenu();
+            }} className="relative">
               <ShoppingCart className="w-6 h-6" />
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-yorbot-orange text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
-            </Link>
+            </button>
             <button onClick={() => {
               handleProfileClick();
               toggleMobileMenu();

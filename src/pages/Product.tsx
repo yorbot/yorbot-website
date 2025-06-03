@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProductImage {
   url: string;
@@ -53,13 +56,18 @@ interface RelatedProduct {
 const Product: React.FC = () => {
   const { toast } = useToast();
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [product, setProduct] = useState<Product | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
   const [mainImage, setMainImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
-  const [isInWishlist, setIsInWishlist] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Context hooks
+  const { addToCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { user } = useAuth();
 
   // Fetch product data
   useEffect(() => {
@@ -181,27 +189,48 @@ const Product: React.FC = () => {
   };
 
   // Handle add to cart
-  const addToCart = () => {
+  const handleAddToCart = () => {
     if (!product) return;
     
-    toast({
-      title: "Added to cart!",
-      description: `${product.name} (Qty: ${quantity}) has been added to your cart.`,
-      variant: "default",
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to add items to your cart",
+        variant: "destructive",
+      });
+      navigate("/sign-in", { state: { from: { pathname: `/product/${slug}` } } });
+      return;
+    }
+    
+    const currentPrice = product.sale_price || product.price;
+    
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: currentPrice,
+      quantity: quantity,
+      image: product.image_url || ""
     });
   };
 
   // Handle add to wishlist
-  const toggleWishlist = () => {
-    setIsInWishlist(!isInWishlist);
-    
+  const handleToggleWishlist = () => {
     if (!product) return;
     
-    toast({
-      title: isInWishlist ? "Removed from wishlist" : "Added to wishlist!",
-      description: `${product.name} has been ${isInWishlist ? "removed from" : "added to"} your wishlist.`,
-      variant: "default",
-    });
+    const currentPrice = product.sale_price || product.price;
+    const inStock = product.stock === null || product.stock > 0;
+    
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist({
+        id: product.id,
+        name: product.name,
+        price: currentPrice,
+        image: product.image_url || "",
+        inStock: inStock
+      });
+    }
   };
 
   // Loading state
@@ -418,7 +447,7 @@ const Product: React.FC = () => {
               
               <div className="flex space-x-4">
                 <button
-                  onClick={addToCart}
+                  onClick={handleAddToCart}
                   disabled={!inStock}
                   className={`flex items-center px-6 py-3 rounded-md ${
                     inStock
@@ -431,14 +460,14 @@ const Product: React.FC = () => {
                 </button>
                 
                 <button
-                  onClick={toggleWishlist}
+                  onClick={handleToggleWishlist}
                   className={`flex items-center justify-center w-12 h-12 rounded-full border ${
-                    isInWishlist 
+                    isInWishlist(product.id) 
                       ? "border-yorbot-orange bg-yorbot-orange text-white" 
                       : "border-gray-300 bg-white text-yorbot-orange hover:border-yorbot-orange"
                   } transition-colors`}
                 >
-                  <Heart size={20} className={isInWishlist ? "fill-white" : ""} />
+                  <Heart size={20} className={isInWishlist(product.id) ? "fill-white" : ""} />
                 </button>
               </div>
             </div>

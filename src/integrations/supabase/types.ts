@@ -245,6 +245,132 @@ export type Database = {
         }
         Relationships: []
       }
+      order_items: {
+        Row: {
+          created_at: string | null
+          id: number
+          order_id: number | null
+          product_id: number | null
+          product_image: string | null
+          product_name: string
+          product_sku: string | null
+          quantity: number
+          total_price: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          order_id?: number | null
+          product_id?: number | null
+          product_image?: string | null
+          product_name: string
+          product_sku?: string | null
+          quantity?: number
+          total_price: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          order_id?: number | null
+          product_id?: number | null
+          product_image?: string | null
+          product_name?: string
+          product_sku?: string | null
+          quantity?: number
+          total_price?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          billing_address: Json | null
+          coupon_code: string | null
+          created_at: string | null
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          discount_amount: number
+          id: number
+          items: Json
+          notes: string | null
+          order_number: string
+          order_status: string
+          payment_method: string | null
+          payment_status: string
+          shipping_address: Json
+          shipping_amount: number
+          subtotal: number
+          tax_amount: number
+          total_amount: number
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          billing_address?: Json | null
+          coupon_code?: string | null
+          created_at?: string | null
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          discount_amount?: number
+          id?: number
+          items?: Json
+          notes?: string | null
+          order_number?: string
+          order_status?: string
+          payment_method?: string | null
+          payment_status?: string
+          shipping_address: Json
+          shipping_amount?: number
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          billing_address?: Json | null
+          coupon_code?: string | null
+          created_at?: string | null
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          discount_amount?: number
+          id?: number
+          items?: Json
+          notes?: string | null
+          order_number?: string
+          order_status?: string
+          payment_method?: string | null
+          payment_status?: string
+          shipping_address?: Json
+          shipping_amount?: number
+          subtotal?: number
+          tax_amount?: number
+          total_amount?: number
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           additional_images: Json | null
@@ -258,6 +384,7 @@ export type Database = {
           name: string
           price: number
           sale_price: number | null
+          sku: string | null
           slug: string
           specifications: Json | null
           stock: number | null
@@ -277,6 +404,7 @@ export type Database = {
           name: string
           price: number
           sale_price?: number | null
+          sku?: string | null
           slug: string
           specifications?: Json | null
           stock?: number | null
@@ -296,6 +424,7 @@ export type Database = {
           name?: string
           price?: number
           sale_price?: number | null
+          sku?: string | null
           slug?: string
           specifications?: Json | null
           stock?: number | null
