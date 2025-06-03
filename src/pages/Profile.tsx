@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Profile: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
@@ -122,7 +122,7 @@ const Profile: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await signOut();
       navigate("/");
       toast("Signed out successfully", {
         duration: 2000,
@@ -187,33 +187,39 @@ const Profile: React.FC = () => {
             <div className="p-6">
               {activeTab === "profile" && (
                 <div>
-                  <div className="p-4 border-b">
+                  <div className="flex justify-between items-center p-4 border-b">
                     <h2 className="font-semibold text-lg">Profile Information</h2>
+                    <button
+                      onClick={handleLogout}
+                      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    >
+                      Logout
+                    </button>
                   </div>
                   <div className="p-6">
                     <form onSubmit={handleSave} className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                          <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                          <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">
                             First Name
                           </label>
                           <input
                             type="text"
-                            id="firstName"
-                            name="firstName"
+                            id="first_name"
+                            name="first_name"
                             value={profile.first_name}
                             onChange={handleInputChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
                           />
                         </div>
                         <div>
-                          <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                          <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">
                             Last Name
                           </label>
                           <input
                             type="text"
-                            id="lastName"
-                            name="lastName"
+                            id="last_name"
+                            name="last_name"
                             value={profile.last_name}
                             onChange={handleInputChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"

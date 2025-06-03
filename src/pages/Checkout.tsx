@@ -93,13 +93,12 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     if (cartCount === 0) {
       navigate('/cart');
-      toast({
-        title: "Your cart is empty",
+      toast("Your cart is empty", {
         description: "Add some items to your cart before checking out.",
-        variant: "destructive",
+        duration: 2000,
       });
     }
-  }, [cartCount, navigate, toast]);
+  }, [cartCount, navigate]);
 
   // Handle address form change
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
