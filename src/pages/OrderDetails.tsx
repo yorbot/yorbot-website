@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -7,14 +6,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const OrderDetails: React.FC = () => {
-  const { orderId } = useParams<{ orderId: string }>();
+  const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOrder = async () => {
-      if (!orderId || !user) {
+      if (!id || !user) {
         setLoading(false);
         return;
       }
@@ -23,7 +22,7 @@ const OrderDetails: React.FC = () => {
         const { data, error } = await supabase
           .from('orders')
           .select('*')
-          .eq('id', orderId)
+          .eq('id', parseInt(id))
           .eq('user_id', user.id)
           .single();
 
@@ -49,7 +48,7 @@ const OrderDetails: React.FC = () => {
     };
 
     fetchOrder();
-  }, [orderId, user]);
+  }, [id, user]);
 
   if (loading) {
     return (

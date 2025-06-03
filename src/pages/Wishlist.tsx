@@ -1,14 +1,14 @@
+
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { ShoppingCart, X } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useWishlist, WishlistItem } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Wishlist: React.FC = () => {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const { wishlistItems, wishlistCount, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
@@ -17,10 +17,9 @@ const Wishlist: React.FC = () => {
   // Add item to cart
   const handleAddToCart = (item: WishlistItem) => {
     if (!user) {
-      toast({
-        title: "Sign in required",
+      toast("Sign in required", {
         description: "Please sign in to add items to your cart",
-        variant: "destructive",
+        duration: 2000,
       });
       navigate("/sign-in", { state: { from: { pathname: "/wishlist" } } });
       return;
@@ -31,7 +30,7 @@ const Wishlist: React.FC = () => {
       name: item.name,
       image: item.image,
       price: item.price,
-      quantity: 1 // Add this field!
+      quantity: 1
     });
   };
 
