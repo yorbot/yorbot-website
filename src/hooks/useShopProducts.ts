@@ -12,6 +12,15 @@ export interface Product {
   description: string | null;
   category_id?: number | null;
   subcategory_id?: number | null;
+  stock?: number;
+  additional_images?: string[];
+  specifications?: Record<string, any>;
+  featured?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  discount_percentage?: number;
+  tags?: string[];
+  sku?: string;
 }
 
 export function useShopProducts(categoryId?: number, subcategoryId?: number) {

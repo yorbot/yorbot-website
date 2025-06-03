@@ -205,7 +205,7 @@ const Product: React.FC = () => {
             <div className="flex items-center space-x-2">
               <div className={`w-3 h-3 rounded-full ${(product.stock || 0) > 0 ? 'bg-green-500' : 'bg-red-500'}`}></div>
               <span className={`text-sm ${(product.stock || 0) > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {(product.stock || 0) > 0 ? `In Stock (${product.stock} available)` : 'Out of Stock'}
+                {(product.stock || 0) > 0 ? `In Stock (${product.stock || 0} available)` : 'Out of Stock'}
               </span>
             </div>
 
