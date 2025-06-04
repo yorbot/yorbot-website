@@ -198,59 +198,155 @@ const Profile: React.FC = () => {
                   </div>
                   <div className="p-6">
                     <form onSubmit={handleSave} className="space-y-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                          <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">
-                            First Name
-                          </label>
-                          <input
-                            type="text"
-                            id="first_name"
-                            name="first_name"
-                            value={profile.first_name}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
-                          />
+                      {/* Personal Information */}
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-4">Personal Information</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div>
+                            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700 mb-1">
+                              First Name
+                            </label>
+                            <input
+                              type="text"
+                              id="first_name"
+                              name="first_name"
+                              value={profile.first_name}
+                              onChange={handleInputChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">
+                              Last Name
+                            </label>
+                            <input
+                              type="text"
+                              id="last_name"
+                              name="last_name"
+                              value={profile.last_name}
+                              onChange={handleInputChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                              Email Address
+                            </label>
+                            <input
+                              type="email"
+                              id="email"
+                              name="email"
+                              value={user.email}
+                              disabled
+                              className="w-full px-3 py-2 border border-gray-300 bg-gray-50 rounded-md"
+                            />
+                            <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
+                          </div>
+                          <div>
+                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+                              Phone Number
+                            </label>
+                            <input
+                              type="text"
+                              id="phone"
+                              name="phone"
+                              value={profile.phone}
+                              onChange={handleInputChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
+                            />
+                          </div>
                         </div>
-                        <div>
-                          <label htmlFor="last_name" className="block text-sm font-medium text-gray-700 mb-1">
-                            Last Name
-                          </label>
-                          <input
-                            type="text"
-                            id="last_name"
-                            name="last_name"
-                            value={profile.last_name}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
-                          />
-                        </div>
-                        <div>
-                          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                            Email Address
-                          </label>
-                          <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={user.email}
-                            disabled
-                            className="w-full px-3 py-2 border border-gray-300 bg-gray-50 rounded-md"
-                          />
-                          <p className="mt-1 text-xs text-gray-500">Email cannot be changed</p>
-                        </div>
-                        <div>
-                          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                            Phone Number
-                          </label>
-                          <input
-                            type="text"
-                            id="phone"
-                            name="phone"
-                            value={profile.phone}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
-                          />
+                      </div>
+
+                      {/* Address Information */}
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-4">Address Information</h3>
+                        <div className="grid grid-cols-1 gap-6">
+                          <div>
+                            <label htmlFor="address_line1" className="block text-sm font-medium text-gray-700 mb-1">
+                              Address Line 1
+                            </label>
+                            <input
+                              type="text"
+                              id="address_line1"
+                              name="address_line1"
+                              value={profile.address_line1}
+                              onChange={handleInputChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="address_line2" className="block text-sm font-medium text-gray-700 mb-1">
+                              Address Line 2 (Optional)
+                            </label>
+                            <input
+                              type="text"
+                              id="address_line2"
+                              name="address_line2"
+                              value={profile.address_line2}
+                              onChange={handleInputChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
+                            />
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                              <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+                                City
+                              </label>
+                              <input
+                                type="text"
+                                id="city"
+                                name="city"
+                                value={profile.city}
+                                onChange={handleInputChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
+                                State
+                              </label>
+                              <input
+                                type="text"
+                                id="state"
+                                name="state"
+                                value={profile.state}
+                                onChange={handleInputChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor="postal_code" className="block text-sm font-medium text-gray-700 mb-1">
+                                Postal Code
+                              </label>
+                              <input
+                                type="text"
+                                id="postal_code"
+                                name="postal_code"
+                                value={profile.postal_code}
+                                onChange={handleInputChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+                              Country
+                            </label>
+                            <select
+                              id="country"
+                              name="country"
+                              value={profile.country}
+                              onChange={handleInputChange}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
+                            >
+                              <option value="India">India</option>
+                              <option value="United States">United States</option>
+                              <option value="United Kingdom">United Kingdom</option>
+                              <option value="Canada">Canada</option>
+                              <option value="Australia">Australia</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
 

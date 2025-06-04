@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -7,11 +8,11 @@ import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Product: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  // Fetch all products to find the one with matching slug
   const { products, loading } = useShopProducts();
   const { addToCart } = useCart();
   const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
@@ -20,10 +21,7 @@ const Product: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
-  // Find the product by slug
   const product = products.find((p) => p.slug === slug);
-
-  // Check if product is in wishlist
   const isInWishlist = wishlistItems.some(item => item.id === product?.id);
 
   useEffect(() => {
@@ -105,7 +103,7 @@ const Product: React.FC = () => {
 
   const images = [
     product.image_url || "/placeholder.svg",
-    ...(product.additional_images || []).map((img: string) => img)
+    ...(product.additional_images || []).filter(img => img)
   ];
 
   const discount = product.sale_price 
@@ -125,8 +123,9 @@ const Product: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
-          {/* Product Images */}
+          {/* Product Images - Left Side */}
           <div className="space-y-4">
+            {/* Main Product Image */}
             <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
               <img
                 src={images[selectedImage]}
@@ -135,13 +134,14 @@ const Product: React.FC = () => {
               />
             </div>
             
+            {/* Image Thumbnails */}
             {images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="flex space-x-2 overflow-x-auto">
                 {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 ${
+                    className={`flex-shrink-0 w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border-2 ${
                       selectedImage === index ? "border-yorbot-orange" : "border-transparent"
                     }`}
                   >
@@ -156,8 +156,9 @@ const Product: React.FC = () => {
             )}
           </div>
 
-          {/* Product Details */}
+          {/* Product Details - Right Side */}
           <div className="space-y-6">
+            {/* Product Name */}
             <div>
               <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
               <div className="flex items-center space-x-2 mb-4">
@@ -170,6 +171,7 @@ const Product: React.FC = () => {
               </div>
             </div>
 
+            {/* Price */}
             <div className="space-y-2">
               <div className="flex items-center space-x-3">
                 {product.sale_price ? (
@@ -192,13 +194,6 @@ const Product: React.FC = () => {
               </div>
               <p className="text-sm text-gray-600">Inclusive of all taxes</p>
             </div>
-
-            {product.description && (
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Description</h3>
-                <p className="text-gray-700">{product.description}</p>
-              </div>
-            )}
 
             {/* Stock Status */}
             <div className="flex items-center space-x-2">
@@ -253,20 +248,46 @@ const Product: React.FC = () => {
           </div>
         </div>
 
-        {/* Specifications */}
-        {product.specifications && Object.keys(product.specifications).length > 0 && (
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <h3 className="text-xl font-semibold mb-4">Specifications</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {Object.entries(product.specifications as Record<string, any>).map(([key, value]) => (
-                <div key={key} className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-700 capitalize">{key.replace('_', ' ')}</span>
-                  <span className="text-gray-600">{String(value)}</span>
+        {/* Description and Specifications Tabs */}
+        <div className="bg-white rounded-lg shadow-sm">
+          <Tabs defaultValue="description" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="description">Description</TabsTrigger>
+              <TabsTrigger value="specifications">Specifications</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="description" className="mt-4">
+              <div className="p-6">
+                <h3 className="text-xl font-semibold mb-4">Product Description</h3>
+                <div className="prose max-w-none">
+                  {product.description ? (
+                    <p className="text-gray-700 leading-relaxed">{product.description}</p>
+                  ) : (
+                    <p className="text-gray-500 italic">No description available for this product.</p>
+                  )}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="specifications" className="mt-4">
+              <div className="p-6">
+                <h3 className="text-xl font-semibold mb-4">Product Specifications</h3>
+                {product.specifications && Object.keys(product.specifications).length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(product.specifications as Record<string, any>).map(([key, value]) => (
+                      <div key={key} className="flex justify-between py-2 border-b border-gray-100">
+                        <span className="font-medium text-gray-700 capitalize">{key.replace('_', ' ')}</span>
+                        <span className="text-gray-600">{String(value)}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic">No specifications available for this product.</p>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
     </Layout>
   );
