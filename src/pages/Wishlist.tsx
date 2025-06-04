@@ -1,4 +1,3 @@
-
 import React from "react";
 import Layout from "@/components/layout/Layout";
 import { Heart, ShoppingCart, Trash2 } from "lucide-react";
@@ -16,8 +15,7 @@ const Wishlist: React.FC = () => {
       id: item.id,
       name: item.name,
       image: item.image,
-      price: item.price,
-      quantity: 1
+      price: item.price
     });
 
     toast("Added to cart!", {

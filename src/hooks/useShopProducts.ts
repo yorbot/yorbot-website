@@ -46,7 +46,29 @@ export function useShopProducts(categoryId?: number, subcategoryId?: number) {
         console.error("Error fetching products:", error);
         setProducts([]);
       } else {
-        setProducts(data || []);
+        // Map the Supabase data to our Product interface
+        const mappedProducts: Product[] = (data || []).map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          slug: item.slug,
+          image_url: item.image_url,
+          price: item.price,
+          sale_price: item.sale_price,
+          description: item.description,
+          category_id: item.category_id,
+          subcategory_id: item.subcategory_id,
+          stock: item.stock,
+          additional_images: Array.isArray(item.additional_images) ? item.additional_images : [],
+          specifications: typeof item.specifications === 'object' ? item.specifications : {},
+          featured: item.featured,
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          discount_percentage: item.discount_percentage,
+          tags: Array.isArray(item.tags) ? item.tags : [],
+          sku: item.sku,
+        }));
+        
+        setProducts(mappedProducts);
       }
       
       setLoading(false);

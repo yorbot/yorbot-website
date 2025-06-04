@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -62,8 +61,7 @@ const Product: React.FC = () => {
       id: product.id,
       name: product.name,
       image: product.image_url || "/placeholder.svg",
-      price: product.sale_price || product.price,
-      quantity: quantity
+      price: product.sale_price || product.price
     });
 
     toast("Added to cart!", {
