@@ -122,6 +122,7 @@ const Product: React.FC = () => {
           <span className="font-semibold">{product.name}</span>
         </div>
 
+        {/* Main Product Section - Side by Side Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images - Left Side */}
           <div className="space-y-4">
