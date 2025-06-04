@@ -122,11 +122,11 @@ const Product: React.FC = () => {
           <span className="font-semibold">{product.name}</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images - Left Side */}
           <div className="space-y-4">
             {/* Main Product Image */}
-            <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+            <div className="w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
               <img
                 src={images[selectedImage]}
                 alt={product.name}
@@ -141,7 +141,7 @@ const Product: React.FC = () => {
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-20 h-20 bg-gray-100 rounded-lg overflow-hidden border-2 ${
+                    className={`flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border-2 ${
                       selectedImage === index ? "border-yorbot-orange" : "border-transparent"
                     }`}
                   >
@@ -160,11 +160,14 @@ const Product: React.FC = () => {
           <div className="space-y-6">
             {/* Product Name */}
             <div>
-              <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+              <h1 className="text-2xl font-bold mb-2">{product.name}</h1>
+              {product.sku && (
+                <p className="text-sm text-gray-600 mb-3">SKU: {product.sku}</p>
+              )}
               <div className="flex items-center space-x-2 mb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
                 <span className="text-sm text-gray-600">(4.5 - 23 reviews)</span>
@@ -176,10 +179,10 @@ const Product: React.FC = () => {
               <div className="flex items-center space-x-3">
                 {product.sale_price ? (
                   <>
-                    <span className="text-3xl font-bold text-yorbot-orange">
+                    <span className="text-2xl font-bold text-yorbot-orange">
                       ₹{product.sale_price.toFixed(2)}
                     </span>
-                    <span className="text-xl text-gray-500 line-through">
+                    <span className="text-lg text-gray-500 line-through">
                       ₹{product.price.toFixed(2)}
                     </span>
                     <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-medium">
@@ -187,7 +190,7 @@ const Product: React.FC = () => {
                     </span>
                   </>
                 ) : (
-                  <span className="text-3xl font-bold text-yorbot-orange">
+                  <span className="text-2xl font-bold text-yorbot-orange">
                     ₹{product.price.toFixed(2)}
                   </span>
                 )}
@@ -210,15 +213,15 @@ const Product: React.FC = () => {
                 <button
                   onClick={() => handleQuantityChange("decrease")}
                   disabled={quantity <= 1}
-                  className="w-10 h-10 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
+                  className="w-8 h-8 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
                 >
                   <Minus className="w-4 h-4" />
                 </button>
-                <span className="text-lg font-medium w-12 text-center">{quantity}</span>
+                <span className="text-lg font-medium w-8 text-center">{quantity}</span>
                 <button
                   onClick={() => handleQuantityChange("increase")}
                   disabled={quantity >= (product.stock || 0)}
-                  className="w-10 h-10 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
+                  className="w-8 h-8 border border-gray-300 rounded-md flex items-center justify-center hover:bg-gray-50 disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
@@ -230,19 +233,19 @@ const Product: React.FC = () => {
               <button
                 onClick={handleAddToCart}
                 disabled={(product.stock || 0) <= 0}
-                className="flex-1 bg-yorbot-orange text-white py-3 px-6 rounded-md font-medium hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                className="flex-1 bg-yorbot-orange text-white py-2 px-4 rounded-md font-medium hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
-                <ShoppingCart className="w-5 h-5" />
+                <ShoppingCart className="w-4 h-4" />
                 <span>Add to Cart</span>
               </button>
               
               <button
                 onClick={handleWishlistToggle}
-                className={`p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors ${
+                className={`p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors ${
                   isInWishlist ? 'bg-red-50 border-red-300 text-red-600' : 'text-gray-600'
                 }`}
               >
-                <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+                <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
               </button>
             </div>
           </div>
