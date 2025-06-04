@@ -39,6 +39,7 @@ export function useShopProducts(categoryId?: number, subcategoryId?: number) {
         // If only category is provided, show products that are directly in the category
         query = query.eq("category_id", categoryId);
       }
+      // If no categoryId or subcategoryId, fetch all products (for product page search)
 
       const { data, error } = await query;
       
@@ -74,11 +75,7 @@ export function useShopProducts(categoryId?: number, subcategoryId?: number) {
       setLoading(false);
     }
 
-    if (categoryId || subcategoryId) {
-      fetchProducts();
-    } else {
-      setProducts([]);
-    }
+    fetchProducts();
   }, [categoryId, subcategoryId]);
 
   return { products, loading };

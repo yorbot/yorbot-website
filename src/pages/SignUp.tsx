@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -8,7 +9,7 @@ import { toast } from "sonner";
 const SignUp: React.FC = () => {
   const { toast: uiToast } = useToast();
   const navigate = useNavigate();
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signIn, signInWithGoogle } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -49,21 +50,35 @@ const SignUp: React.FC = () => {
     setFormError("");
 
     try {
-      const { error } = await signUp(
+      const { error: signUpError } = await signUp(
         formData.email,
         formData.password,
         { first_name: formData.name.split(" ")[0], last_name: formData.name.split(" ").slice(1).join(" ") }
       );
 
-      if (error) {
-        setFormError(error.message || "Failed to sign up");
+      if (signUpError) {
+        setFormError(signUpError.message || "Failed to sign up");
       } else {
-        uiToast({
-          title: "Account created successfully!",
-          description: "You can now sign in with your credentials.",
-          variant: "default",
-        });
-        navigate("/sign-in");
+        // Automatically sign in the user after successful registration
+        const { error: signInError } = await signIn(formData.email, formData.password);
+        
+        if (signInError) {
+          // If auto sign-in fails, still show success but redirect to sign-in
+          uiToast({
+            title: "Account created successfully!",
+            description: "Please sign in with your credentials.",
+            variant: "default",
+          });
+          navigate("/sign-in");
+        } else {
+          // Auto sign-in successful
+          uiToast({
+            title: "Welcome to Yorbot!",
+            description: "Your account has been created and you're now signed in.",
+            variant: "default",
+          });
+          navigate("/");
+        }
       }
     } catch (error) {
       setFormError("An unexpected error occurred");

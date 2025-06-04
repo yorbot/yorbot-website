@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -37,7 +36,18 @@ const SignIn: React.FC = () => {
       const { error } = await signIn(formData.email, formData.password);
 
       if (error) {
-        setFormError(error.message || "Failed to sign in");
+        // Provide more user-friendly error messages
+        let errorMessage = "Failed to sign in";
+        if (error.message?.includes("Invalid login credentials")) {
+          errorMessage = "Invalid email or password. Please check your credentials and try again.";
+        } else if (error.message?.includes("Email not confirmed")) {
+          errorMessage = "Please check your email and click the confirmation link before signing in.";
+        } else if (error.message?.includes("Too many requests")) {
+          errorMessage = "Too many login attempts. Please wait a moment and try again.";
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        setFormError(errorMessage);
       } else {
         uiToast({
           title: "Signed in successfully!",
@@ -49,7 +59,7 @@ const SignIn: React.FC = () => {
         navigate(from, { replace: true });
       }
     } catch (error) {
-      setFormError("An unexpected error occurred");
+      setFormError("An unexpected error occurred. Please try again.");
       console.error(error);
     } finally {
       setIsLoading(false);

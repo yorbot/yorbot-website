@@ -11,6 +11,7 @@ import { toast } from "sonner";
 const Product: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  // Fetch all products to find the one with matching slug
   const { products, loading } = useShopProducts();
   const { addToCart } = useCart();
   const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
@@ -26,10 +27,10 @@ const Product: React.FC = () => {
   const isInWishlist = wishlistItems.some(item => item.id === product?.id);
 
   useEffect(() => {
-    if (!loading && !product) {
+    if (!loading && !product && products.length > 0) {
       navigate("/404");
     }
-  }, [product, loading, navigate]);
+  }, [product, loading, navigate, products.length]);
 
   if (loading) {
     return (
