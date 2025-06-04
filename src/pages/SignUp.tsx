@@ -71,13 +71,13 @@ const SignUp: React.FC = () => {
           });
           navigate("/sign-in");
         } else {
-          // Auto sign-in successful
+          // Auto sign-in successful - redirect to home page
           uiToast({
             title: "Welcome to Yorbot!",
             description: "Your account has been created and you're now signed in.",
             variant: "default",
           });
-          navigate("/");
+          navigate("/"); // Navigate to home page instead of login
         }
       }
     } catch (error) {
@@ -92,6 +92,7 @@ const SignUp: React.FC = () => {
     try {
       setGoogleLoading(true);
       await signInWithGoogle();
+      // User will be redirected by Google OAuth, no need to manually navigate
     } catch (error) {
       console.error("Google sign in error", error);
       toast("Google Sign-Up Failed", {

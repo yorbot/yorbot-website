@@ -126,7 +126,7 @@ const Product: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images - Left Side */}
           <div className="space-y-4">
-            {/* Main Product Image */}
+            {/* Main Product Image - Aligned to left */}
             <div className="w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
               <img
                 src={images[selectedImage]}
@@ -277,7 +277,7 @@ const Product: React.FC = () => {
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-4">Product Specifications</h3>
                 {product.specifications && Object.keys(product.specifications).length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
                     {Object.entries(product.specifications as Record<string, any>).map(([key, value]) => (
                       <div key={key} className="flex justify-between py-2 border-b border-gray-100">
                         <span className="font-medium text-gray-700 capitalize">{key.replace('_', ' ')}</span>
