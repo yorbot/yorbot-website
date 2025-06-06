@@ -51,6 +51,33 @@ export type Database = {
         }
         Relationships: []
       }
+      base_categories: {
+        Row: {
+          created_at: string | null
+          id: number
+          image_url: string | null
+          name: string
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          image_url?: string | null
+          name: string
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          image_url?: string | null
+          name?: string
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           created_at: string | null
@@ -538,6 +565,7 @@ export type Database = {
       }
       subcategories: {
         Row: {
+          base_category_id: number | null
           category_id: number | null
           created_at: string | null
           id: number
@@ -546,6 +574,7 @@ export type Database = {
           slug: string
         }
         Insert: {
+          base_category_id?: number | null
           category_id?: number | null
           created_at?: string | null
           id?: number
@@ -554,6 +583,7 @@ export type Database = {
           slug: string
         }
         Update: {
+          base_category_id?: number | null
           category_id?: number | null
           created_at?: string | null
           id?: number
@@ -562,6 +592,13 @@ export type Database = {
           slug?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_subcategories_base_category"
+            columns: ["base_category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "subcategories_category_id_fkey"
             columns: ["category_id"]

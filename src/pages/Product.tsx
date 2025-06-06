@@ -8,6 +8,7 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 const Product: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -278,16 +279,20 @@ const Product: React.FC = () => {
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-4">Product Specifications</h3>
                 {product.specifications && Object.keys(product.specifications).length > 0 ? (
-                  <div className="grid grid-cols-1 gap-4">
-                    {Object.entries(product.specifications as Record<string, any>).map(([key, value]) => (
-                      <div key={key} className="py-3 border-b border-gray-100">
-                        <div className="flex flex-col space-y-1">
-                          <span className="font-medium text-gray-700 capitalize">{key.replace('_', ' ')}</span>
-                          <span className="text-gray-600">{String(value)}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <Table>
+                    <TableBody>
+                      {Object.entries(product.specifications as Record<string, any>).map(([key, value]) => (
+                        <TableRow key={key}>
+                          <TableCell className="font-medium text-gray-700 capitalize w-1/3">
+                            {key.replace('_', ' ')}
+                          </TableCell>
+                          <TableCell className="text-gray-600">
+                            {String(value)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 ) : (
                   <p className="text-gray-500 italic">No specifications available for this product.</p>
                 )}
