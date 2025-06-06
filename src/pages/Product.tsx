@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -126,8 +125,8 @@ const Product: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images - Left Side */}
           <div className="space-y-4">
-            {/* Main Product Image - Smaller square with subtle blur shadow */}
-            <div className="w-80 h-80 mx-auto lg:mx-0 rounded-lg overflow-hidden bg-white" style={{boxShadow: '0 0 20px rgba(0, 0, 0, 0.15)'}}>
+            {/* Main Product Image - Larger rectangle with subtle blur shadow */}
+            <div className="w-96 h-80 mx-auto lg:mx-0 rounded-lg overflow-hidden bg-white" style={{boxShadow: '0 0 20px rgba(0, 0, 0, 0.15)'}}>
               <img
                 src={images[selectedImage]}
                 alt={product.name}
@@ -135,21 +134,23 @@ const Product: React.FC = () => {
               />
             </div>
             
-            {/* Image Thumbnails without borders */}
+            {/* Image Thumbnails with improved visibility */}
             {images.length > 1 && (
-              <div className="flex space-x-2 overflow-x-auto justify-center lg:justify-start">
+              <div className="flex space-x-3 overflow-x-auto justify-center lg:justify-start">
                 {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100 ${
-                      selectedImage === index ? "ring-2 ring-yorbot-orange" : ""
+                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-50 border-2 transition-all duration-200 ${
+                      selectedImage === index 
+                        ? "border-yorbot-orange shadow-md scale-105" 
+                        : "border-gray-200 hover:border-gray-300"
                     }`}
                   >
                     <img
                       src={image}
                       alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-contain p-1"
+                      className="w-full h-full object-contain p-2"
                     />
                   </button>
                 ))}
@@ -277,9 +278,9 @@ const Product: React.FC = () => {
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-4">Product Specifications</h3>
                 {product.specifications && Object.keys(product.specifications).length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 gap-4">
                     {Object.entries(product.specifications as Record<string, any>).map(([key, value]) => (
-                      <div key={key} className="py-2 border-b border-gray-100">
+                      <div key={key} className="py-3 border-b border-gray-100">
                         <div className="flex flex-col space-y-1">
                           <span className="font-medium text-gray-700 capitalize">{key.replace('_', ' ')}</span>
                           <span className="text-gray-600">{String(value)}</span>
