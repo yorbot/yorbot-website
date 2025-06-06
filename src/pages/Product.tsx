@@ -126,8 +126,8 @@ const Product: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images - Left Side */}
           <div className="space-y-4">
-            {/* Main Product Image - Square with blurred black border */}
-            <div className="w-full aspect-square border-4 border-black rounded-lg overflow-hidden bg-white shadow-lg" style={{filter: 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.3))'}}>
+            {/* Main Product Image - Smaller square with subtle blur shadow */}
+            <div className="w-80 h-80 mx-auto lg:mx-0 rounded-lg overflow-hidden bg-white" style={{boxShadow: '0 0 20px rgba(0, 0, 0, 0.15)'}}>
               <img
                 src={images[selectedImage]}
                 alt={product.name}
@@ -137,7 +137,7 @@ const Product: React.FC = () => {
             
             {/* Image Thumbnails without borders */}
             {images.length > 1 && (
-              <div className="flex space-x-2 overflow-x-auto">
+              <div className="flex space-x-2 overflow-x-auto justify-center lg:justify-start">
                 {images.map((image, index) => (
                   <button
                     key={index}
