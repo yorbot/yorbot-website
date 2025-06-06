@@ -126,30 +126,30 @@ const Product: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images - Left Side */}
           <div className="space-y-4">
-            {/* Main Product Image - Aligned to left */}
-            <div className="w-full h-96 bg-gray-100 rounded-lg overflow-hidden">
+            {/* Main Product Image with black border */}
+            <div className="w-full h-96 border-2 border-black rounded-lg overflow-hidden bg-white">
               <img
                 src={images[selectedImage]}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain p-2"
               />
             </div>
             
-            {/* Image Thumbnails */}
+            {/* Image Thumbnails with black borders */}
             {images.length > 1 && (
               <div className="flex space-x-2 overflow-x-auto">
                 {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg overflow-hidden border-2 ${
-                      selectedImage === index ? "border-yorbot-orange" : "border-transparent"
+                    className={`flex-shrink-0 w-16 h-16 border-2 border-black rounded-lg overflow-hidden bg-white ${
+                      selectedImage === index ? "ring-2 ring-yorbot-orange" : ""
                     }`}
                   >
                     <img
                       src={image}
                       alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain p-1"
                     />
                   </button>
                 ))}
