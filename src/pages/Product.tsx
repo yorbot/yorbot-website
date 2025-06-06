@@ -126,23 +126,23 @@ const Product: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images - Left Side */}
           <div className="space-y-4">
-            {/* Main Product Image with black border */}
-            <div className="w-full h-96 border-2 border-black rounded-lg overflow-hidden bg-white">
+            {/* Main Product Image - Square with blurred black border */}
+            <div className="w-full aspect-square border-4 border-black rounded-lg overflow-hidden bg-white shadow-lg" style={{filter: 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.3))'}}>
               <img
                 src={images[selectedImage]}
                 alt={product.name}
-                className="w-full h-full object-contain p-2"
+                className="w-full h-full object-contain p-4"
               />
             </div>
             
-            {/* Image Thumbnails with black borders */}
+            {/* Image Thumbnails without borders */}
             {images.length > 1 && (
               <div className="flex space-x-2 overflow-x-auto">
                 {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-16 h-16 border-2 border-black rounded-lg overflow-hidden bg-white ${
+                    className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-gray-100 ${
                       selectedImage === index ? "ring-2 ring-yorbot-orange" : ""
                     }`}
                   >
@@ -279,9 +279,11 @@ const Product: React.FC = () => {
                 {product.specifications && Object.keys(product.specifications).length > 0 ? (
                   <div className="space-y-3">
                     {Object.entries(product.specifications as Record<string, any>).map(([key, value]) => (
-                      <div key={key} className="flex justify-between py-2 border-b border-gray-100">
-                        <span className="font-medium text-gray-700 capitalize">{key.replace('_', ' ')}</span>
-                        <span className="text-gray-600">{String(value)}</span>
+                      <div key={key} className="py-2 border-b border-gray-100">
+                        <div className="flex flex-col space-y-1">
+                          <span className="font-medium text-gray-700 capitalize">{key.replace('_', ' ')}</span>
+                          <span className="text-gray-600">{String(value)}</span>
+                        </div>
                       </div>
                     ))}
                   </div>
