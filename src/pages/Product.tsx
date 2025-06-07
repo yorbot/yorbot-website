@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -20,9 +21,65 @@ const Product: React.FC = () => {
   
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [validImages, setValidImages] = useState<string[]>([]);
 
   const product = products.find((p) => p.slug === slug);
   const isInWishlist = wishlistItems.some(item => item.id === product?.id);
+
+  // Function to check if an image is valid
+  const isValidImage = (url: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if (!url || url.trim() === '') {
+        resolve(false);
+        return;
+      }
+      
+      // Check for error keywords in URL
+      if (url.includes('error') || url.includes('404') || url.includes('not-found')) {
+        resolve(false);
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => resolve(false);
+      img.src = url;
+    });
+  };
+
+  // Validate images when product changes
+  useEffect(() => {
+    if (!product) return;
+
+    const validateImages = async () => {
+      const allImages = [
+        product.image_url,
+        ...(product.additional_images || [])
+      ].filter(img => img && img.trim() !== '');
+
+      const imageValidations = await Promise.all(
+        allImages.map(async (img) => ({
+          url: img,
+          isValid: await isValidImage(img)
+        }))
+      );
+
+      const validImageUrls = imageValidations
+        .filter(item => item.isValid)
+        .map(item => item.url);
+
+      if (validImageUrls.length === 0) {
+        setValidImages(["/placeholder.svg"]);
+      } else {
+        setValidImages(validImageUrls);
+      }
+      
+      // Reset selected image if current selection is invalid
+      setSelectedImage(0);
+    };
+
+    validateImages();
+  }, [product]);
 
   useEffect(() => {
     if (!loading && !product && products.length > 0) {
@@ -101,14 +158,6 @@ const Product: React.FC = () => {
     });
   };
 
-  // Filter out invalid images and only include valid ones
-  const validImages = [
-    product.image_url,
-    ...(product.additional_images || [])
-  ].filter(img => img && img.trim() !== '' && !img.includes('error'));
-
-  const images = validImages.length > 0 ? validImages : ["/placeholder.svg"];
-
   const discount = product.sale_price 
     ? Math.round(((product.price - product.sale_price) / product.price) * 100)
     : 0;
@@ -132,17 +181,17 @@ const Product: React.FC = () => {
             {/* Main Product Image - Larger rectangle */}
             <div className="w-full max-w-lg mx-auto lg:mx-0 aspect-[4/3] rounded-lg overflow-hidden bg-white" style={{boxShadow: '0 0 20px rgba(0, 0, 0, 0.15)'}}>
               <img
-                src={images[selectedImage]}
+                src={validImages[selectedImage]}
                 alt={product.name}
                 className="w-full h-full object-contain p-4"
               />
             </div>
             
-            {/* Image Thumbnails - Only show if more than 1 image and fit container */}
-            {images.length > 1 && (
+            {/* Image Thumbnails - Only show if more than 1 valid image */}
+            {validImages.length > 1 && (
               <div className="w-full max-w-lg mx-auto lg:mx-0">
                 <div className="flex space-x-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
-                  {images.map((image, index) => (
+                  {validImages.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
