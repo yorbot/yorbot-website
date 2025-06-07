@@ -101,10 +101,13 @@ const Product: React.FC = () => {
     });
   };
 
-  const images = [
-    product.image_url || "/placeholder.svg",
-    ...(product.additional_images || []).filter(img => img)
-  ];
+  // Filter out invalid images and only include valid ones
+  const validImages = [
+    product.image_url,
+    ...(product.additional_images || [])
+  ].filter(img => img && img.trim() !== '' && !img.includes('error'));
+
+  const images = validImages.length > 0 ? validImages : ["/placeholder.svg"];
 
   const discount = product.sale_price 
     ? Math.round(((product.price - product.sale_price) / product.price) * 100)
@@ -126,8 +129,8 @@ const Product: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Product Images - Left Side */}
           <div className="space-y-4">
-            {/* Main Product Image - Larger rectangle with subtle blur shadow */}
-            <div className="w-96 h-80 mx-auto lg:mx-0 rounded-lg overflow-hidden bg-white" style={{boxShadow: '0 0 20px rgba(0, 0, 0, 0.15)'}}>
+            {/* Main Product Image - Larger rectangle */}
+            <div className="w-full max-w-lg mx-auto lg:mx-0 aspect-[4/3] rounded-lg overflow-hidden bg-white" style={{boxShadow: '0 0 20px rgba(0, 0, 0, 0.15)'}}>
               <img
                 src={images[selectedImage]}
                 alt={product.name}
@@ -135,26 +138,28 @@ const Product: React.FC = () => {
               />
             </div>
             
-            {/* Image Thumbnails with improved visibility */}
+            {/* Image Thumbnails - Only show if more than 1 image and fit container */}
             {images.length > 1 && (
-              <div className="flex space-x-3 overflow-x-auto justify-center lg:justify-start">
-                {images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-50 border-2 transition-all duration-200 ${
-                      selectedImage === index 
-                        ? "border-yorbot-orange shadow-md scale-105" 
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-contain p-2"
-                    />
-                  </button>
-                ))}
+              <div className="w-full max-w-lg mx-auto lg:mx-0">
+                <div className="flex space-x-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
+                  {images.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImage(index)}
+                      className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-gray-50 border-2 transition-all duration-200 ${
+                        selectedImage === index 
+                          ? "border-yorbot-orange shadow-md scale-105" 
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <img
+                        src={image}
+                        alt={`${product.name} ${index + 1}`}
+                        className="w-full h-full object-contain p-2"
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>

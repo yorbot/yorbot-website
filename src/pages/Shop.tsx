@@ -180,30 +180,27 @@ const Shop: React.FC = () => {
 
         {/* 3b. Show products for selected category only IF it has no subcategories */}
         {category && selectedCategory && !subcategory && selectedCategory.subcategories.length === 0 && products.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {products.map(prod => (
               <div key={prod.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
                 <Link to={`/product/${prod.slug}`}>
-                  <div className="h-48 overflow-hidden">
+                  <div className="h-32 overflow-hidden">
                     <img
                       src={prod.image_url || "https://via.placeholder.com/300x300?text=Product"}
                       alt={prod.name}
                       className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                     />
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold group-hover:text-yorbot-orange transition-colors">
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold group-hover:text-yorbot-orange transition-colors line-clamp-2">
                       {prod.name}
                     </h3>
                     <div className="mt-2 flex items-center justify-between">
-                      <span className="font-semibold">₹{prod.price.toFixed(2)}</span>
+                      <span className="font-semibold text-sm">₹{prod.price.toFixed(2)}</span>
                       {prod.sale_price && (
-                        <span className="text-sm text-gray-500 line-through">₹{prod.sale_price.toFixed(2)}</span>
+                        <span className="text-xs text-gray-500 line-through">₹{prod.sale_price.toFixed(2)}</span>
                       )}
                     </div>
-                    {prod.description && (
-                      <p className="text-gray-600 mt-1 text-sm line-clamp-2">{prod.description}</p>
-                    )}
                   </div>
                 </Link>
               </div>
@@ -214,30 +211,27 @@ const Shop: React.FC = () => {
         {/* 4. SELECTED SUBCATEGORY: SHOW PRODUCTS */}
         {subcategory && selectedSubcategory && (
           products.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {products.map(prod => (
                 <div key={prod.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
                   <Link to={`/product/${prod.slug}`}>
-                    <div className="h-48 overflow-hidden">
+                    <div className="h-32 overflow-hidden">
                       <img
                         src={prod.image_url || "https://via.placeholder.com/300x300?text=Product"}
                         alt={prod.name}
                         className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
                       />
                     </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold group-hover:text-yorbot-orange transition-colors">
+                    <div className="p-3">
+                      <h3 className="text-sm font-semibold group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {prod.name}
                       </h3>
                       <div className="mt-2 flex items-center justify-between">
-                        <span className="font-semibold">₹{prod.price.toFixed(2)}</span>
+                        <span className="font-semibold text-sm">₹{prod.price.toFixed(2)}</span>
                         {prod.sale_price && (
-                          <span className="text-sm text-gray-500 line-through">₹{prod.sale_price.toFixed(2)}</span>
+                          <span className="text-xs text-gray-500 line-through">₹{prod.sale_price.toFixed(2)}</span>
                         )}
                       </div>
-                      {prod.description && (
-                        <p className="text-gray-600 mt-1 text-sm line-clamp-2">{prod.description}</p>
-                      )}
                     </div>
                   </Link>
                 </div>

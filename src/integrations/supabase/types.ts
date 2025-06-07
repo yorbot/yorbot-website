@@ -401,6 +401,7 @@ export type Database = {
       products: {
         Row: {
           additional_images: Json | null
+          base_category_id: number | null
           category_id: number | null
           created_at: string | null
           description: string | null
@@ -421,6 +422,7 @@ export type Database = {
         }
         Insert: {
           additional_images?: Json | null
+          base_category_id?: number | null
           category_id?: number | null
           created_at?: string | null
           description?: string | null
@@ -441,6 +443,7 @@ export type Database = {
         }
         Update: {
           additional_images?: Json | null
+          base_category_id?: number | null
           category_id?: number | null
           created_at?: string | null
           description?: string | null
@@ -460,6 +463,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "products_base_category_id_fkey"
+            columns: ["base_category_id"]
+            isOneToOne: false
+            referencedRelation: "base_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "products_category_id_fkey"
             columns: ["category_id"]
