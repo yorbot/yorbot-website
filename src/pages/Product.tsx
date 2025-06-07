@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { Heart, ShoppingCart, Star, Minus, Plus } from "lucide-react";
+import { Heart, ShoppingCart, Star, Minus, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useShopProducts } from "@/hooks/useShopProducts";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
@@ -10,6 +9,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselNext, 
+  CarouselPrevious 
+} from "@/components/ui/carousel";
 
 const Product: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -25,6 +31,17 @@ const Product: React.FC = () => {
 
   const product = products.find((p) => p.slug === slug);
   const isInWishlist = wishlistItems.some(item => item.id === product?.id);
+
+  // Get recommended products from the same category/subcategory
+  const { products: recommendedProducts } = useShopProducts(
+    product?.category_id, 
+    product?.subcategory_id
+  );
+  
+  // Filter out current product and limit to 10
+  const filteredRecommendedProducts = recommendedProducts
+    .filter(p => p.id !== product?.id)
+    .slice(0, 10);
 
   // Function to check if an image is valid
   const isValidImage = (url: string): Promise<boolean> => {
@@ -309,7 +326,7 @@ const Product: React.FC = () => {
         </div>
 
         {/* Description and Specifications Tabs */}
-        <div className="bg-white rounded-lg shadow-sm">
+        <div className="bg-white rounded-lg shadow-sm mb-12">
           <Tabs defaultValue="description" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="description">Description</TabsTrigger>
@@ -354,6 +371,63 @@ const Product: React.FC = () => {
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* Recommended Products Section */}
+        {filteredRecommendedProducts.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm">
+            <div className="p-6">
+              <h3 className="text-xl font-semibold mb-6">Recommended Products</h3>
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: false,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-2 md:-ml-4">
+                  {filteredRecommendedProducts.map((recommendedProduct) => (
+                    <CarouselItem key={recommendedProduct.id} className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5">
+                      <Link to={`/product/${recommendedProduct.slug}`}>
+                        <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow h-full">
+                          <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center">
+                            <img
+                              src={recommendedProduct.image_url || "/placeholder.svg"}
+                              alt={recommendedProduct.name}
+                              className="max-w-full max-h-full object-contain hover:scale-110 transition-transform duration-300"
+                            />
+                          </div>
+                          <div className="p-3">
+                            <h4 className="text-sm font-semibold line-clamp-2 mb-2 hover:text-yorbot-orange transition-colors">
+                              {recommendedProduct.name}
+                            </h4>
+                            <div className="flex items-center justify-between">
+                              {recommendedProduct.sale_price ? (
+                                <>
+                                  <span className="text-sm font-bold text-yorbot-orange">
+                                    ₹{recommendedProduct.sale_price.toFixed(2)}
+                                  </span>
+                                  <span className="text-xs text-gray-500 line-through">
+                                    ₹{recommendedProduct.price.toFixed(2)}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-sm font-bold text-yorbot-orange">
+                                  ₹{recommendedProduct.price.toFixed(2)}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
