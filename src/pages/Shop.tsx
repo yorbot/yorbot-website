@@ -184,11 +184,11 @@ const Shop: React.FC = () => {
             {products.map(prod => (
               <div key={prod.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
                 <Link to={`/product/${prod.slug}`}>
-                  <div className="h-32 overflow-hidden">
+                  <div className="h-32 overflow-hidden bg-gray-50 flex items-center justify-center">
                     <img
                       src={prod.image_url || "https://via.placeholder.com/300x300?text=Product"}
                       alt={prod.name}
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                      className="max-w-full max-h-full object-contain hover:scale-110 transition-transform duration-300"
                     />
                   </div>
                   <div className="p-3">
@@ -215,11 +215,11 @@ const Shop: React.FC = () => {
               {products.map(prod => (
                 <div key={prod.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
                   <Link to={`/product/${prod.slug}`}>
-                    <div className="h-32 overflow-hidden">
+                    <div className="h-32 overflow-hidden bg-gray-50 flex items-center justify-center">
                       <img
                         src={prod.image_url || "https://via.placeholder.com/300x300?text=Product"}
                         alt={prod.name}
-                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                        className="max-w-full max-h-full object-contain hover:scale-110 transition-transform duration-300"
                       />
                     </div>
                     <div className="p-3">
