@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -5,25 +6,36 @@ import { supabase } from "@/integrations/supabase/client";
 import { useShopProducts } from "@/hooks/useShopProducts";
 
 // Types for table rows
+interface BaseCategory {
+  id: number;
+  name: string;
+  slug: string;
+  image_url: string | null;
+}
+
 interface Category {
   id: number;
   name: string;
   slug: string;
   image_url: string | null;
 }
+
 interface Subcategory {
   id: number;
   name: string;
   slug: string;
   category_id: number;
 }
+
 interface CategoryWithSubcategories extends Category {
   subcategories: Subcategory[];
 }
 
 const Shop: React.FC = () => {
   const { category, subcategory } = useParams();
+  const [baseCategories, setBaseCategories] = useState<BaseCategory[]>([]);
   const [categories, setCategories] = useState<CategoryWithSubcategories[]>([]);
+  const [selectedBaseCategory, setSelectedBaseCategory] = useState<BaseCategory | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<CategoryWithSubcategories | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,44 +44,65 @@ const Shop: React.FC = () => {
   useEffect(() => {
     async function fetchCategoriesAndSubs() {
       setLoading(true);
-      const { data: cats, error: catsErr } = await supabase
-        .from("categories")
+      
+      // First check for base categories
+      const { data: baseCats, error: baseCatsErr } = await supabase
+        .from("base_categories")
         .select("*")
         .order("id");
-      if (catsErr) {
-        setCategories([]);
-        setLoading(false);
-        return;
-      }
-      const { data: subs } = await supabase.from("subcategories").select("*");
-      const categoriesWithSubs: CategoryWithSubcategories[] = (cats || []).map(cat => ({
-        ...cat,
-        subcategories: (subs || []).filter(sub => sub.category_id === cat.id),
-      }));
-      setCategories(categoriesWithSubs);
-
-      if (category) {
-        const catObj = categoriesWithSubs.find(c => c.slug === category) || null;
-        setSelectedCategory(catObj);
-        if (subcategory && catObj) {
-          const subObj = catObj.subcategories.find(s => s.slug === subcategory) || null;
-          setSelectedSubcategory(subObj);
+      
+      if (!baseCatsErr && baseCats && baseCats.length > 0) {
+        setBaseCategories(baseCats);
+        
+        if (category) {
+          const baseCatObj = baseCats.find(c => c.slug === category) || null;
+          setSelectedBaseCategory(baseCatObj);
         } else {
-          setSelectedSubcategory(null);
+          setSelectedBaseCategory(null);
         }
       } else {
-        setSelectedCategory(null);
-        setSelectedSubcategory(null);
+        // If no base categories, fetch regular categories
+        const { data: cats, error: catsErr } = await supabase
+          .from("categories")
+          .select("*")
+          .order("id");
+        if (catsErr) {
+          setCategories([]);
+          setLoading(false);
+          return;
+        }
+        const { data: subs } = await supabase.from("subcategories").select("*");
+        const categoriesWithSubs: CategoryWithSubcategories[] = (cats || []).map(cat => ({
+          ...cat,
+          subcategories: (subs || []).filter(sub => sub.category_id === cat.id),
+        }));
+        setCategories(categoriesWithSubs);
+
+        if (category) {
+          const catObj = categoriesWithSubs.find(c => c.slug === category) || null;
+          setSelectedCategory(catObj);
+          if (subcategory && catObj) {
+            const subObj = catObj.subcategories.find(s => s.slug === subcategory) || null;
+            setSelectedSubcategory(subObj);
+          } else {
+            setSelectedSubcategory(null);
+          }
+        } else {
+          setSelectedCategory(null);
+          setSelectedSubcategory(null);
+        }
       }
+      
       setLoading(false);
     }
     fetchCategoriesAndSubs();
   }, [category, subcategory]);
 
   // Get the IDs for fetching products
+  const selectedBaseCatId = selectedBaseCategory?.id ?? undefined;
   const selectedCatId = selectedCategory?.id ?? undefined;
   const selectedSubId = selectedSubcategory?.id ?? undefined;
-  const { products, loading: productsLoading } = useShopProducts(selectedCatId, selectedSubId);
+  const { products, loading: productsLoading } = useShopProducts(selectedCatId, selectedSubId, selectedBaseCatId);
 
   // Loading/Spinner
   if (loading || productsLoading) {
@@ -100,10 +133,10 @@ const Shop: React.FC = () => {
           <Link to="/" className="text-gray-500 hover:text-yorbot-orange">Home</Link>
           <span className="mx-2">/</span>
           <Link to="/shop" className="text-gray-500 hover:text-yorbot-orange">Shop</Link>
-          {category && selectedCategory && (
+          {category && (selectedBaseCategory || selectedCategory) && (
             <>
               <span className="mx-2">/</span>
-              <span className="font-semibold">{selectedCategory.name}</span>
+              <span className="font-semibold">{selectedBaseCategory?.name || selectedCategory?.name}</span>
             </>
           )}
           {subcategory && selectedSubcategory && (
@@ -116,22 +149,22 @@ const Shop: React.FC = () => {
 
         <h1 className="text-3xl font-bold mb-8">
           {!category ? "All Categories"
-            : !subcategory ? (selectedCategory?.name || "Category not found")
+            : !subcategory ? (selectedBaseCategory?.name || selectedCategory?.name || "Category not found")
             : selectedSubcategory?.name || "Subcategory not found"}
         </h1>
 
         {/* 1. NO CATEGORIES AT ALL */}
-        {categories.length === 0 && (
+        {baseCategories.length === 0 && categories.length === 0 && (
           <div className="text-center py-8">
             <h2 className="text-xl font-medium text-gray-600">No categories found</h2>
             <p className="text-gray-500 mt-2">Add categories from your admin panel to see them here.</p>
           </div>
         )}
 
-        {/* 2. SHOW ALL CATEGORIES */}
-        {!category && categories.length > 0 && (
+        {/* 2. SHOW ALL BASE CATEGORIES OR REGULAR CATEGORIES */}
+        {!category && (baseCategories.length > 0 || categories.length > 0) && (
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {categories.map(cat => (
+            {(baseCategories.length > 0 ? baseCategories : categories).map(cat => (
               <div key={cat.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
                 <Link to={`/shop/${cat.slug}`}>
                   <div className="h-48 overflow-hidden">
@@ -145,7 +178,7 @@ const Shop: React.FC = () => {
                     <h2 className="text-lg font-semibold mb-2 hover:text-yorbot-orange transition-colors">
                       {cat.name}
                     </h2>
-                    {(cat.subcategories && cat.subcategories.length > 0) && (
+                    {('subcategories' in cat && cat.subcategories && cat.subcategories.length > 0) && (
                       <ul className="text-sm text-gray-600 space-y-1">
                         {cat.subcategories.slice(0, 3).map((sub) => (
                           <li key={sub.id} className="hover:text-yorbot-orange">
@@ -161,7 +194,37 @@ const Shop: React.FC = () => {
           </div>
         )}
 
-        {/* 3. SELECTED CATEGORY: SHOW ITS SUBCATEGORIES ONLY (NO PRODUCTS) */}
+        {/* 3. SELECTED BASE CATEGORY: SHOW PRODUCTS */}
+        {category && selectedBaseCategory && products.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {products.map(prod => (
+              <div key={prod.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+                <Link to={`/product/${prod.slug}`}>
+                  <div className="h-32 overflow-hidden bg-gray-50 flex items-center justify-center">
+                    <img
+                      src={prod.image_url || "https://via.placeholder.com/300x300?text=Product"}
+                      alt={prod.name}
+                      className="max-w-full max-h-full object-contain hover:scale-110 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-sm font-semibold group-hover:text-yorbot-orange transition-colors line-clamp-2">
+                      {prod.name}
+                    </h3>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="font-semibold text-sm">₹{prod.price.toFixed(2)}</span>
+                      {prod.sale_price && (
+                        <span className="text-xs text-gray-500 line-through">₹{prod.sale_price.toFixed(2)}</span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 4. SELECTED CATEGORY: SHOW ITS SUBCATEGORIES ONLY (NO PRODUCTS) */}
         {category && selectedCategory && !subcategory && selectedCategory.subcategories.length > 0 && (
           <div className="mb-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {selectedCategory.subcategories.map(sub => (
@@ -178,7 +241,7 @@ const Shop: React.FC = () => {
           </div>
         )}
 
-        {/* 3b. Show products for selected category only IF it has no subcategories */}
+        {/* 5. Show products for selected category only IF it has no subcategories */}
         {category && selectedCategory && !subcategory && selectedCategory.subcategories.length === 0 && products.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {products.map(prod => (
@@ -208,7 +271,7 @@ const Shop: React.FC = () => {
           </div>
         )}
 
-        {/* 4. SELECTED SUBCATEGORY: SHOW PRODUCTS */}
+        {/* 6. SELECTED SUBCATEGORY: SHOW PRODUCTS */}
         {subcategory && selectedSubcategory && (
           products.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -246,7 +309,7 @@ const Shop: React.FC = () => {
         )}
 
         {/* Category/subcategory not found error */}
-        {(category && !selectedCategory) || (subcategory && !selectedSubcategory) ? (
+        {(category && !selectedBaseCategory && !selectedCategory) || (subcategory && !selectedSubcategory) ? (
           <div className="col-span-full text-center py-8">
             <h2 className="text-xl font-medium text-gray-600">Not found</h2>
             <p className="text-gray-500 mt-2">

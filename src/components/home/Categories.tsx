@@ -2,7 +2,14 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
-import { fetchCategories, fetchSubcategories } from "@/utils/supabaseContent";
+import { fetchBaseCategories, fetchCategories, fetchSubcategories } from "@/utils/supabaseContent";
+
+interface BaseCategory {
+  id: number;
+  name: string;
+  slug: string;
+  image_url: string;
+}
 
 interface Category {
   id: number;
@@ -14,33 +21,42 @@ interface Category {
 
 const Categories: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [baseCategories, setBaseCategories] = useState<BaseCategory[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchCategoriesData() {
       try {
-        // Fetch categories
-        const categoriesData = await fetchCategories();
-
-        if (categoriesData && categoriesData.length > 0) {
-          // Fetch subcategories for each category
-          const categoriesWithSubs = await Promise.all(
-            categoriesData.map(async (category) => {
-              const subcategoriesData = await fetchSubcategories(category.id);
-              return {
-                ...category,
-                subcategories: subcategoriesData || []
-              };
-            })
-          );
-
-          setCategories(categoriesWithSubs);
+        // Fetch base categories first
+        const baseCategoriesData = await fetchBaseCategories();
+        
+        if (baseCategoriesData && baseCategoriesData.length > 0) {
+          setBaseCategories(baseCategoriesData);
         } else {
-          setCategories([]);
+          // If no base categories, fetch regular categories
+          const categoriesData = await fetchCategories();
+
+          if (categoriesData && categoriesData.length > 0) {
+            // Fetch subcategories for each category
+            const categoriesWithSubs = await Promise.all(
+              categoriesData.map(async (category) => {
+                const subcategoriesData = await fetchSubcategories(category.id);
+                return {
+                  ...category,
+                  subcategories: subcategoriesData || []
+                };
+              })
+            );
+
+            setCategories(categoriesWithSubs);
+          } else {
+            setCategories([]);
+          }
         }
       } catch (error) {
         console.error('Error fetching categories:', error);
+        setBaseCategories([]);
         setCategories([]);
       } finally {
         setLoading(false);
@@ -84,7 +100,10 @@ const Categories: React.FC = () => {
     );
   }
 
-  if (categories.length === 0) {
+  // Use base categories if available, otherwise use regular categories
+  const displayCategories = baseCategories.length > 0 ? baseCategories : categories;
+
+  if (displayCategories.length === 0) {
     return null; // Don't render the section at all if there are no categories
   }
 
@@ -116,7 +135,7 @@ const Categories: React.FC = () => {
             ref={scrollRef}
             className="flex overflow-x-auto pb-4 hide-scrollbar gap-4"
           >
-            {categories.map((category) => (
+            {displayCategories.map((category) => (
               <Link
                 key={category.id}
                 to={`/shop/${category.slug}`}
@@ -161,7 +180,7 @@ const Categories: React.FC = () => {
 
         {/* Desktop: Grid layout */}
         <div className="hidden md:grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-          {categories.map((category) => (
+          {displayCategories.map((category) => (
             <Link
               key={category.id}
               to={`/shop/${category.slug}`}
