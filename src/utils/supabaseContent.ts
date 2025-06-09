@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 export async function fetchProducts(categorySlug?: string, subcategorySlug?: string) {
@@ -60,18 +59,6 @@ export async function fetchServices() {
     .order("created_at", { ascending: false });
   if (error) {
     console.error("Error fetching services:", error);
-    return [];
-  }
-  return data;
-}
-
-export async function fetchBaseCategories() {
-  const { data, error } = await supabase
-    .from("base_categories")
-    .select("*")
-    .order("id");
-  if (error) {
-    console.error("Error fetching base categories:", error);
     return [];
   }
   return data;

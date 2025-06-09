@@ -12,7 +12,6 @@ export interface Product {
   description: string | null;
   category_id?: number | null;
   subcategory_id?: number | null;
-  base_category_id?: number | null;
   stock?: number;
   additional_images?: string[];
   specifications?: Record<string, any>;
@@ -24,7 +23,7 @@ export interface Product {
   sku?: string;
 }
 
-export function useShopProducts(categoryId?: number, subcategoryId?: number, baseCategoryId?: number) {
+export function useShopProducts(categoryId?: number, subcategoryId?: number) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -39,11 +38,8 @@ export function useShopProducts(categoryId?: number, subcategoryId?: number, bas
       } else if (categoryId) {
         // If only category is provided, show products that are directly in the category
         query = query.eq("category_id", categoryId);
-      } else if (baseCategoryId) {
-        // If only base category is provided, show products that are directly in the base category
-        query = query.eq("base_category_id", baseCategoryId);
       }
-      // If no categoryId, subcategoryId, or baseCategoryId, fetch all products
+      // If no categoryId or subcategoryId, fetch all products (for product page search)
 
       const { data, error } = await query;
       
@@ -62,7 +58,6 @@ export function useShopProducts(categoryId?: number, subcategoryId?: number, bas
           description: item.description,
           category_id: item.category_id,
           subcategory_id: item.subcategory_id,
-          base_category_id: item.base_category_id,
           stock: item.stock,
           additional_images: Array.isArray(item.additional_images) ? item.additional_images : [],
           specifications: typeof item.specifications === 'object' ? item.specifications : {},
@@ -81,7 +76,7 @@ export function useShopProducts(categoryId?: number, subcategoryId?: number, bas
     }
 
     fetchProducts();
-  }, [categoryId, subcategoryId, baseCategoryId]);
+  }, [categoryId, subcategoryId]);
 
   return { products, loading };
 }
