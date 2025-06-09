@@ -1,13 +1,46 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
-export async function fetchProducts(categorySlug?: string, subcategorySlug?: string) {
+export async function fetchProducts(categorySlug?: string, subcategorySlug?: string, baseCategorySlug?: string) {
   let query = supabase
     .from("products")
     .select("*")
     .order("created_at", { ascending: false });
   
+  // If we have category, subcategory, and base category slugs
+  if (categorySlug && subcategorySlug && baseCategorySlug) {
+    // First get the category ID
+    const { data: category } = await supabase
+      .from("categories")
+      .select("id")
+      .eq("slug", categorySlug)
+      .single();
+    
+    if (category) {
+      // Then get the subcategory ID
+      const { data: subcategory } = await supabase
+        .from("subcategories")
+        .select("id")
+        .eq("slug", subcategorySlug)
+        .eq("category_id", category.id)
+        .single();
+      
+      if (subcategory) {
+        // Finally get the base category ID
+        const { data: baseCategory } = await supabase
+          .from("base_categories")
+          .select("id")
+          .eq("slug", baseCategorySlug)
+          .single();
+        
+        if (baseCategory) {
+          query = query.eq("base_category_id", baseCategory.id);
+        }
+      }
+    }
+  }
   // If we have both category and subcategory slugs, find products in that hierarchy
-  if (categorySlug && subcategorySlug) {
+  else if (categorySlug && subcategorySlug) {
     // First get the category ID
     const { data: category } = await supabase
       .from("categories")
@@ -89,6 +122,36 @@ export async function fetchSubcategories(categoryId?: number) {
   const { data, error } = await query;
   if (error) {
     console.error("Error fetching subcategories:", error);
+    return [];
+  }
+  return data;
+}
+
+export async function fetchBaseCategories(subcategoryId?: number) {
+  let query = supabase
+    .from("base_categories")
+    .select("*")
+    .order("id");
+    
+  if (subcategoryId) {
+    // Note: Assuming base_categories table has a subcategory_id field
+    // If the relationship is different, adjust accordingly
+    const { data: subcategory } = await supabase
+      .from("subcategories")
+      .select("id")
+      .eq("id", subcategoryId)
+      .single();
+    
+    if (subcategory) {
+      // Get base categories that belong to this subcategory
+      // Adjust this query based on your actual table structure
+      query = query.eq("id", subcategoryId); // This might need adjustment based on your schema
+    }
+  }
+  
+  const { data, error } = await query;
+  if (error) {
+    console.error("Error fetching base categories:", error);
     return [];
   }
   return data;

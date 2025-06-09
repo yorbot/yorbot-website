@@ -12,6 +12,7 @@ export interface Product {
   description: string | null;
   category_id?: number | null;
   subcategory_id?: number | null;
+  base_category_id?: number | null;
   stock?: number;
   additional_images?: string[];
   specifications?: Record<string, any>;
@@ -23,7 +24,7 @@ export interface Product {
   sku?: string;
 }
 
-export function useShopProducts(categoryId?: number, subcategoryId?: number) {
+export function useShopProducts(categoryId?: number, subcategoryId?: number, baseCategoryId?: number) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -32,14 +33,17 @@ export function useShopProducts(categoryId?: number, subcategoryId?: number) {
       setLoading(true);
       let query = supabase.from("products").select("*").order("created_at", { ascending: false });
 
-      if (subcategoryId) {
+      if (baseCategoryId) {
+        // If base category is provided, only show products from that base category
+        query = query.eq("base_category_id", baseCategoryId);
+      } else if (subcategoryId) {
         // If subcategory is provided, only show products from that subcategory
         query = query.eq("subcategory_id", subcategoryId);
       } else if (categoryId) {
         // If only category is provided, show products that are directly in the category
         query = query.eq("category_id", categoryId);
       }
-      // If no categoryId or subcategoryId, fetch all products (for product page search)
+      // If no categoryId, subcategoryId, or baseCategoryId, fetch all products (for product page search)
 
       const { data, error } = await query;
       
@@ -58,6 +62,7 @@ export function useShopProducts(categoryId?: number, subcategoryId?: number) {
           description: item.description,
           category_id: item.category_id,
           subcategory_id: item.subcategory_id,
+          base_category_id: item.base_category_id,
           stock: item.stock,
           additional_images: Array.isArray(item.additional_images) ? item.additional_images : [],
           specifications: typeof item.specifications === 'object' ? item.specifications : {},
@@ -76,7 +81,7 @@ export function useShopProducts(categoryId?: number, subcategoryId?: number) {
     }
 
     fetchProducts();
-  }, [categoryId, subcategoryId]);
+  }, [categoryId, subcategoryId, baseCategoryId]);
 
   return { products, loading };
 }

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
@@ -58,6 +59,7 @@ function App() {
                     <Route path="/shop" element={<Shop />} />
                     <Route path="/shop/:category" element={<Shop />} />
                     <Route path="/shop/:category/:subcategory" element={<Shop />} />
+                    <Route path="/shop/:category/:subcategory/:baseCategory" element={<Shop />} />
                     <Route path="/product/:slug" element={<Product />} />
                     <Route path="/cart" element={
                       <RequireAuth>

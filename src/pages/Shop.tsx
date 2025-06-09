@@ -1,8 +1,18 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useShopProducts } from "@/hooks/useShopProducts";
+import {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 // Types for table rows
 interface Category {
@@ -17,21 +27,32 @@ interface Subcategory {
   slug: string;
   category_id: number;
 }
+interface BaseCategory {
+  id: number;
+  name: string;
+  slug: string;
+}
 interface CategoryWithSubcategories extends Category {
-  subcategories: Subcategory[];
+  subcategories: SubcategoryWithBaseCategories[];
+}
+interface SubcategoryWithBaseCategories extends Subcategory {
+  baseCategories: BaseCategory[];
 }
 
 const Shop: React.FC = () => {
-  const { category, subcategory } = useParams();
+  const { category, subcategory, baseCategory } = useParams();
   const [categories, setCategories] = useState<CategoryWithSubcategories[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<CategoryWithSubcategories | null>(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<Subcategory | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<SubcategoryWithBaseCategories | null>(null);
+  const [selectedBaseCategory, setSelectedBaseCategory] = useState<BaseCategory | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch All Categories and Their Subcategories
+  // Fetch All Categories, Subcategories, and Base Categories
   useEffect(() => {
-    async function fetchCategoriesAndSubs() {
+    async function fetchAllData() {
       setLoading(true);
+      
+      // Fetch categories
       const { data: cats, error: catsErr } = await supabase
         .from("categories")
         .select("*")
@@ -41,35 +62,68 @@ const Shop: React.FC = () => {
         setLoading(false);
         return;
       }
+
+      // Fetch subcategories
       const { data: subs } = await supabase.from("subcategories").select("*");
-      const categoriesWithSubs: CategoryWithSubcategories[] = (cats || []).map(cat => ({
-        ...cat,
-        subcategories: (subs || []).filter(sub => sub.category_id === cat.id),
-      }));
+      
+      // Fetch base categories
+      const { data: baseCats } = await supabase.from("base_categories").select("*");
+
+      // Build the hierarchy
+      const categoriesWithSubs: CategoryWithSubcategories[] = (cats || []).map(cat => {
+        const subcategoriesForCat = (subs || []).filter(sub => sub.category_id === cat.id);
+        const subcategoriesWithBase = subcategoriesForCat.map(sub => ({
+          ...sub,
+          baseCategories: (baseCats || []).filter(base => {
+            // Assuming base categories are linked to subcategories somehow
+            // You may need to adjust this based on your actual database schema
+            return true; // For now, show all base categories under each subcategory
+          })
+        }));
+        
+        return {
+          ...cat,
+          subcategories: subcategoriesWithBase,
+        };
+      });
+
       setCategories(categoriesWithSubs);
 
+      // Set selected items based on URL params
       if (category) {
         const catObj = categoriesWithSubs.find(c => c.slug === category) || null;
         setSelectedCategory(catObj);
+        
         if (subcategory && catObj) {
           const subObj = catObj.subcategories.find(s => s.slug === subcategory) || null;
           setSelectedSubcategory(subObj);
+          
+          if (baseCategory && subObj) {
+            const baseObj = subObj.baseCategories.find(b => b.slug === baseCategory) || null;
+            setSelectedBaseCategory(baseObj);
+          } else {
+            setSelectedBaseCategory(null);
+          }
         } else {
           setSelectedSubcategory(null);
+          setSelectedBaseCategory(null);
         }
       } else {
         setSelectedCategory(null);
         setSelectedSubcategory(null);
+        setSelectedBaseCategory(null);
       }
+      
       setLoading(false);
     }
-    fetchCategoriesAndSubs();
-  }, [category, subcategory]);
+    fetchAllData();
+  }, [category, subcategory, baseCategory]);
 
   // Get the IDs for fetching products
   const selectedCatId = selectedCategory?.id ?? undefined;
   const selectedSubId = selectedSubcategory?.id ?? undefined;
-  const { products, loading: productsLoading } = useShopProducts(selectedCatId, selectedSubId);
+  const selectedBaseId = selectedBaseCategory?.id ?? undefined;
+  const { products, loading: productsLoading } = useShopProducts(selectedCatId, selectedSubId, selectedBaseId);
 
   // Loading/Spinner
   if (loading || productsLoading) {
@@ -96,28 +150,66 @@ const Shop: React.FC = () => {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center mb-6">
-          <Link to="/" className="text-gray-500 hover:text-yorbot-orange">Home</Link>
-          <span className="mx-2">/</span>
-          <Link to="/shop" className="text-gray-500 hover:text-yorbot-orange">Shop</Link>
-          {category && selectedCategory && (
-            <>
-              <span className="mx-2">/</span>
-              <span className="font-semibold">{selectedCategory.name}</span>
-            </>
-          )}
-          {subcategory && selectedSubcategory && (
-            <>
-              <span className="mx-2">/</span>
-              <span className="font-semibold">{selectedSubcategory.name}</span>
-            </>
-          )}
-        </div>
+        {/* Breadcrumb Navigation */}
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link to="/shop">Shop</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            {category && selectedCategory && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  {subcategory ? (
+                    <BreadcrumbLink asChild>
+                      <Link to={`/shop/${selectedCategory.slug}`}>{selectedCategory.name}</Link>
+                    </BreadcrumbLink>
+                  ) : (
+                    <BreadcrumbPage>{selectedCategory.name}</BreadcrumbPage>
+                  )}
+                </BreadcrumbItem>
+              </>
+            )}
+            {subcategory && selectedSubcategory && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  {baseCategory ? (
+                    <BreadcrumbLink asChild>
+                      <Link to={`/shop/${selectedCategory?.slug}/${selectedSubcategory.slug}`}>
+                        {selectedSubcategory.name}
+                      </Link>
+                    </BreadcrumbLink>
+                  ) : (
+                    <BreadcrumbPage>{selectedSubcategory.name}</BreadcrumbPage>
+                  )}
+                </BreadcrumbItem>
+              </>
+            )}
+            {baseCategory && selectedBaseCategory && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{selectedBaseCategory.name}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </>
+            )}
+          </BreadcrumbList>
+        </Breadcrumb>
 
         <h1 className="text-3xl font-bold mb-8">
           {!category ? "All Categories"
             : !subcategory ? (selectedCategory?.name || "Category not found")
-            : selectedSubcategory?.name || "Subcategory not found"}
+            : !baseCategory ? (selectedSubcategory?.name || "Subcategory not found")
+            : selectedBaseCategory?.name || "Base Category not found"}
         </h1>
 
         {/* 1. NO CATEGORIES AT ALL */}
@@ -161,7 +253,7 @@ const Shop: React.FC = () => {
           </div>
         )}
 
-        {/* 3. SELECTED CATEGORY: SHOW ITS SUBCATEGORIES ONLY (NO PRODUCTS) */}
+        {/* 3. SELECTED CATEGORY: SHOW ITS SUBCATEGORIES */}
         {category && selectedCategory && !subcategory && selectedCategory.subcategories.length > 0 && (
           <div className="mb-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {selectedCategory.subcategories.map(sub => (
@@ -171,6 +263,17 @@ const Shop: React.FC = () => {
                     <h2 className="text-lg font-semibold hover:text-yorbot-orange transition-colors">
                       {sub.name}
                     </h2>
+                    {sub.baseCategories && sub.baseCategories.length > 0 && (
+                      <ul className="text-sm text-gray-600 space-y-1 mt-2">
+                        {sub.baseCategories.slice(0, 3).map((base) => (
+                          <li key={base.id} className="hover:text-yorbot-orange">
+                            <Link to={`/shop/${selectedCategory.slug}/${sub.slug}/${base.slug}`}>
+                              • {base.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 </Link>
               </div>
@@ -178,8 +281,27 @@ const Shop: React.FC = () => {
           </div>
         )}
 
-        {/* 3b. Show products for selected category only IF it has no subcategories */}
-        {category && selectedCategory && !subcategory && selectedCategory.subcategories.length === 0 && products.length > 0 && (
+        {/* 4. SELECTED SUBCATEGORY: SHOW BASE CATEGORIES */}
+        {subcategory && selectedSubcategory && !baseCategory && selectedSubcategory.baseCategories.length > 0 && (
+          <div className="mb-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {selectedSubcategory.baseCategories.map(base => (
+              <div key={base.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+                <Link to={`/shop/${selectedCategory?.slug}/${selectedSubcategory.slug}/${base.slug}`}>
+                  <div className="p-4">
+                    <h2 className="text-lg font-semibold hover:text-yorbot-orange transition-colors">
+                      {base.name}
+                    </h2>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 5. SHOW PRODUCTS */}
+        {((category && selectedCategory && !subcategory && selectedCategory.subcategories.length === 0) ||
+          (subcategory && selectedSubcategory && !baseCategory && selectedSubcategory.baseCategories.length === 0) ||
+          (baseCategory && selectedBaseCategory)) && products.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {products.map(prod => (
               <div key={prod.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
@@ -208,52 +330,25 @@ const Shop: React.FC = () => {
           </div>
         )}
 
-        {/* 4. SELECTED SUBCATEGORY: SHOW PRODUCTS */}
-        {subcategory && selectedSubcategory && (
-          products.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {products.map(prod => (
-                <div key={prod.id} className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-                  <Link to={`/product/${prod.slug}`}>
-                    <div className="h-32 overflow-hidden bg-gray-50 flex items-center justify-center">
-                      <img
-                        src={prod.image_url || "https://via.placeholder.com/300x300?text=Product"}
-                        alt={prod.name}
-                        className="max-w-full max-h-full object-contain hover:scale-110 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-3">
-                      <h3 className="text-sm font-semibold group-hover:text-yorbot-orange transition-colors line-clamp-2">
-                        {prod.name}
-                      </h3>
-                      <div className="mt-2 flex items-center justify-between">
-                        <span className="font-semibold text-sm">₹{prod.price.toFixed(2)}</span>
-                        {prod.sale_price && (
-                          <span className="text-xs text-gray-500 line-through">₹{prod.sale_price.toFixed(2)}</span>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="col-span-full text-center py-8">
-              <h2 className="text-xl font-medium text-gray-600">No products found</h2>
-              <p className="text-gray-500 mt-2">No products added in this subcategory yet. Please add from your admin panel.</p>
-            </div>
-          )
+        {/* No products found */}
+        {((category && selectedCategory && !subcategory && selectedCategory.subcategories.length === 0) ||
+          (subcategory && selectedSubcategory && !baseCategory && selectedSubcategory.baseCategories.length === 0) ||
+          (baseCategory && selectedBaseCategory)) && products.length === 0 && (
+          <div className="text-center py-8">
+            <h2 className="text-xl font-medium text-gray-600">No products found</h2>
+            <p className="text-gray-500 mt-2">No products added in this category yet. Please add from your admin panel.</p>
+          </div>
         )}
 
-        {/* Category/subcategory not found error */}
-        {(category && !selectedCategory) || (subcategory && !selectedSubcategory) ? (
-          <div className="col-span-full text-center py-8">
+        {/* Category/subcategory/base category not found error */}
+        {((category && !selectedCategory) || (subcategory && !selectedSubcategory) || (baseCategory && !selectedBaseCategory)) && (
+          <div className="text-center py-8">
             <h2 className="text-xl font-medium text-gray-600">Not found</h2>
             <p className="text-gray-500 mt-2">
               <Link to="/shop" className="text-yorbot-orange hover:underline">Return to all categories</Link>
             </p>
           </div>
-        ) : null}
+        )}
       </div>
     </Layout>
   );
