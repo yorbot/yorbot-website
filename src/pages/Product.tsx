@@ -64,6 +64,29 @@ const Product: React.FC = () => {
     });
   };
 
+  // Function to format description text into paragraphs
+  const formatDescription = (text: string) => {
+    if (!text) return null;
+    
+    // Split by double newlines first (paragraph breaks), then by single newlines
+    const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim());
+    
+    return paragraphs.map((paragraph, index) => {
+      // Handle single line breaks within paragraphs
+      const lines = paragraph.split('\n').filter(line => line.trim());
+      return (
+        <p key={index} className="text-gray-700 leading-relaxed mb-4 last:mb-0">
+          {lines.map((line, lineIndex) => (
+            <React.Fragment key={lineIndex}>
+              {line.trim()}
+              {lineIndex < lines.length - 1 && <br />}
+            </React.Fragment>
+          ))}
+        </p>
+      );
+    });
+  };
+
   // Validate images when product changes
   useEffect(() => {
     if (!product) return;
@@ -338,7 +361,7 @@ const Product: React.FC = () => {
                 <h3 className="text-xl font-semibold mb-4">Product Description</h3>
                 <div className="prose max-w-none">
                   {product.description ? (
-                    <p className="text-gray-700 leading-relaxed">{product.description}</p>
+                    <div>{formatDescription(product.description)}</div>
                   ) : (
                     <p className="text-gray-500 italic">No description available for this product.</p>
                   )}
@@ -354,10 +377,10 @@ const Product: React.FC = () => {
                     <TableBody>
                       {Object.entries(product.specifications as Record<string, any>).map(([key, value]) => (
                         <TableRow key={key}>
-                          <TableCell className="font-medium text-gray-700 capitalize w-1/3">
+                          <TableCell className="font-medium text-gray-700 capitalize w-1/3 text-center">
                             {key.replace('_', ' ')}
                           </TableCell>
-                          <TableCell className="text-gray-600">
+                          <TableCell className="text-gray-600 text-center">
                             {String(value)}
                           </TableCell>
                         </TableRow>
