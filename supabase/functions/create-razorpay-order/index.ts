@@ -1,6 +1,5 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,9 +12,9 @@ serve(async (req) => {
   }
 
   try {
-    const { amount, currency = 'INR', receipt } = await req.json()
+    const { amount, currency = 'INR', receipt, payment_method = 'card' } = await req.json()
 
-    // Get Razorpay credentials from environment
+    // Get Razorpay credentials from environment (stored securely)
     const razorpayKeyId = Deno.env.get('RAZORPAY_KEY_ID')
     const razorpayKeySecret = Deno.env.get('RAZORPAY_KEY_SECRET')
 
@@ -23,12 +22,27 @@ serve(async (req) => {
       throw new Error('Razorpay credentials not configured')
     }
 
+    console.log('Creating Razorpay order for amount:', amount, 'method:', payment_method)
+
     // Create Razorpay order
-    const orderData = {
+    let orderData: any = {
       amount: amount * 100, // Razorpay expects amount in paise
       currency,
       receipt,
       payment_capture: 1
+    }
+
+    // Add UPI-specific configuration for QR code generation
+    if (payment_method === 'upi') {
+      orderData = {
+        ...orderData,
+        method: {
+          upi: {
+            flow: "collect",
+            vpa: "auto"
+          }
+        }
+      }
     }
 
     const auth = btoa(`${razorpayKeyId}:${razorpayKeySecret}`)
@@ -45,13 +59,30 @@ serve(async (req) => {
     if (!response.ok) {
       const errorData = await response.text()
       console.error('Razorpay API error:', errorData)
-      throw new Error(`Razorpay API error: ${response.status}`)
+      throw new Error(`Razorpay API error: ${response.status} - ${errorData}`)
     }
 
     const order = await response.json()
+    console.log('Razorpay order created successfully:', order.id)
+
+    // For UPI, generate QR code data
+    let qrCodeData = null
+    if (payment_method === 'upi') {
+      // Generate UPI QR code using Razorpay's UPI link
+      const upiString = `upi://pay?pa=${razorpayKeyId.replace('rzp_live_', '')}@razorpay&pn=YorBot&am=${amount}&cu=INR&tn=Payment for Order ${receipt}`
+      qrCodeData = {
+        upi_string: upiString,
+        qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`
+      }
+    }
 
     return new Response(
-      JSON.stringify({ success: true, order }),
+      JSON.stringify({ 
+        success: true, 
+        order,
+        qr_code_data: qrCodeData,
+        razorpay_key_id: razorpayKeyId // Safe to send public key
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
