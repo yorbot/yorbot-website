@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -60,7 +61,7 @@ const Checkout: React.FC = () => {
           .eq('id', user.id)
           .single();
 
-        if (error) {
+        if (error && error.code !== 'PGRST116') {
           console.error('Error fetching user profile:', error);
           return;
         }
@@ -153,8 +154,18 @@ const Checkout: React.FC = () => {
       navigate('/sign-in', { state: { from: { pathname: '/checkout' } } });
       return;
     }
+
+    // Validate required fields
+    if (!addressForm.fullName || !addressForm.phoneNumber || !addressForm.streetAddress || !addressForm.pinCode || !addressForm.city || !addressForm.state) {
+      toast("Missing required fields", {
+        description: "Please fill in all required address fields.",
+        duration: 2000,
+      });
+      return;
+    }
     
     setIsLoading(true);
+    console.log('Starting order creation process...');
     
     try {
       // Create order in database
@@ -198,6 +209,8 @@ const Checkout: React.FC = () => {
         order_status: 'pending',
       };
 
+      console.log('Order data prepared:', orderData);
+
       const { data: order, error } = await supabase
         .from('orders')
         .insert(orderData)
@@ -206,8 +219,10 @@ const Checkout: React.FC = () => {
 
       if (error) {
         console.error('Error creating order:', error);
-        throw new Error('Failed to create order');
+        throw new Error(`Failed to create order: ${error.message}`);
       }
+
+      console.log('Order created successfully:', order);
 
       // Clear the cart after successful order
       await clearCart();
@@ -227,8 +242,8 @@ const Checkout: React.FC = () => {
     } catch (error) {
       console.error('Error processing order:', error);
       toast("Order failed", {
-        description: "An error occurred while processing your order. Please try again.",
-        duration: 2000,
+        description: error instanceof Error ? error.message : "An error occurred while processing your order. Please try again.",
+        duration: 3000,
       });
     } finally {
       setIsLoading(false);

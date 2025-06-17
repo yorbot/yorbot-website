@@ -40,12 +40,12 @@ const FeaturedProducts: React.FC = () => {
               <div className="h-4 bg-gray-300 rounded w-96 mx-auto"></div>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-0">
             {[...Array(20)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="aspect-square bg-gray-300 rounded mb-4"></div>
-                <div className="h-4 bg-gray-300 rounded mb-2"></div>
-                <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                <div className="aspect-square bg-gray-300 mb-2"></div>
+                <div className="h-3 bg-gray-300 rounded mb-1"></div>
+                <div className="h-3 bg-gray-300 rounded w-3/4"></div>
               </div>
             ))}
           </div>
@@ -66,12 +66,12 @@ const FeaturedProducts: React.FC = () => {
 
         {currentProducts.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-12">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-0 mb-12">
               {currentProducts.map((product) => (
                 <Link key={product.id} to={`/product/${product.slug}`}>
-                  <Card className="h-full hover:shadow-lg transition-shadow duration-300 group">
-                    <CardContent className="p-4">
-                      <div className="aspect-square mb-4 overflow-hidden rounded-lg bg-gray-100">
+                  <Card className="h-full hover:shadow-lg transition-shadow duration-300 group border-0 rounded-none">
+                    <CardContent className="p-2">
+                      <div className="aspect-square mb-2 overflow-hidden bg-gray-100">
                         {product.image_url ? (
                           <img
                             src={product.image_url}
@@ -79,29 +79,29 @@ const FeaturedProducts: React.FC = () => {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
                             No Image
                           </div>
                         )}
                       </div>
                       
-                      <div className="space-y-2">
-                        <h3 className="font-medium text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      <div className="space-y-1">
+                        <h3 className="font-medium text-xs text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
                           {product.name}
                         </h3>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           {product.sale_price ? (
                             <>
-                              <span className="text-lg font-bold text-green-600">
+                              <span className="text-sm font-bold text-green-600">
                                 ₹{product.sale_price.toLocaleString()}
                               </span>
-                              <span className="text-sm text-gray-500 line-through">
+                              <span className="text-xs text-gray-500 line-through">
                                 ₹{product.price.toLocaleString()}
                               </span>
                             </>
                           ) : (
-                            <span className="text-lg font-bold text-gray-900">
+                            <span className="text-sm font-bold text-gray-900">
                               ₹{product.price.toLocaleString()}
                             </span>
                           )}

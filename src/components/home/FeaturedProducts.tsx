@@ -22,9 +22,9 @@ const FeaturedProducts: React.FC = () => {
         <div className="text-center">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-300 rounded w-64 mx-auto mb-8"></div>
-            <div className="flex space-x-4">
+            <div className="flex space-x-0">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="w-64 h-80 bg-gray-300 rounded"></div>
+                <div key={i} className="w-48 h-64 bg-gray-300 rounded"></div>
               ))}
             </div>
           </div>
@@ -54,13 +54,13 @@ const FeaturedProducts: React.FC = () => {
           }}
           className="w-full"
         >
-          <CarouselContent className="-ml-2 md:-ml-4">
+          <CarouselContent className="-ml-0">
             {featuredProducts.map((product) => (
-              <CarouselItem key={product.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5">
+              <CarouselItem key={product.id} className="pl-0 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
                 <Link to={`/product/${product.slug}`}>
-                  <Card className="h-full hover:shadow-lg transition-shadow duration-300 group">
-                    <CardContent className="p-4">
-                      <div className="aspect-square mb-4 overflow-hidden rounded-lg bg-gray-100">
+                  <Card className="h-full hover:shadow-lg transition-shadow duration-300 group border-0 rounded-none">
+                    <CardContent className="p-2">
+                      <div className="aspect-square mb-2 overflow-hidden bg-gray-100">
                         {product.image_url ? (
                           <img
                             src={product.image_url}
@@ -68,29 +68,29 @@ const FeaturedProducts: React.FC = () => {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
+                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
                             No Image
                           </div>
                         )}
                       </div>
                       
-                      <div className="space-y-2">
-                        <h3 className="font-medium text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      <div className="space-y-1">
+                        <h3 className="font-medium text-xs text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
                           {product.name}
                         </h3>
                         
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                           {product.sale_price ? (
                             <>
-                              <span className="text-lg font-bold text-green-600">
+                              <span className="text-sm font-bold text-green-600">
                                 ₹{product.sale_price.toLocaleString()}
                               </span>
-                              <span className="text-sm text-gray-500 line-through">
+                              <span className="text-xs text-gray-500 line-through">
                                 ₹{product.price.toLocaleString()}
                               </span>
                             </>
                           ) : (
-                            <span className="text-lg font-bold text-gray-900">
+                            <span className="text-sm font-bold text-gray-900">
                               ₹{product.price.toLocaleString()}
                             </span>
                           )}
