@@ -24,7 +24,7 @@ const FeaturedProducts: React.FC = () => {
             <div className="h-8 bg-gray-300 rounded w-64 mx-auto mb-8"></div>
             <div className="flex space-x-0">
               {[...Array(4)].map((_, i) => (
-                <div key={i} className="w-48 h-64 bg-gray-300 rounded"></div>
+                <div key={i} className="w-48 h-64 bg-gray-300 rounded border"></div>
               ))}
             </div>
           </div>
@@ -58,7 +58,7 @@ const FeaturedProducts: React.FC = () => {
             {featuredProducts.map((product) => (
               <CarouselItem key={product.id} className="pl-0 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6">
                 <Link to={`/product/${product.slug}`}>
-                  <Card className="h-full hover:shadow-lg transition-shadow duration-300 group border-0 rounded-none">
+                  <Card className="h-full hover:shadow-lg transition-shadow duration-300 group border border-gray-200 rounded-none">
                     <CardContent className="p-2">
                       <div className="aspect-square mb-2 overflow-hidden bg-gray-100">
                         {product.image_url ? (

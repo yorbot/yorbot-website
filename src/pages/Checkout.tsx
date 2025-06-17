@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -6,6 +5,13 @@ import { toast } from "sonner";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+
+// Declare Razorpay type for TypeScript
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
@@ -45,6 +51,18 @@ const Checkout: React.FC = () => {
   const shippingFee = subtotal > 1000 ? 0 : 100;
   const gst = Math.round(subtotal * 0.18);
   const total = subtotal - discount + shippingFee + gst;
+
+  // Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   // Fetch user profile on component mount
   useEffect(() => {
@@ -141,6 +159,98 @@ const Checkout: React.FC = () => {
     const { name, value } = e.target;
     setCardForm((prev) => ({ ...prev, [name]: value }));
   };
+
+  // Handle Razorpay payment
+  const handleRazorpayPayment = async (orderData: any) => {
+    try {
+      // Create Razorpay order
+      const { data: razorpayOrder, error } = await supabase.functions.invoke('create-razorpay-order', {
+        body: {
+          amount: total,
+          currency: 'INR',
+          receipt: `order_${Date.now()}`
+        }
+      });
+
+      if (error) throw error;
+
+      const options = {
+        key: "rzp_test_9999999999", // Replace with your Razorpay Key ID
+        amount: razorpayOrder.order.amount,
+        currency: razorpayOrder.order.currency,
+        name: "YorBot",
+        description: "Payment for order",
+        order_id: razorpayOrder.order.id,
+        handler: async function (response: any) {
+          try {
+            // Verify payment
+            const { data: verifyData, error: verifyError } = await supabase.functions.invoke('verify-razorpay-payment', {
+              body: {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature
+              }
+            });
+
+            if (verifyError || !verifyData.verified) {
+              throw new Error('Payment verification failed');
+            }
+
+            // Update order with payment details
+            const { data: order, error } = await supabase
+              .from('orders')
+              .insert({
+                ...orderData,
+                payment_status: 'completed',
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id
+              })
+              .select()
+              .single();
+
+            if (error) throw error;
+
+            await clearCart();
+            
+            toast("Payment successful!", {
+              description: `Your order #${order.order_number} has been placed.`,
+              duration: 2000,
+            });
+            
+            navigate(`/order-success/${order.id}`, { 
+              state: { 
+                order: order,
+                paymentMethod: 'razorpay' 
+              } 
+            });
+          } catch (error) {
+            console.error('Payment verification error:', error);
+            toast("Payment verification failed", {
+              description: "Please contact support if money was deducted.",
+              duration: 3000,
+            });
+          }
+        },
+        prefill: {
+          name: addressForm.fullName,
+          email: user?.email,
+          contact: addressForm.phoneNumber
+        },
+        theme: {
+          color: "#F97316"
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error('Razorpay payment error:', error);
+      toast("Payment initialization failed", {
+        description: "Please try again or use a different payment method.",
+        duration: 3000,
+      });
+    }
+  };
   
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -168,7 +278,6 @@ const Checkout: React.FC = () => {
     console.log('Starting order creation process...');
     
     try {
-      // Create order in database
       const orderData = {
         user_id: user.id,
         customer_name: addressForm.fullName,
@@ -209,6 +318,13 @@ const Checkout: React.FC = () => {
         order_status: 'pending',
       };
 
+      if (paymentMethod === 'razorpay') {
+        // Handle Razorpay payment
+        await handleRazorpayPayment(orderData);
+        return;
+      }
+
+      // For cash on delivery
       console.log('Order data prepared:', orderData);
 
       const { data: order, error } = await supabase
@@ -224,7 +340,6 @@ const Checkout: React.FC = () => {
 
       console.log('Order created successfully:', order);
 
-      // Clear the cart after successful order
       await clearCart();
       
       toast("Order placed successfully!", {
@@ -232,7 +347,6 @@ const Checkout: React.FC = () => {
         duration: 2000,
       });
       
-      // Redirect to order success page with order details
       navigate(`/order-success/${order.id}`, { 
         state: { 
           order: order,
@@ -433,6 +547,18 @@ const Checkout: React.FC = () => {
                     className="mr-2 h-4 w-4 text-yorbot-orange focus:ring-yorbot-orange"
                   />
                   <span className="ml-2">Cash on Delivery</span>
+                </label>
+                
+                <label className="flex items-center p-3 border rounded-md cursor-pointer hover:bg-gray-50">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="razorpay"
+                    checked={paymentMethod === "razorpay"}
+                    onChange={() => handlePaymentMethodChange("razorpay")}
+                    className="mr-2 h-4 w-4 text-yorbot-orange focus:ring-yorbot-orange"
+                  />
+                  <span className="ml-2">Pay Online (Razorpay)</span>
                 </label>
                 
                 <label className="flex items-center p-3 border rounded-md cursor-pointer hover:bg-gray-50">

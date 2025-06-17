@@ -42,7 +42,7 @@ const FeaturedProducts: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-0">
             {[...Array(20)].map((_, i) => (
-              <div key={i} className="animate-pulse">
+              <div key={i} className="animate-pulse border border-gray-200">
                 <div className="aspect-square bg-gray-300 mb-2"></div>
                 <div className="h-3 bg-gray-300 rounded mb-1"></div>
                 <div className="h-3 bg-gray-300 rounded w-3/4"></div>
@@ -69,7 +69,7 @@ const FeaturedProducts: React.FC = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-0 mb-12">
               {currentProducts.map((product) => (
                 <Link key={product.id} to={`/product/${product.slug}`}>
-                  <Card className="h-full hover:shadow-lg transition-shadow duration-300 group border-0 rounded-none">
+                  <Card className="h-full hover:shadow-lg transition-shadow duration-300 group border border-gray-200 rounded-none">
                     <CardContent className="p-2">
                       <div className="aspect-square mb-2 overflow-hidden bg-gray-100">
                         {product.image_url ? (
