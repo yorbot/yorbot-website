@@ -24,6 +24,7 @@ import AuthCallback from "./pages/AuthCallback";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import OrderSuccess from "./pages/OrderSuccess";
+import FeaturedProducts from "./pages/FeaturedProducts";
 
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -61,6 +62,7 @@ function App() {
                     <Route path="/shop/:category/:subcategory" element={<Shop />} />
                     <Route path="/shop/:category/:subcategory/:baseCategory" element={<Shop />} />
                     <Route path="/product/:slug" element={<Product />} />
+                    <Route path="/featured-products" element={<FeaturedProducts />} />
                     <Route path="/cart" element={
                       <RequireAuth>
                         <Cart />
