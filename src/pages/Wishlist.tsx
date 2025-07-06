@@ -1,3 +1,4 @@
+
 import React from "react";
 import Layout from "@/components/layout/Layout";
 import { Heart, ShoppingCart, Trash2 } from "lucide-react";
@@ -56,41 +57,51 @@ const Wishlist: React.FC = () => {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="space-y-4">
             {wishlistItems.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                <div className="aspect-square overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">{item.name}</h3>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-lg font-bold text-yorbot-orange">₹{item.price.toFixed(2)}</span>
-                    <span className={`text-xs px-2 py-1 rounded ${
-                      item.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
-                      {item.inStock ? 'In Stock' : 'Out of Stock'}
-                    </span>
+              <div key={item.id} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                <div className="flex flex-col sm:flex-row p-4">
+                  {/* Product Image */}
+                  <div className="w-full sm:w-32 h-32 flex-shrink-0 mb-4 sm:mb-0 sm:mr-6">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover rounded-md"
+                    />
                   </div>
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleAddToCart(item)}
-                      disabled={!item.inStock}
-                      className="flex-1 bg-yorbot-orange text-white py-2 px-3 rounded-md text-sm font-medium hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-1"
-                    >
-                      <ShoppingCart className="w-4 h-4" />
-                      <span>Add to Cart</span>
-                    </button>
-                    <button
-                      onClick={() => handleRemoveFromWishlist(item.id, item.name)}
-                      className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-gray-600"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                  
+                  {/* Product Info */}
+                  <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between">
+                    <div className="flex-1 mb-4 sm:mb-0">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.name}</h3>
+                      <div className="flex items-center space-x-4 mb-2">
+                        <span className="text-xl font-bold text-yorbot-orange">₹{item.price.toFixed(2)}</span>
+                        <span className={`text-xs px-2 py-1 rounded ${
+                          item.inStock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {item.inStock ? 'In Stock' : 'Out of Stock'}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex items-center space-x-3">
+                      <button
+                        onClick={() => handleAddToCart(item)}
+                        disabled={!item.inStock}
+                        className="bg-yorbot-orange text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                      >
+                        <ShoppingCart className="w-4 h-4" />
+                        <span>Add to Cart</span>
+                      </button>
+                      <button
+                        onClick={() => handleRemoveFromWishlist(item.id, item.name)}
+                        className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors text-gray-600"
+                        title="Remove from wishlist"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

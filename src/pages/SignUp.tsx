@@ -46,43 +46,77 @@ const SignUp: React.FC = () => {
       return;
     }
 
+    if (formData.password.length < 6) {
+      setPasswordError("Password must be at least 6 characters long");
+      return;
+    }
+
     setIsLoading(true);
     setFormError("");
 
     try {
+      console.log("Attempting to sign up user:", formData.email);
+      
       const { error: signUpError } = await signUp(
         formData.email,
         formData.password,
-        { first_name: formData.name.split(" ")[0], last_name: formData.name.split(" ").slice(1).join(" ") }
+        { 
+          first_name: formData.name.split(" ")[0], 
+          last_name: formData.name.split(" ").slice(1).join(" "),
+          full_name: formData.name
+        }
       );
 
       if (signUpError) {
-        setFormError(signUpError.message || "Failed to sign up");
-      } else {
-        // Automatically sign in the user after successful registration
-        const { error: signInError } = await signIn(formData.email, formData.password);
+        console.error("Sign up error:", signUpError);
         
-        if (signInError) {
-          // If auto sign-in fails, still show success but redirect to sign-in
-          uiToast({
-            title: "Account created successfully!",
-            description: "Please sign in with your credentials.",
-            variant: "default",
-          });
-          navigate("/sign-in");
+        // Handle specific error cases
+        if (signUpError.message.includes('User already registered')) {
+          setFormError("This email is already registered. Please try signing in instead.");
+        } else if (signUpError.message.includes('Invalid email')) {
+          setFormError("Please enter a valid email address.");
+        } else if (signUpError.message.includes('Password')) {
+          setFormError("Password must be at least 6 characters long.");
         } else {
-          // Auto sign-in successful - redirect to home page
-          uiToast({
-            title: "Welcome to Yorbot!",
-            description: "Your account has been created and you're now signed in.",
-            variant: "default",
-          });
-          navigate("/"); // Navigate to home page instead of login
+          setFormError(signUpError.message || "Failed to create account. Please try again.");
         }
+        return;
+      }
+
+      console.log("Sign up successful, attempting auto sign-in");
+      
+      // Small delay to ensure user is created
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Automatically sign in the user after successful registration
+      const { error: signInError } = await signIn(formData.email, formData.password);
+      
+      if (signInError) {
+        console.error("Auto sign-in error:", signInError);
+        // If auto sign-in fails, still show success but redirect to sign-in
+        uiToast({
+          title: "Account created successfully!",
+          description: "Please sign in with your credentials.",
+          variant: "default",
+        });
+        navigate("/sign-in");
+      } else {
+        console.log("Auto sign-in successful");
+        // Auto sign-in successful - redirect to home page
+        uiToast({
+          title: "Welcome to Yorbot!",
+          description: "Your account has been created and you're now signed in.",
+          variant: "default",
+        });
+        toast("Account created and signed in!", {
+          description: `Welcome ${formData.name}! You're now signed in.`,
+          duration: 3000,
+        });
+        navigate("/");
       }
     } catch (error) {
-      setFormError("An unexpected error occurred");
-      console.error(error);
+      console.error("Unexpected error during signup:", error);
+      setFormError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -170,7 +204,7 @@ const SignUp: React.FC = () => {
                     value={formData.password}
                     onChange={handleChange}
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-yorbot-orange focus:border-yorbot-orange"
-                    placeholder="Create a password"
+                    placeholder="Create a password (min 6 characters)"
                   />
                 </div>
               </div>

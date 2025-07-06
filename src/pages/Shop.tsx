@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -52,34 +51,62 @@ const Shop: React.FC = () => {
     async function fetchAllData() {
       setLoading(true);
       
+      console.log("Fetching categories and subcategories with proper filtering");
+      
       // Fetch categories
       const { data: cats, error: catsErr } = await supabase
         .from("categories")
         .select("*")
         .order("id");
       if (catsErr) {
+        console.error("Error fetching categories:", catsErr);
         setCategories([]);
         setLoading(false);
         return;
       }
 
-      // Fetch subcategories
-      const { data: subs } = await supabase.from("subcategories").select("*");
+      // Fetch subcategories with proper category filtering
+      const { data: subs, error: subsErr } = await supabase
+        .from("subcategories")
+        .select("*")
+        .order("id");
       
-      // Fetch base categories
-      const { data: baseCats } = await supabase.from("base_categories").select("*");
+      if (subsErr) {
+        console.error("Error fetching subcategories:", subsErr);
+      }
 
-      // Build the hierarchy
+      // Fetch base categories
+      const { data: baseCats, error: baseCatsErr } = await supabase
+        .from("base_categories")
+        .select("*")
+        .order("id");
+      
+      if (baseCatsErr) {
+        console.error("Error fetching base categories:", baseCatsErr);
+      }
+
+      console.log("Categories:", cats?.length);
+      console.log("Subcategories fetched:", subs?.length);
+      console.log("Base categories:", baseCats?.length);
+
+      // Build the hierarchy with proper filtering
       const categoriesWithSubs: CategoryWithSubcategories[] = (cats || []).map(cat => {
+        // IMPORTANT: Only get subcategories that belong to this specific category
         const subcategoriesForCat = (subs || []).filter(sub => sub.category_id === cat.id);
-        const subcategoriesWithBase = subcategoriesForCat.map(sub => ({
-          ...sub,
-          baseCategories: (baseCats || []).filter(base => {
-            // Assuming base categories are linked to subcategories somehow
-            // You may need to adjust this based on your actual database schema
-            return true; // For now, show all base categories under each subcategory
-          })
-        }));
+        
+        console.log(`Category ${cat.name} (ID: ${cat.id}) has ${subcategoriesForCat.length} subcategories`);
+        
+        const subcategoriesWithBase = subcategoriesForCat.map(sub => {
+          // Get base categories that belong to this subcategory
+          const baseCategoriesForSub = (baseCats || []).filter(base => base.subcategory_id === sub.id);
+          
+          console.log(`Subcategory ${sub.name} (ID: ${sub.id}) has ${baseCategoriesForSub.length} base categories`);
+          
+          return {
+            ...sub,
+            baseCategories: baseCategoriesForSub,
+          };
+        });
         
         return {
           ...cat,
@@ -93,14 +120,17 @@ const Shop: React.FC = () => {
       if (category) {
         const catObj = categoriesWithSubs.find(c => c.slug === category) || null;
         setSelectedCategory(catObj);
+        console.log("Selected category:", catObj?.name, "with", catObj?.subcategories.length, "subcategories");
         
         if (subcategory && catObj) {
           const subObj = catObj.subcategories.find(s => s.slug === subcategory) || null;
           setSelectedSubcategory(subObj);
+          console.log("Selected subcategory:", subObj?.name);
           
           if (baseCategory && subObj) {
             const baseObj = subObj.baseCategories.find(b => b.slug === baseCategory) || null;
             setSelectedBaseCategory(baseObj);
+            console.log("Selected base category:", baseObj?.name);
           } else {
             setSelectedBaseCategory(null);
           }
@@ -211,6 +241,13 @@ const Shop: React.FC = () => {
             : !baseCategory ? (selectedSubcategory?.name || "Subcategory not found")
             : selectedBaseCategory?.name || "Base Category not found"}
         </h1>
+
+        {/* Debug info - remove in production */}
+        {selectedCategory && (
+          <div className="mb-4 p-2 bg-gray-100 rounded text-sm">
+            Debug: Selected category "{selectedCategory.name}" has {selectedCategory.subcategories.length} subcategories
+          </div>
+        )}
 
         {/* 1. NO CATEGORIES AT ALL */}
         {categories.length === 0 && (

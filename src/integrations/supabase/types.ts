@@ -58,6 +58,7 @@ export type Database = {
           image_url: string | null
           name: string
           slug: string
+          subcategory_id: number | null
           updated_at: string | null
         }
         Insert: {
@@ -66,6 +67,7 @@ export type Database = {
           image_url?: string | null
           name: string
           slug: string
+          subcategory_id?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -74,9 +76,18 @@ export type Database = {
           image_url?: string | null
           name?: string
           slug?: string
+          subcategory_id?: number | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "base_categories_subcategory_id_fkey"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "subcategories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cart_items: {
         Row: {
