@@ -87,6 +87,13 @@ export type Database = {
             referencedRelation: "subcategories"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_base_categories_subcategory"
+            columns: ["subcategory_id"]
+            isOneToOne: false
+            referencedRelation: "subcategories"
+            referencedColumns: ["id"]
+          },
         ]
       }
       cart_items: {
@@ -616,6 +623,13 @@ export type Database = {
           {
             foreignKeyName: "fk_subcategories_base_category"
             columns: ["base_category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_subcategories_category"
+            columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["id"]
