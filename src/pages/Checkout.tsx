@@ -204,7 +204,12 @@ const Checkout: React.FC = () => {
               state: formData.state,
               zip_code: formData.zipCode
             },
-            items: cartItems,
+            items: cartItems.map(item => ({
+              ...item,
+              id: item.id.toString(),
+              price: item.price.toString(),
+              quantity: item.quantity.toString()
+            })),
             subtotal: cartTotal,
             total_amount: cartTotal,
             notes: formData.notes
@@ -239,7 +244,7 @@ const Checkout: React.FC = () => {
     try {
       setIsProcessing(true);
       
-      // Create order without payment
+      // Create order without payment - convert cartItems to JSON-compatible format
       const { error } = await supabase.from('orders').insert({
         user_id: user?.id,
         customer_name: formData.customerName,
@@ -251,7 +256,13 @@ const Checkout: React.FC = () => {
           state: formData.state,
           zip_code: formData.zipCode
         },
-        items: cartItems,
+        items: cartItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image
+        })),
         subtotal: cartTotal,
         total_amount: cartTotal,
         payment_method: 'cod',

@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "../integrations/supabase/client";
 import { useAuth } from "./AuthContext";
@@ -18,6 +19,7 @@ interface CartContextType {
   updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
   cartCount: number;
+  cartTotal: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -226,6 +228,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
 
   return (
     <CartContext.Provider
@@ -236,6 +239,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         updateQuantity,
         clearCart,
         cartCount,
+        cartTotal,
       }}
     >
       {children}

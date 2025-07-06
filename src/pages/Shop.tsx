@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -30,6 +31,7 @@ interface BaseCategory {
   id: number;
   name: string;
   slug: string;
+  subcategory_id: number;
 }
 interface CategoryWithSubcategories extends Category {
   subcategories: SubcategoryWithBaseCategories[];
@@ -97,7 +99,7 @@ const Shop: React.FC = () => {
         console.log(`Category ${cat.name} (ID: ${cat.id}) has ${subcategoriesForCat.length} subcategories`);
         
         const subcategoriesWithBase = subcategoriesForCat.map(sub => {
-          // Get base categories that belong to this subcategory
+          // IMPORTANT: Get base categories that belong to this specific subcategory
           const baseCategoriesForSub = (baseCats || []).filter(base => base.subcategory_id === sub.id);
           
           console.log(`Subcategory ${sub.name} (ID: ${sub.id}) has ${baseCategoriesForSub.length} base categories`);
@@ -241,13 +243,6 @@ const Shop: React.FC = () => {
             : !baseCategory ? (selectedSubcategory?.name || "Subcategory not found")
             : selectedBaseCategory?.name || "Base Category not found"}
         </h1>
-
-        {/* Debug info - remove in production */}
-        {selectedCategory && (
-          <div className="mb-4 p-2 bg-gray-100 rounded text-sm">
-            Debug: Selected category "{selectedCategory.name}" has {selectedCategory.subcategories.length} subcategories
-          </div>
-        )}
 
         {/* 1. NO CATEGORIES AT ALL */}
         {categories.length === 0 && (
