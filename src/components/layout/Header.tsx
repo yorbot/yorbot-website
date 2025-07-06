@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, ShoppingCart, Heart, User, Menu, LogIn } from "lucide-react";
@@ -28,6 +27,7 @@ const Header: React.FC = () => {
     else if (path.includes("/shop")) setActiveNav("shop");
     else if (path.includes("/blogs")) setActiveNav("blogs");
     else if (path.includes("/educational")) setActiveNav("educational");
+    else if (path.includes("/bulk-orders")) setActiveNav("bulk-orders");
     else if (path.includes("/about-us")) setActiveNav("about-us");
     else if (path.includes("/contact-us")) setActiveNav("contact-us");
     else setActiveNav("");
@@ -140,7 +140,7 @@ const Header: React.FC = () => {
       <nav className="hidden md:block bg-[#333333]">
         <div className="container mx-auto px-4">
           <ul className="flex justify-center space-x-8 py-3">
-            {["home", "shop", "blogs", "educational", "about-us", "contact-us"].map((item) => (
+            {["home", "shop", "blogs", "educational", "bulk-orders", "about-us", "contact-us"].map((item) => (
               <li key={item}>
                 <Link
                   to={item === "home" ? "/" : `/${item}`}
@@ -150,7 +150,7 @@ const Header: React.FC = () => {
                       : "text-[#999999]"
                   }`}
                 >
-                  {item.charAt(0).toUpperCase() + item.slice(1).replace("-", " ")}
+                  {item === "bulk-orders" ? "Bulk Orders" : item.charAt(0).toUpperCase() + item.slice(1).replace("-", " ")}
                 </Link>
               </li>
             ))}
@@ -195,7 +195,7 @@ const Header: React.FC = () => {
           </div>
           <nav className="p-4">
             <ul className="space-y-4">
-              {["home", "shop", "blogs", "educational", "about-us", "contact-us"].map((item) => (
+              {["home", "shop", "blogs", "educational", "bulk-orders", "about-us", "contact-us"].map((item) => (
                 <li key={item}>
                   <Link
                     to={item === "home" ? "/" : `/${item}`}
@@ -206,7 +206,7 @@ const Header: React.FC = () => {
                     }`}
                     onClick={toggleMobileMenu}
                   >
-                    {item.charAt(0).toUpperCase() + item.slice(1).replace("-", " ")}
+                    {item === "bulk-orders" ? "Bulk Orders" : item.charAt(0).toUpperCase() + item.slice(1).replace("-", " ")}
                   </Link>
                 </li>
               ))}

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -25,8 +24,6 @@ const Checkout: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [showUpiQr, setShowUpiQr] = useState(false);
-  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
 
   const [addressType, setAddressType] = useState("default");
   const [deliveryType, setDeliveryType] = useState("regular");
@@ -43,12 +40,13 @@ const Checkout: React.FC = () => {
   });
 
   const GST_RATE = 0.18; // 18% GST
-  const REGULAR_DELIVERY_FEE = 15;
+  const REGULAR_DELIVERY_FEE_PER_ITEM = 15;
   const INSTANT_DELIVERY_FEE = 0; // Will be added later with delivery partners
 
   const subtotal = cartTotal;
   const gstAmount = subtotal * GST_RATE;
-  const shippingFee = deliveryType === "instant" ? INSTANT_DELIVERY_FEE : (subtotal >= 800 ? 0 : REGULAR_DELIVERY_FEE);
+  const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+  const shippingFee = deliveryType === "instant" ? INSTANT_DELIVERY_FEE : (subtotal >= 800 ? 0 : (totalItems * REGULAR_DELIVERY_FEE_PER_ITEM));
   const totalAmount = subtotal + gstAmount + shippingFee;
 
   useEffect(() => {
@@ -160,31 +158,7 @@ const Checkout: React.FC = () => {
     }
   };
 
-  const handleUpiPayment = async () => {
-    try {
-      setIsProcessing(true);
-      const orderData = await createRazorpayOrder();
-      
-      if (orderData.qr_code_data) {
-        setQrCodeUrl(orderData.qr_code_data.qr_code_url);
-        setShowUpiQr(true);
-        
-        toast("UPI QR Code Generated", {
-          description: "Scan the QR code with any UPI app to pay",
-          duration: 5000,
-        });
-      }
-    } catch (error) {
-      console.error("UPI payment error:", error);
-      toast("UPI Payment Failed", {
-        description: "Unable to generate UPI QR code. Please try again.",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleCardPayment = async () => {
+  const handleRazorpayPayment = async () => {
     try {
       setIsProcessing(true);
       const orderData = await createRazorpayOrder();
@@ -221,7 +195,7 @@ const Checkout: React.FC = () => {
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (error) {
-      console.error("Card payment error:", error);
+      console.error("Payment error:", error);
       toast("Payment Failed", {
         description: "Unable to process payment. Please try again.",
       });
@@ -352,10 +326,8 @@ const Checkout: React.FC = () => {
 
     switch (paymentMethod) {
       case 'upi':
-        await handleUpiPayment();
-        break;
       case 'card':
-        await handleCardPayment();
+        await handleRazorpayPayment();
         break;
       case 'cod':
         await handleCashOnDelivery();
@@ -499,11 +471,13 @@ const Checkout: React.FC = () => {
                           {subtotal >= 800 ? (
                             <span className="text-green-600">FREE</span>
                           ) : (
-                            `₹${REGULAR_DELIVERY_FEE}`
+                            `₹${shippingFee}`
                           )}
                         </p>
-                        {subtotal >= 800 && (
+                        {subtotal >= 800 ? (
                           <p className="text-xs text-green-600">Free on orders ₹800+</p>
+                        ) : (
+                          <p className="text-xs text-gray-500">₹{REGULAR_DELIVERY_FEE_PER_ITEM} per item</p>
                         )}
                       </div>
                     </div>
@@ -531,26 +505,6 @@ const Checkout: React.FC = () => {
                     </div>
                   </RadioGroup>
                 </div>
-
-                {/* UPI QR Code Display */}
-                {showUpiQr && qrCodeUrl && (
-                  <div className="space-y-4 p-6 bg-gray-50 rounded-lg">
-                    <h4 className="text-lg font-semibold text-center">Scan QR Code to Pay</h4>
-                    <div className="flex justify-center">
-                      <img 
-                        src={qrCodeUrl} 
-                        alt="UPI QR Code" 
-                        className="w-48 h-48 border-2 border-gray-300 rounded-lg"
-                      />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm text-gray-600 mb-2">
-                        Scan with any UPI app (Google Pay, PhonePe, Paytm, etc.)
-                      </p>
-                      <p className="font-semibold text-lg">Amount: ₹{totalAmount.toFixed(2)}</p>
-                    </div>
-                  </div>
-                )}
 
                 {/* Continue to Payment Button */}
                 <Button
@@ -601,7 +555,7 @@ const Checkout: React.FC = () => {
                       <span>₹{gstAmount.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Shipping</span>
+                      <span>Shipping ({totalItems} items)</span>
                       <span>{shippingFee === 0 ? "FREE" : `₹${shippingFee.toFixed(2)}`}</span>
                     </div>
                     <div className="border-t pt-2">
