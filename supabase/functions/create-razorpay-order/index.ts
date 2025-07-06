@@ -24,25 +24,12 @@ serve(async (req) => {
 
     console.log('Creating Razorpay order for amount:', amount, 'method:', payment_method)
 
-    // Create Razorpay order
-    let orderData: any = {
+    // Create basic Razorpay order (same for both UPI and card)
+    const orderData = {
       amount: amount * 100, // Razorpay expects amount in paise
       currency,
       receipt,
       payment_capture: 1
-    }
-
-    // Add UPI-specific configuration for QR code generation
-    if (payment_method === 'upi') {
-      orderData = {
-        ...orderData,
-        method: {
-          upi: {
-            flow: "collect",
-            vpa: "auto"
-          }
-        }
-      }
     }
 
     const auth = btoa(`${razorpayKeyId}:${razorpayKeySecret}`)
@@ -65,22 +52,10 @@ serve(async (req) => {
     const order = await response.json()
     console.log('Razorpay order created successfully:', order.id)
 
-    // For UPI, generate QR code data
-    let qrCodeData = null
-    if (payment_method === 'upi') {
-      // Generate UPI QR code using Razorpay's UPI link
-      const upiString = `upi://pay?pa=${razorpayKeyId.replace('rzp_live_', '')}@razorpay&pn=YorBot&am=${amount}&cu=INR&tn=Payment for Order ${receipt}`
-      qrCodeData = {
-        upi_string: upiString,
-        qr_code_url: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`
-      }
-    }
-
     return new Response(
       JSON.stringify({ 
         success: true, 
         order,
-        qr_code_data: qrCodeData,
         razorpay_key_id: razorpayKeyId // Safe to send public key
       }),
       { 

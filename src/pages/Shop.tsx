@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -128,18 +129,7 @@ const Shop: React.FC = () => {
     if (selectedSubcategory) {
       const subcategory = subcategories.find(sub => sub.slug === selectedSubcategory);
       if (subcategory) {
-        // Only show products that belong to this subcategory AND its parent category
-        filtered = filtered.filter(product => {
-          if (product.subcategory_id === subcategory.id) {
-            // If category is also selected, ensure it matches
-            if (selectedCategory) {
-              const category = categories.find(cat => cat.slug === selectedCategory);
-              return category && subcategory.category_id === category.id;
-            }
-            return true;
-          }
-          return false;
-        });
+        filtered = filtered.filter(product => product.subcategory_id === subcategory.id);
       }
     }
 
@@ -147,18 +137,7 @@ const Shop: React.FC = () => {
     if (selectedBaseCategory) {
       const baseCategory = baseCategories.find(base => base.slug === selectedBaseCategory);
       if (baseCategory) {
-        // Only show products that belong to this base category AND match the subcategory hierarchy
-        filtered = filtered.filter(product => {
-          if (product.base_category_id === baseCategory.id) {
-            // If subcategory is selected, ensure base category belongs to that subcategory
-            if (selectedSubcategory) {
-              const subcategory = subcategories.find(sub => sub.slug === selectedSubcategory);
-              return subcategory && baseCategory.subcategory_id === subcategory.id;
-            }
-            return true;
-          }
-          return false;
-        });
+        filtered = filtered.filter(product => product.base_category_id === baseCategory.id);
       }
     }
 
@@ -283,7 +262,7 @@ const Shop: React.FC = () => {
                       <SelectValue placeholder="All Categories" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Categories</SelectItem>
+                      <SelectItem value="all">All Categories</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.slug}>
                           {category.name}
@@ -294,7 +273,7 @@ const Shop: React.FC = () => {
                 </div>
 
                 {/* Subcategories */}
-                {selectedCategory && (
+                {selectedCategory && selectedCategory !== "all" && (
                   <div className="mb-6">
                     <label className="block text-sm font-medium mb-2">Subcategory</label>
                     <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
@@ -302,7 +281,7 @@ const Shop: React.FC = () => {
                         <SelectValue placeholder="All Subcategories" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Subcategories</SelectItem>
+                        <SelectItem value="all">All Subcategories</SelectItem>
                         {getFilteredSubcategories().map((subcategory) => (
                           <SelectItem key={subcategory.id} value={subcategory.slug}>
                             {subcategory.name}
@@ -314,7 +293,7 @@ const Shop: React.FC = () => {
                 )}
 
                 {/* Base Categories */}
-                {selectedSubcategory && (
+                {selectedSubcategory && selectedSubcategory !== "all" && (
                   <div className="mb-6">
                     <label className="block text-sm font-medium mb-2">Base Category</label>
                     <Select value={selectedBaseCategory} onValueChange={setSelectedBaseCategory}>
@@ -322,7 +301,7 @@ const Shop: React.FC = () => {
                         <SelectValue placeholder="All Base Categories" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Base Categories</SelectItem>
+                        <SelectItem value="all">All Base Categories</SelectItem>
                         {getFilteredBaseCategories().map((baseCategory) => (
                           <SelectItem key={baseCategory.id} value={baseCategory.slug}>
                             {baseCategory.name}
@@ -420,50 +399,50 @@ const Shop: React.FC = () => {
                 <p className="text-gray-400">Try adjusting your filters</p>
               </div>
             ) : (
-              <div className={`grid gap-4 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1"}`}>
+              <div className={`grid gap-3 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1"}`}>
                 {filteredProducts.map((product) => {
                   const pricing = getDisplayPrice(product);
                   return (
                     <Card key={product.id} className="group hover:shadow-lg transition-shadow">
-                      <CardContent className="p-4">
-                        <div className="relative mb-3">
+                      <CardContent className="p-3">
+                        <div className="relative mb-2">
                           <Link to={`/product/${product.slug}`}>
                             <img
                               src={product.image_url || "/placeholder.svg"}
                               alt={product.name}
-                              className="w-full h-36 object-cover rounded-lg"
+                              className="w-full h-28 object-cover rounded-lg"
                             />
                           </Link>
                           {pricing.discount && (
-                            <Badge className="absolute top-2 left-2 bg-red-500">
+                            <Badge className="absolute top-1 left-1 bg-red-500 text-xs">
                               -{pricing.discount}%
                             </Badge>
                           )}
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="absolute top-2 right-2 h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={() => handleWishlistToggle(product)}
                           >
                             <Heart
-                              className={`w-4 h-4 ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : ""}`}
+                              className={`w-3 h-3 ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : ""}`}
                             />
                           </Button>
                         </div>
                         
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                           <Link to={`/product/${product.slug}`}>
-                            <h3 className="font-medium text-sm leading-tight hover:text-yorbot-orange transition-colors line-clamp-2">
+                            <h3 className="font-medium text-xs leading-tight hover:text-yorbot-orange transition-colors line-clamp-2">
                               {product.name}
                             </h3>
                           </Link>
                           
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-yorbot-orange text-lg">
+                          <div className="flex items-center gap-1">
+                            <span className="font-bold text-yorbot-orange text-sm">
                               ₹{pricing.current.toFixed(2)}
                             </span>
                             {pricing.original && (
-                              <span className="text-gray-500 line-through text-sm">
+                              <span className="text-gray-500 line-through text-xs">
                                 ₹{pricing.original.toFixed(2)}
                               </span>
                             )}
@@ -471,9 +450,9 @@ const Shop: React.FC = () => {
                           
                           <Button
                             onClick={() => handleAddToCart(product)}
-                            className="w-full bg-yorbot-orange hover:bg-orange-600 text-sm py-2"
+                            className="w-full bg-yorbot-orange hover:bg-orange-600 text-xs py-1 h-7"
                           >
-                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            <ShoppingCart className="w-3 h-3 mr-1" />
                             Add to Cart
                           </Button>
                         </div>

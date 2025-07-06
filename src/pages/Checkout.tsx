@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -324,16 +325,13 @@ const Checkout: React.FC = () => {
   const handleContinueToPayment = async () => {
     if (!validateForm()) return;
 
-    switch (paymentMethod) {
-      case 'upi':
-      case 'card':
-        await handleRazorpayPayment();
-        break;
-      case 'cod':
-        await handleCashOnDelivery();
-        break;
-      default:
-        toast("Invalid payment method", { description: "Please select a valid payment method." });
+    // For both UPI and card payments, use Razorpay
+    if (paymentMethod === 'upi' || paymentMethod === 'card') {
+      await handleRazorpayPayment();
+    } else if (paymentMethod === 'cod') {
+      await handleCashOnDelivery();
+    } else {
+      toast("Invalid payment method", { description: "Please select a valid payment method." });
     }
   };
 
