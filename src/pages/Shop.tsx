@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -60,11 +61,7 @@ const Shop: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    updateCurrentEntities();
-  }, [categories, subcategories, baseCategories, categorySlug, subcategorySlug, baseCategorySlug]);
+  }, [categorySlug, subcategorySlug, baseCategorySlug]);
 
   const fetchData = async () => {
     try {
@@ -81,34 +78,28 @@ const Shop: React.FC = () => {
       if (categoriesRes.data) setCategories(categoriesRes.data);
       if (subcategoriesRes.data) setSubcategories(subcategoriesRes.data);
       if (baseCategoriesRes.data) setBaseCategories(baseCategoriesRes.data);
+
+      // Set current entities after data is loaded
+      if (categoriesRes.data && categorySlug) {
+        const category = categoriesRes.data.find((cat: Category) => cat.slug === categorySlug);
+        setCurrentCategory(category || null);
+      }
+
+      if (subcategoriesRes.data && subcategorySlug) {
+        const subcategory = subcategoriesRes.data.find((sub: Subcategory) => sub.slug === subcategorySlug);
+        setCurrentSubcategory(subcategory || null);
+      }
+
+      if (baseCategoriesRes.data && baseCategorySlug) {
+        const baseCategory = baseCategoriesRes.data.find((base: BaseCategory) => base.slug === baseCategorySlug);
+        setCurrentBaseCategory(baseCategory || null);
+      }
+
     } catch (error) {
       console.error("Error fetching data:", error);
       toast("Error loading data", { description: "Please try again later." });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const updateCurrentEntities = () => {
-    if (categorySlug) {
-      const category = categories.find(cat => cat.slug === categorySlug);
-      setCurrentCategory(category || null);
-    } else {
-      setCurrentCategory(null);
-    }
-
-    if (subcategorySlug) {
-      const subcategory = subcategories.find(sub => sub.slug === subcategorySlug);
-      setCurrentSubcategory(subcategory || null);
-    } else {
-      setCurrentSubcategory(null);
-    }
-
-    if (baseCategorySlug) {
-      const baseCategory = baseCategories.find(base => base.slug === baseCategorySlug);
-      setCurrentBaseCategory(baseCategory || null);
-    } else {
-      setCurrentBaseCategory(null);
     }
   };
 
@@ -207,19 +198,19 @@ const Shop: React.FC = () => {
         {!categorySlug && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">Shop by Categories</h1>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3">
               {categories.map((category) => (
                 <Link key={category.id} to={`/shop/${category.slug}`}>
                   <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
-                    <div className="aspect-[4/3] overflow-hidden">
+                    <div className="aspect-square overflow-hidden">
                       <img
                         src={category.image_url || "/placeholder.svg"}
                         alt={category.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-3 text-center">
-                      <h3 className="font-medium text-sm group-hover:text-yorbot-orange transition-colors line-clamp-2">
+                    <CardContent className="p-2 text-center">
+                      <h3 className="font-medium text-xs group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {category.name}
                       </h3>
                     </CardContent>
@@ -234,19 +225,19 @@ const Shop: React.FC = () => {
         {categorySlug && !subcategorySlug && currentCategory && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">{currentCategory.name}</h1>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3">
               {getFilteredSubcategories().map((subcategory) => (
                 <Link key={subcategory.id} to={`/shop/${currentCategory.slug}/${subcategory.slug}`}>
                   <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
-                    <div className="aspect-[4/3] overflow-hidden">
+                    <div className="aspect-square overflow-hidden">
                       <img
                         src={subcategory.image_url || "/placeholder.svg"}
                         alt={subcategory.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-3 text-center">
-                      <h3 className="font-medium text-sm group-hover:text-yorbot-orange transition-colors line-clamp-2">
+                    <CardContent className="p-2 text-center">
+                      <h3 className="font-medium text-xs group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {subcategory.name}
                       </h3>
                     </CardContent>
@@ -261,19 +252,19 @@ const Shop: React.FC = () => {
         {categorySlug && subcategorySlug && !baseCategorySlug && currentSubcategory && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">{currentSubcategory.name}</h1>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3">
               {getFilteredBaseCategories().map((baseCategory) => (
                 <Link key={baseCategory.id} to={`/shop/${currentCategory?.slug}/${currentSubcategory.slug}/${baseCategory.slug}`}>
                   <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
-                    <div className="aspect-[4/3] overflow-hidden">
+                    <div className="aspect-square overflow-hidden">
                       <img
                         src={baseCategory.image_url || "/placeholder.svg"}
                         alt={baseCategory.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-3 text-center">
-                      <h3 className="font-medium text-sm group-hover:text-yorbot-orange transition-colors line-clamp-2">
+                    <CardContent className="p-2 text-center">
+                      <h3 className="font-medium text-xs group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {baseCategory.name}
                       </h3>
                     </CardContent>
@@ -287,7 +278,7 @@ const Shop: React.FC = () => {
         {/* Show Products */}
         {baseCategorySlug && currentBaseCategory && (
           <div>
-            <h1 className="text-3xl font-bold mb-8 text-center">{currentBaseCategory.name} Products</h1>
+            <h1 className="text-3xl font-bold mb-8 text-center">{currentBaseCategory.name}</h1>
             {getFilteredProducts().length === 0 ? (
               <div className="text-center py-12">
                 <p className="text-xl text-gray-500">No products found in this category</p>
