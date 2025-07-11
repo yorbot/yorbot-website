@@ -47,6 +47,9 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/shop" element={<Shop />} />
+                  <Route path="/shop/:categorySlug" element={<Shop />} />
+                  <Route path="/shop/:categorySlug/:subcategorySlug" element={<Shop />} />
+                  <Route path="/shop/:categorySlug/:subcategorySlug/:baseCategorySlug" element={<Shop />} />
                   <Route path="/product/:slug" element={<Product />} />
                   <Route path="/cart" element={<Cart />} />
                   <Route path="/wishlist" element={<Wishlist />} />
