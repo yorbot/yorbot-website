@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -208,19 +207,19 @@ const Shop: React.FC = () => {
         {!categorySlug && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">Shop by Categories</h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {categories.map((category) => (
                 <Link key={category.id} to={`/shop/${category.slug}`}>
-                  <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
-                    <div className="aspect-square overflow-hidden">
+                  <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
+                    <div className="aspect-[4/3] overflow-hidden">
                       <img
                         src={category.image_url || "/placeholder.svg"}
                         alt={category.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-4 text-center">
-                      <h3 className="font-semibold text-lg group-hover:text-yorbot-orange transition-colors">
+                    <CardContent className="p-3 text-center">
+                      <h3 className="font-medium text-sm group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {category.name}
                       </h3>
                     </CardContent>
@@ -235,19 +234,19 @@ const Shop: React.FC = () => {
         {categorySlug && !subcategorySlug && currentCategory && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">{currentCategory.name}</h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {getFilteredSubcategories().map((subcategory) => (
                 <Link key={subcategory.id} to={`/shop/${currentCategory.slug}/${subcategory.slug}`}>
-                  <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
-                    <div className="aspect-square overflow-hidden">
+                  <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
+                    <div className="aspect-[4/3] overflow-hidden">
                       <img
                         src={subcategory.image_url || "/placeholder.svg"}
                         alt={subcategory.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-4 text-center">
-                      <h3 className="font-semibold text-lg group-hover:text-yorbot-orange transition-colors">
+                    <CardContent className="p-3 text-center">
+                      <h3 className="font-medium text-sm group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {subcategory.name}
                       </h3>
                     </CardContent>
@@ -262,19 +261,19 @@ const Shop: React.FC = () => {
         {categorySlug && subcategorySlug && !baseCategorySlug && currentSubcategory && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">{currentSubcategory.name}</h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {getFilteredBaseCategories().map((baseCategory) => (
                 <Link key={baseCategory.id} to={`/shop/${currentCategory?.slug}/${currentSubcategory.slug}/${baseCategory.slug}`}>
-                  <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden">
-                    <div className="aspect-square overflow-hidden">
+                  <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
+                    <div className="aspect-[4/3] overflow-hidden">
                       <img
                         src={baseCategory.image_url || "/placeholder.svg"}
                         alt={baseCategory.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-4 text-center">
-                      <h3 className="font-semibold text-lg group-hover:text-yorbot-orange transition-colors">
+                    <CardContent className="p-3 text-center">
+                      <h3 className="font-medium text-sm group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {baseCategory.name}
                       </h3>
                     </CardContent>
