@@ -19,6 +19,7 @@ interface Product {
   image_url?: string;
   slug: string;
   discount_percentage?: number;
+  base_category_id?: number;
 }
 
 interface Category {
