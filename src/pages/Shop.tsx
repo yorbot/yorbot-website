@@ -269,11 +269,11 @@ const Shop: React.FC = () => {
           </div>
         )}
 
-        {/* Show Base Categories */}
+        {/* Show Base Categories - Made bigger with reduced gaps */}
         {categorySlug && subcategorySlug && !baseCategorySlug && currentSubcategory && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">{currentSubcategory.name}</h1>
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {getFilteredBaseCategories().map((baseCategory) => (
                 <Link key={baseCategory.id} to={`/shop/${currentCategory?.slug}/${currentSubcategory.slug}/${baseCategory.slug}`}>
                   <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -284,8 +284,8 @@ const Shop: React.FC = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-1 text-center">
-                      <h3 className="font-medium text-xs group-hover:text-yorbot-orange transition-colors line-clamp-2">
+                    <CardContent className="p-3 text-center">
+                      <h3 className="font-medium text-sm group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {baseCategory.name}
                       </h3>
                     </CardContent>
@@ -296,7 +296,7 @@ const Shop: React.FC = () => {
           </div>
         )}
 
-        {/* Show Products */}
+        {/* Show Products - Made smaller with reduced gaps */}
         {baseCategorySlug && currentBaseCategory && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">{currentBaseCategory.name}</h1>
@@ -306,50 +306,50 @@ const Shop: React.FC = () => {
                 <p className="text-gray-400">Please check back later</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
                 {getFilteredProducts().map((product) => {
                   const pricing = getDisplayPrice(product);
                   return (
                     <Card key={product.id} className="group hover:shadow-lg transition-shadow">
-                      <CardContent className="p-4">
-                        <div className="relative mb-3">
+                      <CardContent className="p-3">
+                        <div className="relative mb-2">
                           <Link to={`/product/${product.slug}`}>
                             <img
                               src={product.image_url || "/placeholder.svg"}
                               alt={product.name}
-                              className="w-full h-48 object-cover rounded-lg"
+                              className="w-full h-32 object-cover rounded-lg"
                             />
                           </Link>
                           {pricing.discount && (
-                            <Badge className="absolute top-2 left-2 bg-red-500">
+                            <Badge className="absolute top-1 left-1 bg-red-500 text-xs px-1 py-0">
                               -{pricing.discount}%
                             </Badge>
                           )}
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="absolute top-2 right-2 h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                             onClick={() => handleWishlistToggle(product)}
                           >
                             <Heart
-                              className={`w-4 h-4 ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : ""}`}
+                              className={`w-3 h-3 ${isInWishlist(product.id) ? "fill-red-500 text-red-500" : ""}`}
                             />
                           </Button>
                         </div>
                         
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                           <Link to={`/product/${product.slug}`}>
-                            <h3 className="font-medium text-sm leading-tight hover:text-yorbot-orange transition-colors line-clamp-2">
+                            <h3 className="font-medium text-xs leading-tight hover:text-yorbot-orange transition-colors line-clamp-2">
                               {product.name}
                             </h3>
                           </Link>
                           
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-yorbot-orange">
+                          <div className="flex items-center gap-1">
+                            <span className="font-bold text-yorbot-orange text-sm">
                               ₹{pricing.current.toFixed(2)}
                             </span>
                             {pricing.original && (
-                              <span className="text-gray-500 line-through text-sm">
+                              <span className="text-gray-500 line-through text-xs">
                                 ₹{pricing.original.toFixed(2)}
                               </span>
                             )}
@@ -357,9 +357,9 @@ const Shop: React.FC = () => {
                           
                           <Button
                             onClick={() => handleAddToCart(product)}
-                            className="w-full bg-yorbot-orange hover:bg-orange-600 text-sm py-2"
+                            className="w-full bg-yorbot-orange hover:bg-orange-600 text-xs py-1 h-7"
                           >
-                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            <ShoppingCart className="w-3 h-3 mr-1" />
                             Add to Cart
                           </Button>
                         </div>
