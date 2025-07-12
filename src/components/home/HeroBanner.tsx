@@ -10,6 +10,7 @@ interface Banner {
   subtitle: string;
   image_url: string;
   link: string;
+  button_text: string;
   position: number;
   is_active: boolean;
 }
@@ -35,7 +36,18 @@ const HeroBanner: React.FC = () => {
         }
 
         if (data && data.length > 0) {
-          setBanners(data);
+          // Map the data to ensure all required fields are present
+          const mappedBanners = data.map(banner => ({
+            id: banner.id,
+            title: banner.title,
+            subtitle: banner.subtitle || '',
+            image_url: banner.image_url || '',
+            link: banner.link || '/shop',
+            button_text: banner.button_text || 'Shop Now',
+            position: banner.position || 1,
+            is_active: banner.is_active || true
+          }));
+          setBanners(mappedBanners);
         } else {
           // Fallback to default banners if none found in database
           setBanners([
@@ -45,6 +57,7 @@ const HeroBanner: React.FC = () => {
               subtitle: "sale up to 30%",
               image_url: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1800&q=80",
               link: "/shop/project-kits",
+              button_text: "Shop Now",
               position: 1,
               is_active: true
             },
@@ -54,6 +67,7 @@ const HeroBanner: React.FC = () => {
               subtitle: "sale up to 10%",
               image_url: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1800&q=80",
               link: "/shop/development-boards",
+              button_text: "Shop Now",
               position: 2,
               is_active: true
             },
@@ -63,6 +77,7 @@ const HeroBanner: React.FC = () => {
               subtitle: "Expert solutions tailored for you",
               image_url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1800&q=80",
               link: "/customized-projects",
+              button_text: "Shop Now",
               position: 3,
               is_active: true
             },
@@ -131,7 +146,7 @@ const HeroBanner: React.FC = () => {
                   to={banner.link}
                   className="bg-white text-yorbot-orange flex items-center space-x-2 px-6 py-2 rounded hover:bg-gray-100 transition-colors"
                 >
-                  <span>Shop Now</span>
+                  <span>{banner.button_text}</span>
                   <ArrowRight size={18} />
                 </Link>
               </div>

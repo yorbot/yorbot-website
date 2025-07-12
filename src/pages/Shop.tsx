@@ -219,7 +219,7 @@ const Shop: React.FC = () => {
         {!categorySlug && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">Shop by Categories</h1>
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {categories.map((category) => (
                 <Link key={category.id} to={`/shop/${category.slug}`}>
                   <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -230,8 +230,8 @@ const Shop: React.FC = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-1 text-center">
-                      <h3 className="font-medium text-xs group-hover:text-yorbot-orange transition-colors line-clamp-2">
+                    <CardContent className="p-3 text-center">
+                      <h3 className="font-medium text-sm group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {category.name}
                       </h3>
                     </CardContent>
@@ -242,11 +242,11 @@ const Shop: React.FC = () => {
           </div>
         )}
 
-        {/* Show Subcategories */}
+        {/* Show Subcategories - Made bigger */}
         {categorySlug && !subcategorySlug && currentCategory && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">{currentCategory.name}</h1>
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {getFilteredSubcategories().map((subcategory) => (
                 <Link key={subcategory.id} to={`/shop/${currentCategory.slug}/${subcategory.slug}`}>
                   <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -257,8 +257,8 @@ const Shop: React.FC = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-1 text-center">
-                      <h3 className="font-medium text-xs group-hover:text-yorbot-orange transition-colors line-clamp-2">
+                    <CardContent className="p-3 text-center">
+                      <h3 className="font-medium text-sm group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {subcategory.name}
                       </h3>
                     </CardContent>

@@ -35,12 +35,12 @@ const CadBanner: React.FC = () => {
         if (data) {
           setBanner(data as Banner);
         } else {
-          // Fallback to default banner if none in database
+          // Fallback to default banner with AutoCAD 3D design image
           setBanner({
             id: 0,
             title: "Get Your Customized CAD Design",
             subtitle: "Professional 3D modeling and design services for your robotics projects",
-            image_url: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1800&q=80",
+            image_url: "https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=1800&q=80",
             link: "/contact-us",
             button_text: "Contact Us",
             is_active: true
