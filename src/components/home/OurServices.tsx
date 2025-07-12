@@ -89,7 +89,7 @@ const OurServices: React.FC = () => {
             {services.map((service) => (
               <div
                 key={service.id}
-                className="flex-shrink-0 w-48 bg-white rounded-lg shadow-sm overflow-hidden"
+                className="flex-shrink-0 w-56 bg-white rounded-lg shadow-sm overflow-hidden"
               >
                 <div className="h-28 overflow-hidden">
                   <img
@@ -98,7 +98,7 @@ const OurServices: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="p-3 h-36 flex flex-col">
+                <div className="p-3 h-32 flex flex-col">
                   <h3 className="text-sm font-semibold mb-2">{service.title}</h3>
                   <p className="text-xs text-gray-600 mb-3 line-clamp-3 flex-1">{service.description}</p>
                   <Link
@@ -123,8 +123,8 @@ const OurServices: React.FC = () => {
           </button>
         </div>
 
-        {/* Desktop: Grid layout - Increased height */}
-        <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Desktop: Grid layout - Increased width, reduced height */}
+        <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service) => (
             <div
               key={service.id}
@@ -137,9 +137,9 @@ const OurServices: React.FC = () => {
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="p-4 h-44 flex flex-col">
+              <div className="p-4 h-36 flex flex-col">
                 <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
-                <p className="text-gray-600 mb-4 text-sm line-clamp-3 flex-1">{service.description}</p>
+                <p className="text-gray-600 mb-4 text-sm line-clamp-2 flex-1">{service.description}</p>
                 <Link
                   to="/contact-us"
                   className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors text-sm mt-auto"

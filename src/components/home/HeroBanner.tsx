@@ -33,6 +33,39 @@ const HeroBanner: React.FC = () => {
 
         if (error) {
           console.error('Error fetching banners:', error);
+          // Set fallback banners on error
+          setBanners([
+            {
+              id: 1,
+              title: "DIY Project Kits",
+              subtitle: "sale up to 30%",
+              image_url: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1800&q=80",
+              link: "/shop/project-kits",
+              button_text: "Shop Now",
+              position: 1,
+              is_active: true
+            },
+            {
+              id: 2,
+              title: "Development Boards",
+              subtitle: "sale up to 10%",
+              image_url: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1800&q=80",
+              link: "/shop/development-boards",
+              button_text: "Shop Now",
+              position: 2,
+              is_active: true
+            },
+            {
+              id: 3,
+              title: "Get Your Customized Projects",
+              subtitle: "Expert solutions tailored for you",
+              image_url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1800&q=80",
+              link: "/customized-projects",
+              button_text: "Shop Now",
+              position: 3,
+              is_active: true
+            },
+          ]);
           return;
         }
 
@@ -40,7 +73,7 @@ const HeroBanner: React.FC = () => {
 
         if (data && data.length > 0) {
           setBanners(data);
-          console.log("Set banners:", data);
+          console.log("Set banners from database:", data);
         } else {
           console.log("No banners found, using fallback");
           // Fallback banners if none found in database
@@ -118,6 +151,25 @@ const HeroBanner: React.FC = () => {
     }
 
     fetchBanners();
+
+    // Set up real-time subscription for banners
+    const channel = supabase
+      .channel('banner-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'banners',
+        filter: 'type=eq.hero'
+      }, (payload) => {
+        console.log('Banner change detected:', payload);
+        // Refetch banners when there's a change
+        fetchBanners();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
