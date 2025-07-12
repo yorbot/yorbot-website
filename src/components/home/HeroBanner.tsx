@@ -23,6 +23,7 @@ const HeroBanner: React.FC = () => {
   useEffect(() => {
     async function fetchBanners() {
       try {
+        console.log("Fetching hero banners...");
         const { data, error } = await supabase
           .from('banners')
           .select('*')
@@ -35,21 +36,14 @@ const HeroBanner: React.FC = () => {
           return;
         }
 
+        console.log("Fetched banners:", data);
+
         if (data && data.length > 0) {
-          // Map the data to ensure all required fields are present
-          const mappedBanners = data.map(banner => ({
-            id: banner.id,
-            title: banner.title,
-            subtitle: banner.subtitle || '',
-            image_url: banner.image_url || '',
-            link: banner.link || '/shop',
-            button_text: banner.button_text || 'Shop Now',
-            position: banner.position || 1,
-            is_active: banner.is_active || true
-          }));
-          setBanners(mappedBanners);
+          setBanners(data);
+          console.log("Set banners:", data);
         } else {
-          // Fallback to default banners if none found in database
+          console.log("No banners found, using fallback");
+          // Fallback banners if none found in database
           setBanners([
             {
               id: 1,
@@ -84,7 +78,40 @@ const HeroBanner: React.FC = () => {
           ]);
         }
       } catch (error) {
-        console.error('Error fetching banners:', error);
+        console.error('Error in fetchBanners:', error);
+        // Set fallback banners on error
+        setBanners([
+          {
+            id: 1,
+            title: "DIY Project Kits",
+            subtitle: "sale up to 30%",
+            image_url: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1800&q=80",
+            link: "/shop/project-kits",
+            button_text: "Shop Now",
+            position: 1,
+            is_active: true
+          },
+          {
+            id: 2,
+            title: "Development Boards",
+            subtitle: "sale up to 10%",
+            image_url: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1800&q=80",
+            link: "/shop/development-boards",
+            button_text: "Shop Now",
+            position: 2,
+            is_active: true
+          },
+          {
+            id: 3,
+            title: "Get Your Customized Projects",
+            subtitle: "Expert solutions tailored for you",
+            image_url: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1800&q=80",
+            link: "/customized-projects",
+            button_text: "Shop Now",
+            position: 3,
+            is_active: true
+          },
+        ]);
       } finally {
         setLoading(false);
       }
@@ -136,7 +163,9 @@ const HeroBanner: React.FC = () => {
           >
             <div
               className="w-full h-full bg-cover bg-center rounded-xl"
-              style={{ backgroundImage: `url(${banner.image_url})` }}
+              style={{ 
+                backgroundImage: `url(${banner.image_url || 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=1800&q=80'})` 
+              }}
             >
               <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-4">

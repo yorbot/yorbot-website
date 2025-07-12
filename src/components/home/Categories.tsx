@@ -69,12 +69,12 @@ const Categories: React.FC = () => {
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold">Categories</h2>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {[...Array(6)].map((_, index) => (
               <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden h-full animate-pulse">
-                <div className="h-48 bg-gray-200"></div>
-                <div className="p-4 flex justify-center">
-                  <div className="h-5 w-24 bg-gray-200 rounded"></div>
+                <div className="h-32 bg-gray-200"></div>
+                <div className="p-3 flex justify-center">
+                  <div className="h-4 w-20 bg-gray-200 rounded"></div>
                 </div>
               </div>
             ))}
@@ -85,7 +85,7 @@ const Categories: React.FC = () => {
   }
 
   if (categories.length === 0) {
-    return null; // Don't render the section at all if there are no categories
+    return null;
   }
 
   return (
@@ -114,23 +114,23 @@ const Categories: React.FC = () => {
           
           <div 
             ref={scrollRef}
-            className="flex overflow-x-auto pb-4 hide-scrollbar gap-4"
+            className="flex overflow-x-auto pb-4 hide-scrollbar gap-3"
           >
             {categories.map((category) => (
               <Link
                 key={category.id}
                 to={`/shop/${category.slug}`}
-                className="flex-shrink-0 w-48 group"
+                className="flex-shrink-0 w-40 group"
               >
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:scale-105">
-                  <div className="h-40 overflow-hidden">
+                  <div className="h-28 overflow-hidden">
                     <img
                       src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                       alt={category.name}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
-                  <div className="p-4 text-center">
+                  <div className="p-3 text-center">
                     <h3 className="text-sm font-medium group-hover:text-yorbot-orange transition-colors">
                       {category.name}
                     </h3>
@@ -159,8 +159,8 @@ const Categories: React.FC = () => {
           </div>
         </div>
 
-        {/* Desktop: Grid layout - Made bigger */}
-        <div className="hidden md:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {/* Desktop: Grid layout - Made smaller */}
+        <div className="hidden md:grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {categories.map((category) => (
             <Link
               key={category.id}
@@ -168,15 +168,15 @@ const Categories: React.FC = () => {
               className="group"
             >
               <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full transition-all hover:shadow-md">
-                <div className="h-48 overflow-hidden">
+                <div className="h-32 overflow-hidden">
                   <img
                     src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                     alt={category.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
-                <div className="p-4 text-center">
-                  <h3 className="font-medium group-hover:text-yorbot-orange transition-colors">
+                <div className="p-3 text-center">
+                  <h3 className="text-sm font-medium group-hover:text-yorbot-orange transition-colors">
                     {category.name}
                   </h3>
                 </div>

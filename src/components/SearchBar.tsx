@@ -9,6 +9,8 @@ interface SearchResult {
   name: string;
   slug: string;
   category_id: number;
+  image_url: string;
+  price: number;
 }
 
 const SearchBar = () => {
@@ -27,7 +29,7 @@ const SearchBar = () => {
       try {
         const { data, error } = await supabase
           .from('products')
-          .select('id, name, slug, category_id')
+          .select('id, name, slug, category_id, image_url, price')
           .ilike('name', `%${query}%`)
           .limit(5);
 
@@ -70,10 +72,20 @@ const SearchBar = () => {
                 <li key={result.id}>
                   <Link
                     to={`/product/${result.slug}`}
-                    className="block px-4 py-2 hover:bg-gray-100"
+                    className="flex items-center p-3 hover:bg-gray-100 transition-colors"
                     onClick={() => setQuery('')}
                   >
-                    {result.name}
+                    <div className="w-12 h-12 mr-3 flex-shrink-0">
+                      <img
+                        src={result.image_url || 'https://via.placeholder.com/48x48?text=Product'}
+                        alt={result.name}
+                        className="w-full h-full object-cover rounded border"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-gray-900">{result.name}</div>
+                      <div className="text-sm text-yorbot-orange font-semibold">₹{result.price}</div>
+                    </div>
                   </Link>
                 </li>
               ))}

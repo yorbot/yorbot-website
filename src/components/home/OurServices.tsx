@@ -45,9 +45,9 @@ const OurServices: React.FC = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((index) => (
               <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden animate-pulse">
-                <div className="h-40 bg-gray-200"></div>
+                <div className="h-32 bg-gray-200"></div>
                 <div className="p-4">
-                  <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
                   <div className="h-3 bg-gray-200 rounded w-full mb-1"></div>
                   <div className="h-3 bg-gray-200 rounded w-5/6 mb-3"></div>
                   <div className="h-8 bg-gray-200 rounded w-full"></div>
@@ -61,7 +61,7 @@ const OurServices: React.FC = () => {
   }
 
   if (services.length === 0) {
-    return null; // Don't render the section if there are no services
+    return null;
   }
 
   return (
@@ -89,21 +89,21 @@ const OurServices: React.FC = () => {
             {services.map((service) => (
               <div
                 key={service.id}
-                className="flex-shrink-0 w-56 bg-white rounded-lg shadow-sm overflow-hidden"
+                className="flex-shrink-0 w-48 bg-white rounded-lg shadow-sm overflow-hidden"
               >
-                <div className="h-32 overflow-hidden">
+                <div className="h-28 overflow-hidden">
                   <img
                     src={service.image_url || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80"}
                     alt={service.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="p-3">
-                  <h3 className="text-base font-semibold mb-2">{service.title}</h3>
-                  <p className="text-xs text-gray-600 mb-3 line-clamp-2">{service.description}</p>
+                <div className="p-3 h-36 flex flex-col">
+                  <h3 className="text-sm font-semibold mb-2">{service.title}</h3>
+                  <p className="text-xs text-gray-600 mb-3 line-clamp-3 flex-1">{service.description}</p>
                   <Link
                     to="/contact-us"
-                    className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors text-sm"
+                    className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors text-xs"
                   >
                     Contact Us
                   </Link>
@@ -123,26 +123,26 @@ const OurServices: React.FC = () => {
           </button>
         </div>
 
-        {/* Desktop: Grid layout - Made smaller */}
+        {/* Desktop: Grid layout - Increased height */}
         <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
           {services.map((service) => (
             <div
               key={service.id}
               className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:translate-y-[-2px]"
             >
-              <div className="h-40 overflow-hidden">
+              <div className="h-32 overflow-hidden">
                 <img
                   src={service.image_url || "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80"}
                   alt={service.title}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <div className="p-4">
+              <div className="p-4 h-44 flex flex-col">
                 <h3 className="text-lg font-semibold mb-2">{service.title}</h3>
-                <p className="text-gray-600 mb-4 text-sm line-clamp-2">{service.description}</p>
+                <p className="text-gray-600 mb-4 text-sm line-clamp-3 flex-1">{service.description}</p>
                 <Link
                   to="/contact-us"
-                  className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors text-sm"
+                  className="block w-full bg-yorbot-orange text-white text-center py-2 rounded-md hover:bg-orange-600 transition-colors text-sm mt-auto"
                 >
                   Contact Us
                 </Link>
