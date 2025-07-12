@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -95,6 +94,22 @@ const Shop: React.FC = () => {
         setCurrentBaseCategory(baseCategory || null);
       }
 
+      // Special handling for "arduino-boards-&-kits" route - set base category ID 8
+      if (baseCategorySlug === "arduino-boards-&-kits") {
+        const targetBaseCategory = baseCategoriesRes.data?.find((base: BaseCategory) => base.id === 8);
+        if (targetBaseCategory) {
+          setCurrentBaseCategory(targetBaseCategory);
+        } else {
+          // Create a fallback base category if ID 8 doesn't exist
+          setCurrentBaseCategory({
+            id: 8,
+            name: "Boards Compatible with Arduino",
+            slug: "arduino-boards-&-kits",
+            image_url: null
+          });
+        }
+      }
+
     } catch (error) {
       console.error("Error fetching data:", error);
       toast("Error loading data", { description: "Please try again later." });
@@ -115,6 +130,12 @@ const Shop: React.FC = () => {
 
   const getFilteredProducts = () => {
     if (!currentBaseCategory) return [];
+    
+    // Special handling for base category ID 8
+    if (currentBaseCategory.id === 8) {
+      return products.filter(product => product.base_category_id === 8);
+    }
+    
     return products.filter(product => product.base_category_id === currentBaseCategory.id);
   };
 
@@ -198,7 +219,7 @@ const Shop: React.FC = () => {
         {!categorySlug && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">Shop by Categories</h1>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3">
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
               {categories.map((category) => (
                 <Link key={category.id} to={`/shop/${category.slug}`}>
                   <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -209,7 +230,7 @@ const Shop: React.FC = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-2 text-center">
+                    <CardContent className="p-1 text-center">
                       <h3 className="font-medium text-xs group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {category.name}
                       </h3>
@@ -225,7 +246,7 @@ const Shop: React.FC = () => {
         {categorySlug && !subcategorySlug && currentCategory && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">{currentCategory.name}</h1>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3">
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
               {getFilteredSubcategories().map((subcategory) => (
                 <Link key={subcategory.id} to={`/shop/${currentCategory.slug}/${subcategory.slug}`}>
                   <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -236,7 +257,7 @@ const Shop: React.FC = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-2 text-center">
+                    <CardContent className="p-1 text-center">
                       <h3 className="font-medium text-xs group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {subcategory.name}
                       </h3>
@@ -252,7 +273,7 @@ const Shop: React.FC = () => {
         {categorySlug && subcategorySlug && !baseCategorySlug && currentSubcategory && (
           <div>
             <h1 className="text-3xl font-bold mb-8 text-center">{currentSubcategory.name}</h1>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3">
+            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3">
               {getFilteredBaseCategories().map((baseCategory) => (
                 <Link key={baseCategory.id} to={`/shop/${currentCategory?.slug}/${currentSubcategory.slug}/${baseCategory.slug}`}>
                   <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
@@ -263,7 +284,7 @@ const Shop: React.FC = () => {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardContent className="p-2 text-center">
+                    <CardContent className="p-1 text-center">
                       <h3 className="font-medium text-xs group-hover:text-yorbot-orange transition-colors line-clamp-2">
                         {baseCategory.name}
                       </h3>
