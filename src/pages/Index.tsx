@@ -8,6 +8,7 @@ import CadBanner from "@/components/home/CadBanner";
 import MechanicalParts from "@/components/home/MechanicalParts";
 import OurServices from "@/components/home/OurServices";
 import ClientFeedback from "@/components/home/ClientFeedback";
+import ProjectKits from "@/components/home/ProjectKits";
 
 const Index: React.FC = () => {
   console.log("Index page is rendering");
@@ -19,6 +20,9 @@ const Index: React.FC = () => {
         <Categories />
         <div className="-mt-4">
           <FeaturedProducts />
+        </div>
+        <div className="-mt-4">
+          <ProjectKits />
         </div>
         <div className="-mt-8">
           <CadBanner />

@@ -123,7 +123,7 @@ const Categories: React.FC = () => {
                 className="flex-shrink-0 w-32 group"
               >
                 <div className="bg-white rounded-xl shadow-sm overflow-hidden transition-transform hover:scale-105 border border-gray-100">
-                  <div className="h-32 overflow-hidden p-4 bg-yorbot-orange">
+                  <div className="h-32 overflow-hidden p-4 bg-gray-100">
                     <img
                       src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                       alt={category.name}
@@ -131,7 +131,7 @@ const Categories: React.FC = () => {
                     />
                   </div>
                   <div className="p-4 text-center">
-                    <h3 className="text-sm font-medium group-hover:text-yorbot-orange transition-colors leading-tight">
+                    <h3 className="text-base font-medium group-hover:text-yorbot-orange transition-colors leading-tight">
                       {category.name}
                     </h3>
                   </div>
@@ -167,8 +167,8 @@ const Categories: React.FC = () => {
               to={`/shop/${category.slug}`}
               className="group"
             >
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden h-full transition-all hover:shadow-md border border-gray-100">
-                <div className="h-32 overflow-hidden p-4 bg-yorbot-orange">
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden h-full transition-all hover:shadow-md border border-gray-100 max-w-32 mx-auto">
+                <div className="h-32 overflow-hidden p-4 bg-gray-100">
                   <img
                     src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                     alt={category.name}
@@ -176,7 +176,7 @@ const Categories: React.FC = () => {
                   />
                 </div>
                 <div className="p-4 text-center">
-                  <h3 className="text-sm font-medium group-hover:text-yorbot-orange transition-colors leading-tight">
+                  <h3 className="text-base font-medium group-hover:text-yorbot-orange transition-colors leading-tight">
                     {category.name}
                   </h3>
                 </div>
