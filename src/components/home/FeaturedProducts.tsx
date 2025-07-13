@@ -18,7 +18,7 @@ const FeaturedProducts: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-12">
         <div className="text-center">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-300 rounded w-64 mx-auto mb-8"></div>
@@ -38,8 +38,8 @@ const FeaturedProducts: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16 bg-gray-50">
-      <div className="text-center mb-12">
+    <div className="container mx-auto px-4 py-12 bg-gray-50">
+      <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Products</h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
           Discover our handpicked selection of premium products from various categories

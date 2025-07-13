@@ -17,10 +17,18 @@ const Index: React.FC = () => {
       <div className="min-h-screen">
         <HeroBanner />
         <Categories />
-        <FeaturedProducts />
-        <CadBanner />
-        <MechanicalParts />
-        <OurServices />
+        <div className="-mt-4">
+          <FeaturedProducts />
+        </div>
+        <div className="-mt-8">
+          <CadBanner />
+        </div>
+        <div className="-mt-4">
+          <MechanicalParts />
+        </div>
+        <div className="-mt-4">
+          <OurServices />
+        </div>
         <ClientFeedback />
       </div>
     </Layout>

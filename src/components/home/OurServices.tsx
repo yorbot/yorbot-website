@@ -39,9 +39,9 @@ const OurServices: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="py-12 bg-gray-50">
+      <div className="py-8 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Our Services</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">Our Services</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((index) => (
               <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden animate-pulse">
@@ -65,9 +65,9 @@ const OurServices: React.FC = () => {
   }
 
   return (
-    <div className="py-12 bg-gray-50">
+    <div className="py-8 bg-gray-50">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Our Services</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">Our Services</h2>
 
         {/* Mobile: Scrollable services */}
         <div className="relative md:hidden">
