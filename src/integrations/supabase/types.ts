@@ -686,6 +686,57 @@ export type Database = {
         }
         Relationships: []
       }
+      vouchers: {
+        Row: {
+          code: string
+          created_at: string | null
+          description: string | null
+          id: number
+          is_active: boolean | null
+          max_discount: number | null
+          min_purchase: number | null
+          type: string
+          updated_at: string | null
+          use_limit: number | null
+          used_count: number | null
+          valid_from: string
+          valid_to: string
+          value: number
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          is_active?: boolean | null
+          max_discount?: number | null
+          min_purchase?: number | null
+          type: string
+          updated_at?: string | null
+          use_limit?: number | null
+          used_count?: number | null
+          valid_from?: string
+          valid_to: string
+          value: number
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          id?: number
+          is_active?: boolean | null
+          max_discount?: number | null
+          min_purchase?: number | null
+          type?: string
+          updated_at?: string | null
+          use_limit?: number | null
+          used_count?: number | null
+          valid_from?: string
+          valid_to?: string
+          value?: number
+        }
+        Relationships: []
+      }
       wishlist_items: {
         Row: {
           created_at: string | null

@@ -69,12 +69,12 @@ const Categories: React.FC = () => {
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold">Categories</h2>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {[...Array(6)].map((_, index) => (
+          <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-6 gap-3">
+            {[...Array(12)].map((_, index) => (
               <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden h-full animate-pulse">
-                <div className="h-32 bg-gray-200"></div>
-                <div className="p-3 flex justify-center">
-                  <div className="h-4 w-20 bg-gray-200 rounded"></div>
+                <div className="h-20 bg-gray-200"></div>
+                <div className="p-2 flex justify-center">
+                  <div className="h-3 w-16 bg-gray-200 rounded"></div>
                 </div>
               </div>
             ))}
@@ -120,18 +120,18 @@ const Categories: React.FC = () => {
               <Link
                 key={category.id}
                 to={`/shop/${category.slug}`}
-                className="flex-shrink-0 w-40 group"
+                className="flex-shrink-0 w-32 group"
               >
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:scale-105">
-                  <div className="h-28 overflow-hidden">
+                  <div className="h-20 overflow-hidden p-2">
                     <img
                       src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                       alt={category.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      className="w-full h-full object-cover rounded group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
-                  <div className="p-3 text-center">
-                    <h3 className="text-sm font-medium group-hover:text-yorbot-orange transition-colors">
+                  <div className="p-2 text-center">
+                    <h3 className="text-xs font-medium group-hover:text-yorbot-orange transition-colors">
                       {category.name}
                     </h3>
                   </div>
@@ -159,24 +159,24 @@ const Categories: React.FC = () => {
           </div>
         </div>
 
-        {/* Desktop: Grid layout - Made smaller */}
-        <div className="hidden md:grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {categories.map((category) => (
+        {/* Desktop: 2-row grid layout with 6 categories per row */}
+        <div className="hidden md:grid grid-cols-6 gap-4">
+          {categories.slice(0, 12).map((category) => (
             <Link
               key={category.id}
               to={`/shop/${category.slug}`}
               className="group"
             >
               <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full transition-all hover:shadow-md">
-                <div className="h-32 overflow-hidden">
+                <div className="h-20 overflow-hidden p-3">
                   <img
                     src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                     alt={category.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-full object-cover rounded group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
-                <div className="p-3 text-center">
-                  <h3 className="text-sm font-medium group-hover:text-yorbot-orange transition-colors">
+                <div className="p-2 text-center">
+                  <h3 className="text-xs font-medium group-hover:text-yorbot-orange transition-colors">
                     {category.name}
                   </h3>
                 </div>
