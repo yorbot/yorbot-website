@@ -69,10 +69,10 @@ const Categories: React.FC = () => {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl md:text-3xl font-bold">Categories</h2>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-6 gap-2">
             {[...Array(12)].map((_, index) => (
               <div key={index} className="bg-white rounded-xl shadow-sm overflow-hidden h-full animate-pulse border border-gray-100">
-                <div className="h-32 bg-gray-200"></div>
+                <div className="h-40 bg-gray-200"></div>
                 <div className="p-4 flex justify-center">
                   <div className="h-3 w-16 bg-gray-200 rounded"></div>
                 </div>
@@ -114,16 +114,16 @@ const Categories: React.FC = () => {
           
           <div 
             ref={scrollRef}
-            className="flex overflow-x-auto pb-4 hide-scrollbar gap-3"
+            className="flex overflow-x-auto pb-4 hide-scrollbar gap-2"
           >
             {categories.map((category) => (
               <Link
                 key={category.id}
                 to={`/shop/${category.slug}`}
-                className="flex-shrink-0 w-32 group"
+                className="flex-shrink-0 w-40 group"
               >
                 <div className="bg-white rounded-xl shadow-sm overflow-hidden transition-transform hover:scale-105 border border-gray-100">
-                  <div className="h-32 overflow-hidden p-4 bg-gray-100">
+                  <div className="h-40 overflow-hidden p-4 bg-gray-100">
                     <img
                       src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                       alt={category.name}
@@ -131,7 +131,7 @@ const Categories: React.FC = () => {
                     />
                   </div>
                   <div className="p-4 text-center">
-                    <h3 className="text-base font-medium group-hover:text-yorbot-orange transition-colors leading-tight">
+                    <h3 className="text-lg font-medium group-hover:text-yorbot-orange transition-colors leading-tight">
                       {category.name}
                     </h3>
                   </div>
@@ -160,15 +160,15 @@ const Categories: React.FC = () => {
         </div>
 
         {/* Desktop: 2-row grid layout with 6 categories per row */}
-        <div className="hidden md:grid grid-cols-6 gap-4">
+        <div className="hidden md:grid grid-cols-6 gap-2">
           {categories.slice(0, 12).map((category) => (
             <Link
               key={category.id}
               to={`/shop/${category.slug}`}
               className="group"
             >
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden h-full transition-all hover:shadow-md border border-gray-100 max-w-32 mx-auto">
-                <div className="h-32 overflow-hidden p-4 bg-gray-100">
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden h-full transition-all hover:shadow-md border border-gray-100">
+                <div className="h-40 overflow-hidden p-4 bg-gray-100">
                   <img
                     src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                     alt={category.name}
@@ -176,7 +176,7 @@ const Categories: React.FC = () => {
                   />
                 </div>
                 <div className="p-4 text-center">
-                  <h3 className="text-base font-medium group-hover:text-yorbot-orange transition-colors leading-tight">
+                  <h3 className="text-lg font-medium group-hover:text-yorbot-orange transition-colors leading-tight">
                     {category.name}
                   </h3>
                 </div>
