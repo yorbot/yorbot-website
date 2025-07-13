@@ -72,8 +72,8 @@ const Categories: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-6 gap-3">
             {[...Array(12)].map((_, index) => (
               <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden h-full animate-pulse">
-                <div className="h-20 bg-gray-200"></div>
-                <div className="p-2 flex justify-center">
+                <div className="h-24 bg-gray-200"></div>
+                <div className="p-3 flex justify-center">
                   <div className="h-3 w-16 bg-gray-200 rounded"></div>
                 </div>
               </div>
@@ -120,17 +120,17 @@ const Categories: React.FC = () => {
               <Link
                 key={category.id}
                 to={`/shop/${category.slug}`}
-                className="flex-shrink-0 w-32 group"
+                className="flex-shrink-0 w-28 group"
               >
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:scale-105">
-                  <div className="h-20 overflow-hidden p-2">
+                  <div className="h-24 overflow-hidden p-3">
                     <img
                       src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                       alt={category.name}
                       className="w-full h-full object-cover rounded group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
-                  <div className="p-2 text-center">
+                  <div className="p-3 text-center">
                     <h3 className="text-xs font-medium group-hover:text-yorbot-orange transition-colors">
                       {category.name}
                     </h3>
@@ -159,23 +159,23 @@ const Categories: React.FC = () => {
           </div>
         </div>
 
-        {/* Desktop: 2-row grid layout with 6 categories per row */}
-        <div className="hidden md:grid grid-cols-6 gap-4">
+        {/* Desktop: 2-row grid layout with 6 categories per row - reduced width, increased height */}
+        <div className="hidden md:grid grid-cols-6 gap-6">
           {categories.slice(0, 12).map((category) => (
             <Link
               key={category.id}
               to={`/shop/${category.slug}`}
-              className="group"
+              className="group max-w-32 mx-auto"
             >
               <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full transition-all hover:shadow-md">
-                <div className="h-20 overflow-hidden p-3">
+                <div className="h-24 overflow-hidden p-3">
                   <img
                     src={category.image_url || "https://via.placeholder.com/300x200?text=Category"}
                     alt={category.name}
                     className="w-full h-full object-cover rounded group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
-                <div className="p-2 text-center">
+                <div className="p-3 text-center">
                   <h3 className="text-xs font-medium group-hover:text-yorbot-orange transition-colors">
                     {category.name}
                   </h3>
